@@ -26,7 +26,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 1338 2006-12-15 08:21:56Z bruyeron $
+ * @version $Id: IrcPublisher.java 1349 2006-12-17 01:38:09Z kohsuke $
  */
 public class IrcPublisher extends Publisher {
 
@@ -69,7 +69,7 @@ public class IrcPublisher extends Publisher {
 	 * Descriptor for {@link IrcPublisher}
 	 * 
 	 * @author bruyeron
-	 * @version $Id: IrcPublisher.java 1338 2006-12-15 08:21:56Z bruyeron $
+	 * @version $Id: IrcPublisher.java 1349 2006-12-17 01:38:09Z kohsuke $
 	 */
     public static final class DescriptorImpl extends Descriptor<Publisher> {
 
@@ -89,7 +89,6 @@ public class IrcPublisher extends Publisher {
     	transient volatile IrcBot bot;
     	
 		/**
-		 * @param clazz
 		 */
 		DescriptorImpl() {
 			super(IrcPublisher.class);
