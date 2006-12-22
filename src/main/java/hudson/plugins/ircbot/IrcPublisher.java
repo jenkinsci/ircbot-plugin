@@ -11,10 +11,13 @@ import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.model.Project;
 import hudson.model.Result;
+import hudson.scm.ChangeLogSet;
+import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.Publisher;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +29,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 1349 2006-12-17 01:38:09Z kohsuke $
+ * @version $Id: IrcPublisher.java 1415 2006-12-22 16:49:11Z bruyeron $
  */
 public class IrcPublisher extends Publisher {
 
@@ -69,7 +72,7 @@ public class IrcPublisher extends Publisher {
 	 * Descriptor for {@link IrcPublisher}
 	 * 
 	 * @author bruyeron
-	 * @version $Id: IrcPublisher.java 1349 2006-12-17 01:38:09Z kohsuke $
+	 * @version $Id: IrcPublisher.java 1415 2006-12-22 16:49:11Z bruyeron $
 	 */
     public static final class DescriptorImpl extends Descriptor<Publisher> {
 
@@ -142,7 +145,7 @@ public class IrcPublisher extends Publisher {
 				if(commandPrefix == null || "".equals(commandPrefix.trim())){
 					commandPrefix = null;
 				} else {
-					commandPrefix = commandPrefix + " ";
+					commandPrefix = commandPrefix.trim() + " ";
 				}
 				channels = Arrays.asList(req.getParameter("irc_publisher.channels").split(" "));
 			}
@@ -218,20 +221,44 @@ public class IrcPublisher extends Publisher {
 			
 			IrcBot(String name){
 				setName(name);
+				setMessageDelay(5);
 			}
 			
 			void publish(Build build){
 				String status = null;
+				String suspects = null;
 				if(build.getResult() ==  Result.SUCCESS){
 					status = "fixed";
 				} else if(build.getResult() == Result.FAILURE){
 					status = "failed";
+					ChangeLogSet<? extends Entry> cs = build.getChangeSet();
+					if(cs != null && !cs.isEmptySet()){
+						StringBuilder sb = new StringBuilder(" last commit(s): ");
+						for(Iterator<? extends Entry> it = cs.iterator(); it.hasNext();){
+							IrcUserProperty iup = (IrcUserProperty) it.next().getAuthor().getProperties().get(IrcUserProperty.DESCRIPTOR);
+							sb.append(iup.getNick());
+							if(it.hasNext())
+								sb.append(",");
+						}
+						suspects = sb.toString();
+					}
 				} else if(build.getResult() == Result.UNSTABLE){
 					status = "unstable";
+					ChangeLogSet<? extends Entry> cs = build.getChangeSet();
+					if(cs != null && !cs.isEmptySet()){
+						StringBuilder sb = new StringBuilder(" last commit(s): ");
+						for(Iterator<? extends Entry> it = cs.iterator(); it.hasNext();){
+							IrcUserProperty iup = (IrcUserProperty) it.next().getAuthor().getProperties().get(IrcUserProperty.DESCRIPTOR);
+							sb.append(iup.getNick());
+							if(it.hasNext())
+								sb.append(",");
+						}
+						suspects = sb.toString();
+					}
 				}
 				if(status != null){
 					for(String channel:channels){
-						sendNotice(channel, build.getProject().getName() + " build " + status + " (#" + build.getNumber() + ")");
+						sendNotice(channel, build.getProject().getName() + " build " + status + " (" + Hudson.getInstance().getRootUrl() + build.getUrl() + ")" + (suspects == null ? "":suspects));
 					}
 				}
 			}
@@ -251,7 +278,7 @@ public class IrcPublisher extends Publisher {
 							for(Job job : jobs){
 								if(job instanceof Project){
 									if(job.getLastBuild() != null){
-										sendNotice(sender, job.getName() + ": " + job.getLastBuild().getResult().toString() + " (#" + job.getLastBuild().getNumber() + ")");
+										sendNotice(sender, job.getName() + ": " + job.getLastBuild().getResult().toString() + " (" + Hudson.getInstance().getRootUrl() + job.getLastBuild().getUrl() + ")" + (job.isInQueue() ? ": BUILDING":""));
 									} else {
 										sendNotice(sender, job.getName() + ": no build");
 									}
@@ -282,8 +309,7 @@ public class IrcPublisher extends Publisher {
 								}
 						}
 					}
-					
-				}					
+				}
 			}
 
 			/**
