@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: pom.xml 1618 2007-01-04 02:37:06Z kohsuke $ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jvnet.hudson.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>org.jvnet.hudson.plugins</groupId>
+  <artifactId>ircbot</artifactId>
+  <packaging>hpi</packaging>
+  <version>1.1</version>
+  <name>Hudson IRC Plugin</name>
+  <description>A Build status publisher that notifies channels on a IRC server</description>
+  <dependencies>
+    <dependency>
+      <groupId>pircbot</groupId>
+      <artifactId>pircbot</artifactId>
+      <version>1.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.main</groupId>
+      <artifactId>hudson-war</artifactId>
+      <type>war</type>
+      <version>1.68</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.main</groupId>
+      <artifactId>hudson-core</artifactId>
+      <version>1.68</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <scm>
+    <tag>ircbot-1_1</tag>
+  </scm>
+</project>
