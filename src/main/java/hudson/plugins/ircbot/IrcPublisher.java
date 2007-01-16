@@ -3,19 +3,18 @@
  */
 package hudson.plugins.ircbot;
 
-import hudson.Launcher;
 import hudson.model.Build;
-import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.model.Project;
-import hudson.model.Result;
+import hudson.plugins.im.IMPublisher;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.Publisher;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -29,36 +28,83 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 1415 2006-12-22 16:49:11Z bruyeron $
+ * @version $Id: IrcPublisher.java 1790 2007-01-16 10:08:14Z bruyeron $
  */
-public class IrcPublisher extends Publisher {
+public class IrcPublisher extends IMPublisher<IrcPublisher> {
 
     /**
      * Descriptor should be singleton.
      */
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
-
+    
+    /**
+     * channels to notify with build status
+     * If not empty, this replaces the main channels defined at the descriptor level.
+     */    
+    public List<String> channels = new ArrayList<String>();
+    
     /**
 	 * 
 	 */
 	public IrcPublisher() {
 	}
+	
+	/**
+	 * @see hudson.plugins.im.IMPublisher#reportFailure(hudson.model.Build)
+	 */
+	@Override
+	protected void reportFailure(Build build) {
+		String status = "failed";
+		String suspects = calculateSuspectsString(build.getChangeSet());
+		DESCRIPTOR.bot.sendNotice(channels.isEmpty()?DESCRIPTOR.channels:channels, build.getProject().getName() + " build " + status + " (" + Hudson.getInstance().getRootUrl() + build.getUrl() + ")" + (suspects == null ? "":suspects));
+	}
 
 	/**
-	 * @see hudson.tasks.BuildStep#perform(hudson.model.Build, hudson.Launcher, hudson.model.BuildListener)
+	 * @see hudson.plugins.im.IMPublisher#reportSuccess(hudson.model.Build)
 	 */
-	public boolean perform(Build build, Launcher launcher,
-			BuildListener listener) {
-		if(build.getPreviousBuild() != null){
-			if(build.getResult() != build.getPreviousBuild().getResult()){
-				DESCRIPTOR.bot.publish(build);
+	@Override
+	protected void reportSuccess(Build build) {
+		String status = "fixed";
+		DESCRIPTOR.bot.sendNotice(channels.isEmpty()?DESCRIPTOR.channels:channels, build.getProject().getName() + " build " + status + " (" + Hudson.getInstance().getRootUrl() + build.getUrl() + ")");
+	}
+
+	/**
+	 * @see hudson.plugins.im.IMPublisher#reportUnstability(hudson.model.Build)
+	 */
+	@Override
+	protected void reportUnstability(Build build) {
+		String status = "unstable";
+		String suspects = calculateSuspectsString(build.getChangeSet());
+		DESCRIPTOR.bot.sendNotice(channels.isEmpty()?DESCRIPTOR.channels:channels, build.getProject().getName() + " build " + status + " (" + Hudson.getInstance().getRootUrl() + build.getUrl() + ")" + (suspects == null ? "":suspects));
+	}
+	
+	private String calculateSuspectsString(ChangeLogSet<? extends Entry> cs){
+		if(cs != null && !cs.isEmptySet()){
+			StringBuilder sb = new StringBuilder(" last commit(s): ");
+			for(Iterator<? extends Entry> it = cs.iterator(); it.hasNext();){
+				IrcUserProperty iup = (IrcUserProperty) it.next().getAuthor().getProperties().get(IrcUserProperty.DESCRIPTOR);
+				sb.append(iup.getNick());
+				if(it.hasNext())
+					sb.append(",");
 			}
-		} else {
-			if(build.getResult() != Result.SUCCESS){
-				DESCRIPTOR.bot.publish(build);
+			return sb.toString();
+		}
+		return null;
+	}
+
+	/**
+	 * For the UI redisplay
+	 * 
+	 * @return
+	 */
+	public String getChannels(){
+		StringBuilder sb = new StringBuilder();
+		if(channels != null){
+			for(String c : channels){
+				sb.append(c).append(" ");
 			}
 		}
-		return true;
+		return sb.toString().trim();
 	}
 
 	/**
@@ -72,7 +118,7 @@ public class IrcPublisher extends Publisher {
 	 * Descriptor for {@link IrcPublisher}
 	 * 
 	 * @author bruyeron
-	 * @version $Id: IrcPublisher.java 1415 2006-12-22 16:49:11Z bruyeron $
+	 * @version $Id: IrcPublisher.java 1790 2007-01-16 10:08:14Z bruyeron $
 	 */
     public static final class DescriptorImpl extends Descriptor<Publisher> {
 
@@ -83,7 +129,12 @@ public class IrcPublisher extends Publisher {
     	Integer port = 194;
     	String password = null;
     	String nick = null;
+    	
+    	/**
+    	 * channels to join
+    	 */
     	List<String> channels;
+    	
     	String commandPrefix = null;
     	
     	/**
@@ -117,6 +168,7 @@ public class IrcPublisher extends Publisher {
 		public void stop(){
 			if(bot != null && bot.isConnected()){
 				bot.quitServer("mama grounded me!");
+				bot.dispose();
 				bot = null;
 				LOGGER.info("IRC bot stopped");
 			}
@@ -186,7 +238,11 @@ public class IrcPublisher extends Publisher {
 		 */
 		@Override
 		public Publisher newInstance(StaplerRequest req) throws FormException {
-			return new IrcPublisher();
+			IrcPublisher result = new IrcPublisher();
+			result.channels.addAll(Arrays.asList(req.getParameter("channels").split(" ")));
+			// dedup
+			result.channels.removeAll(channels);
+			return result;
 		}
 
 		/**
@@ -224,45 +280,12 @@ public class IrcPublisher extends Publisher {
 				setMessageDelay(5);
 			}
 			
-			void publish(Build build){
-				String status = null;
-				String suspects = null;
-				if(build.getResult() ==  Result.SUCCESS){
-					status = "fixed";
-				} else if(build.getResult() == Result.FAILURE){
-					status = "failed";
-					ChangeLogSet<? extends Entry> cs = build.getChangeSet();
-					if(cs != null && !cs.isEmptySet()){
-						StringBuilder sb = new StringBuilder(" last commit(s): ");
-						for(Iterator<? extends Entry> it = cs.iterator(); it.hasNext();){
-							IrcUserProperty iup = (IrcUserProperty) it.next().getAuthor().getProperties().get(IrcUserProperty.DESCRIPTOR);
-							sb.append(iup.getNick());
-							if(it.hasNext())
-								sb.append(",");
-						}
-						suspects = sb.toString();
-					}
-				} else if(build.getResult() == Result.UNSTABLE){
-					status = "unstable";
-					ChangeLogSet<? extends Entry> cs = build.getChangeSet();
-					if(cs != null && !cs.isEmptySet()){
-						StringBuilder sb = new StringBuilder(" last commit(s): ");
-						for(Iterator<? extends Entry> it = cs.iterator(); it.hasNext();){
-							IrcUserProperty iup = (IrcUserProperty) it.next().getAuthor().getProperties().get(IrcUserProperty.DESCRIPTOR);
-							sb.append(iup.getNick());
-							if(it.hasNext())
-								sb.append(",");
-						}
-						suspects = sb.toString();
-					}
-				}
-				if(status != null){
-					for(String channel:channels){
-						sendNotice(channel, build.getProject().getName() + " build " + status + " (" + Hudson.getInstance().getRootUrl() + build.getUrl() + ")" + (suspects == null ? "":suspects));
-					}
+			protected void sendNotice(List<String> channels, String message){
+				for(String channel:channels){
+					sendNotice(channel, message);
 				}
 			}
-
+			
 			/**
 			 * @see org.jibble.pircbot.PircBot#onMessage(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 			 */

@@ -4,5 +4,10 @@
 
     See global.jelly for a general discussion about jelly script.
   -->
-  <f:entry/>
+  <f:entry title="Channels"
+  	description="Whitespace-separated list of IRC channels"
+  	help="/plugin/ircbot/help-instanceConfigChannels.html">
+  	<input class="setting-input" name="channels"
+      type="text" value="${instance.channels}"/>
+  </f:entry>
 </j:jelly>

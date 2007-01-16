@@ -13,7 +13,7 @@
   -->
   <f:section title="IRC Notification">
         <f:optionalBlock name="irc_publisher.enabled" title="Enable IRC Notification" checked="${descriptor.enabled}"
-          help="${rootURL}/plugin/ircbot/help-globalConfigEnable.html">
+          help="/plugin/ircbot/help-globalConfigEnable.html">
     <!--
       optional @help points to the help document HTML. ${rootURL}/plugin/hello-world
       is mapped to our resources/ directory, so this is a convenient way to serve
@@ -31,7 +31,7 @@
     </f:entry>
     <f:entry title="Port"
       description="Port of the IRC server"
-      help="${rootURL}/plugin/ircbot/help-globalConfigPort.html">
+      help="/plugin/ircbot/help-globalConfigPort.html">
       <f:textbox name="irc_publisher.port" value="${descriptor.getPort()}" />
     </f:entry>
     <f:entry title="Password"
@@ -44,12 +44,12 @@
     </f:entry>
     <f:entry title="Channels"
       description="Channels the bot should join"
-      help="${rootURL}/plugin/ircbot/help-globalConfigChannels.html">
+      help="/plugin/ircbot/help-globalConfigChannels.html">
       <f:textbox name="irc_publisher.channels" value="${descriptor.getChannels()}" />
     </f:entry>
     <f:entry title="Command prefix"
       description="The prefix for the commands"
-      help="${rootURL}/plugin/ircbot/help-globalConfigCommandPrefix.html">
+      help="/plugin/ircbot/help-globalConfigCommandPrefix.html">
       <f:textbox name="irc_publisher.commandPrefix" value="${descriptor.getCommandPrefix()}" />
     </f:entry>
     	</f:optionalBlock>
