@@ -3,15 +3,19 @@
  */
 package hudson.plugins.ircbot;
 
+import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
-import hudson.model.Job;
 import hudson.model.Project;
 import hudson.plugins.im.IMPublisher;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.Publisher;
+import org.jibble.pircbot.IrcException;
+import org.jibble.pircbot.NickAlreadyInUseException;
+import org.jibble.pircbot.PircBot;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,14 +25,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jibble.pircbot.IrcException;
-import org.jibble.pircbot.NickAlreadyInUseException;
-import org.jibble.pircbot.PircBot;
-import org.kohsuke.stapler.StaplerRequest;
-
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 1791 2007-01-16 13:19:37Z bruyeron $
+ * @version $Id: IrcPublisher.java 1834 2007-01-20 07:10:24Z kohsuke $
  */
 public class IrcPublisher extends IMPublisher<IrcPublisher> {
 
@@ -122,7 +121,7 @@ public class IrcPublisher extends IMPublisher<IrcPublisher> {
 	 * Descriptor for {@link IrcPublisher}
 	 * 
 	 * @author bruyeron
-	 * @version $Id: IrcPublisher.java 1791 2007-01-16 13:19:37Z bruyeron $
+	 * @version $Id: IrcPublisher.java 1834 2007-01-20 07:10:24Z kohsuke $
 	 */
     public static final class DescriptorImpl extends Descriptor<Publisher> {
 
@@ -298,36 +297,33 @@ public class IrcPublisher extends IMPublisher<IrcPublisher> {
 				if(commandPrefix != null && message.startsWith(commandPrefix)){
 					final String command = message.substring(commandPrefix.length()).trim();
 					if("status".equals(command)){
-						List<Job> jobs = Hudson.getInstance().getJobs();
+						List<AbstractProject> jobs = Hudson.getInstance().getAllItems(AbstractProject.class);
 						if(jobs.isEmpty()){
 							sendNotice(sender, "No jobs configured");
 						} else {
-							for(Job job : jobs){
-								if(job instanceof Project){
-									if(job.getLastBuild() != null){
-										sendNotice(sender, job.getName() + ": " + job.getLastBuild().getResult().toString() + " (" + Hudson.getInstance().getRootUrl() + job.getLastBuild().getUrl() + ")" + (job.isInQueue() ? ": BUILDING":""));
-									} else {
-										sendNotice(sender, job.getName() + ": no build");
-									}
-								}
-							}
+							for(AbstractProject job : jobs){
+                                if(job.getLastBuild() != null){
+                                    sendNotice(sender, job.getName() + ": " + job.getLastBuild().getResult().toString() + " (" + Hudson.getInstance().getRootUrl() + job.getLastBuild().getUrl() + ")" + (job.isInQueue() ? ": BUILDING":""));
+                                } else {
+                                    sendNotice(sender, job.getName() + ": no build");
+                                }
+                            }
 						}
 					} else if(command.startsWith("build")){
 						String jobName = command.substring(5).trim();
 						if(jobName.length() == 0){
 							sendNotice(sender, "You must specify a project name");
 						} else {
-							if(jobName != null && jobName.length() > 0){
-								Job j = Hudson.getInstance().getJob(jobName);
-								if(j!=null && (j instanceof Project)){
-									Project p = (Project) j;
-									if(p.isInQueue()){
+							if(jobName.length() > 0){
+								Project project = Hudson.getInstance().getItemByFullName(jobName,Project.class);
+								if(project!=null){
+                                    if(project.isInQueue()){
 										sendNotice(sender, jobName + " is already in build queue");
 									} else {
-										if(p.isDisabled()){
+										if(project.isDisabled()){
 											sendNotice(sender, jobName + " is disabled");
 										} else {
-											p.scheduleBuild();
+											project.scheduleBuild();
 											sendNotice(sender, jobName + " build scheduled");
 										}
 
