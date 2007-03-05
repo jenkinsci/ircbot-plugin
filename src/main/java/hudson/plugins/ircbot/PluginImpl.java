@@ -8,14 +8,14 @@ import hudson.tasks.Publisher;
  * Entry point of the plugin.
  *
  * @author Renaud Bruyeron
- * @version $Id: PluginImpl.java 1415 2006-12-22 16:49:11Z bruyeron $
+ * @version $Id: PluginImpl.java 2346 2007-03-05 18:02:54Z kohsuke $
  * @plugin
  */
 public class PluginImpl extends Plugin {
     public void start() throws Exception {
         // plugins normally extend Hudson by providing custom implementations
         // of 'extension points'. In this case, we'll add one publisher.
-        Publisher.PUBLISHERS.add(IrcPublisher.DESCRIPTOR);
+        Publisher.PUBLISHERS.addNotifier(IrcPublisher.DESCRIPTOR);
         UserProperties.LIST.add(IrcUserProperty.DESCRIPTOR);
     }
 
