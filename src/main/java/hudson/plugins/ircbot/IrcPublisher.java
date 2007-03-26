@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 1834 2007-01-20 07:10:24Z kohsuke $
+ * @version $Id: IrcPublisher.java 2678 2007-03-26 09:48:04Z bruyeron $
  */
 public class IrcPublisher extends IMPublisher<IrcPublisher> {
 
@@ -121,7 +121,7 @@ public class IrcPublisher extends IMPublisher<IrcPublisher> {
 	 * Descriptor for {@link IrcPublisher}
 	 * 
 	 * @author bruyeron
-	 * @version $Id: IrcPublisher.java 1834 2007-01-20 07:10:24Z kohsuke $
+	 * @version $Id: IrcPublisher.java 2678 2007-03-26 09:48:04Z bruyeron $
 	 */
     public static final class DescriptorImpl extends Descriptor<Publisher> {
 
@@ -242,9 +242,17 @@ public class IrcPublisher extends IMPublisher<IrcPublisher> {
 		@Override
 		public Publisher newInstance(StaplerRequest req) throws FormException {
 			IrcPublisher result = new IrcPublisher();
-			result.channels.addAll(Arrays.asList(req.getParameter("channels").split(" ")));
+                        String channelParam = req.getParameter("channels");
+                        if(channelParam != null){
+                            for(String c : Arrays.asList(channelParam.split(" "))){
+                                if(c.trim().length() > 0){
+                                    result.channels.add(c.trim());
+                                }
+                            }
+                        }
 			// dedup
 			result.channels.removeAll(channels);
+                        LOGGER.info("project specific channel config: " + result.channels);
 			return result;
 		}
 
@@ -285,6 +293,7 @@ public class IrcPublisher extends IMPublisher<IrcPublisher> {
 			
 			protected void sendNotice(List<String> channels, String message){
 				for(String channel:channels){
+                                    LOGGER.info("sending notice to channel " + channel);
 					sendNotice(channel, message);
 				}
 			}
@@ -302,11 +311,13 @@ public class IrcPublisher extends IMPublisher<IrcPublisher> {
 							sendNotice(sender, "No jobs configured");
 						} else {
 							for(AbstractProject job : jobs){
-                                if(job.getLastBuild() != null){
-                                    sendNotice(sender, job.getName() + ": " + job.getLastBuild().getResult().toString() + " (" + Hudson.getInstance().getRootUrl() + job.getLastBuild().getUrl() + ")" + (job.isInQueue() ? ": BUILDING":""));
-                                } else {
-                                    sendNotice(sender, job.getName() + ": no build");
-                                }
+								if(!job.isDisabled()){
+									if(job.getLastBuild() != null){
+										sendNotice(sender, job.getName() + ": " + job.getLastBuild().getResult().toString() + " (" + Hudson.getInstance().getRootUrl() + job.getLastBuild().getUrl() + ")" + (job.isInQueue() ? ": BUILDING":""));
+									} else {
+										sendNotice(sender, job.getName() + ": no build");
+									}
+								}
                             }
 						}
 					} else if(command.startsWith("build")){
@@ -329,7 +340,7 @@ public class IrcPublisher extends IMPublisher<IrcPublisher> {
 
 									}
 								}
-								}
+							}
 						}
 					}
 				}

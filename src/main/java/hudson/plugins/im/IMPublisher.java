@@ -13,7 +13,7 @@ import hudson.tasks.Publisher;
 
 /**
  * @author bruyeron
- * @version $Id: IMPublisher.java 1790 2007-01-16 10:08:14Z bruyeron $
+ * @version $Id: IMPublisher.java 2678 2007-03-26 09:48:04Z bruyeron $
  */
 public abstract class IMPublisher<T extends IMPublisher<T>> extends Publisher {
 
@@ -24,14 +24,14 @@ public abstract class IMPublisher<T extends IMPublisher<T>> extends Publisher {
 			BuildListener listener) {
 		if(build.getPreviousBuild() != null){
 			// only broadcast change of status
-			if(build.getResult() != build.getPreviousBuild().getResult()){
+			if(!build.getResult().toString().equals(build.getPreviousBuild().getResult().toString())){
 				publish(build);
 			}
 		} else {
 			// if first build, only broadcast failure/unstable
 			if(build.getResult() != Result.SUCCESS){
 				publish(build);
-			}
+                        }
 		}
 		return true;
 	}
