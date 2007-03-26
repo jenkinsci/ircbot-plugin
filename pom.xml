@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 2679 2007-03-26 10:56:58Z bruyeron $ -->
+<!-- $Id: pom.xml 2681 2007-03-26 10:57:07Z bruyeron $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -11,7 +11,7 @@
   <groupId>org.jvnet.hudson.plugins</groupId>
   <artifactId>ircbot</artifactId>
   <packaging>hpi</packaging>
-  <version>1.6</version>
+  <version>1.7-SNAPSHOT</version>
   <name>Hudson IRC Plugin</name>
   <description>A Build status publisher that notifies channels on a IRC server</description>
   <dependencies>
@@ -21,8 +21,4 @@
       <version>1.4.2</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <tag>ircbot-1_6</tag>
-  </scm>
 </project>
