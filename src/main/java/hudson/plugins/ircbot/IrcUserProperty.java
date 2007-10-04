@@ -14,33 +14,33 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcUserProperty.java 1415 2006-12-22 16:49:11Z bruyeron $
+ * @version $Id: IrcUserProperty.java 5101 2007-10-04 22:20:46Z bruyeron $
  */
 public class IrcUserProperty extends hudson.model.UserProperty {
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
-	private final String nick;
-	
-	public IrcUserProperty(String nick){
-		this.nick = nick;
-	}
-	
-	public String getNick() {
-        if(nick!=null)
+    private final String nick;
+
+    public IrcUserProperty(String nick) {
+        this.nick = nick;
+    }
+
+    public String getNick() {
+        if (nick != null)
             return nick;
 
         return user.getId();
-        
-    }
-	
-    /**
-	 * @see hudson.model.Describable#getDescriptor()
-	 */
-	public Descriptor<UserProperty> getDescriptor() {
-		return DESCRIPTOR;
-	}
 
-	public static final class DescriptorImpl extends UserPropertyDescriptor {
+    }
+
+    /**
+     * @see hudson.model.Describable#getDescriptor()
+     */
+    public Descriptor<UserProperty> getDescriptor() {
+        return DESCRIPTOR;
+    }
+
+    public static final class DescriptorImpl extends UserPropertyDescriptor {
         public DescriptorImpl() {
             super(IrcUserProperty.class);
         }
@@ -53,7 +53,8 @@ public class IrcUserProperty extends hudson.model.UserProperty {
             return new IrcUserProperty(null);
         }
 
-        public IrcUserProperty newInstance(StaplerRequest req) throws FormException {
+        public IrcUserProperty newInstance(StaplerRequest req)
+                throws FormException {
             return new IrcUserProperty(req.getParameter("irc.nick"));
         }
     }
