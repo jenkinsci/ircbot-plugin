@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * @author bruyeron
- * @version $Id: IrcNotifier.java 5101 2007-10-04 22:20:46Z bruyeron $
+ * @version $Id: IrcNotifier.java 5179 2007-10-08 08:24:15Z bruyeron $
  */
 public class IrcNotifier {
 
@@ -54,7 +54,7 @@ public class IrcNotifier {
                 + status
                 + " ("
                 + Hudson.getInstance().getRootUrl()
-                + build.getUrl() + ")" + (suspects == null ? "" : suspects));
+                + build.getUrl() + "console)" + (suspects == null ? "" : suspects));
     }
 
     private static void reportSuccess(AbstractBuild build, List<String> channels) {
@@ -77,7 +77,7 @@ public class IrcNotifier {
                 + status
                 + " ("
                 + Hudson.getInstance().getRootUrl()
-                + build.getUrl() + ")" + (suspects == null ? "" : suspects));
+                + build.getUrl() + "testReport)" + (suspects == null ? "" : suspects));
     }
 
     private static <T extends Entry> String calculateSuspectsString(

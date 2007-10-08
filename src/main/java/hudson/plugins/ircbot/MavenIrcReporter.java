@@ -21,7 +21,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: MavenIrcReporter.java 5101 2007-10-04 22:20:46Z bruyeron $
+ * @version $Id: MavenIrcReporter.java 5179 2007-10-08 08:24:15Z bruyeron $
  */
 public class MavenIrcReporter extends MavenReporter {
 
@@ -91,6 +91,7 @@ public class MavenIrcReporter extends MavenReporter {
         public MavenIrcReporter newInstance(StaplerRequest req) throws FormException {
             MavenIrcReporter result = new MavenIrcReporter();
             String channelParam = req.getParameter("channels");
+            LOGGER.info("supplied channels: " + channelParam);
             if (channelParam != null) {
                 for (String c : Arrays.asList(channelParam.split(" "))) {
                     if (c.trim().length() > 0) {
