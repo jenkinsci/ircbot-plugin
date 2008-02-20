@@ -26,7 +26,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 5101 2007-10-04 22:20:46Z bruyeron $
+ * @version $Id: IrcPublisher.java 7170 2008-02-20 21:53:14Z bruyeron $
  */
 public class IrcPublisher extends Publisher {
 
@@ -88,7 +88,7 @@ public class IrcPublisher extends Publisher {
      * Descriptor for {@link IrcPublisher}
      * 
      * @author bruyeron
-     * @version $Id: IrcPublisher.java 5101 2007-10-04 22:20:46Z bruyeron $
+     * @version $Id: IrcPublisher.java 7170 2008-02-20 21:53:14Z bruyeron $
      */
     public static final class DescriptorImpl extends Descriptor<Publisher> {
 
@@ -242,9 +242,6 @@ public class IrcPublisher extends Publisher {
                     }
                 }
             }
-            // dedup
-            result.channels.removeAll(channels);
-            LOGGER.info("project specific channel config: " + result.channels);
             return result;
         }
 
