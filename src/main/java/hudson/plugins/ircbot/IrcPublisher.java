@@ -26,7 +26,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 7170 2008-02-20 21:53:14Z bruyeron $
+ * @version $Id: IrcPublisher.java 7173 2008-02-21 14:39:33Z bruyeron $
  */
 public class IrcPublisher extends Publisher {
 
@@ -88,7 +88,7 @@ public class IrcPublisher extends Publisher {
      * Descriptor for {@link IrcPublisher}
      * 
      * @author bruyeron
-     * @version $Id: IrcPublisher.java 7170 2008-02-20 21:53:14Z bruyeron $
+     * @version $Id: IrcPublisher.java 7173 2008-02-21 14:39:33Z bruyeron $
      */
     public static final class DescriptorImpl extends Descriptor<Publisher> {
 
@@ -298,65 +298,16 @@ public class IrcPublisher extends Publisher {
                 if (commandPrefix != null && message.startsWith(commandPrefix)) {
                     final String command = message.substring(
                             commandPrefix.length()).trim();
-                    if ("status".equals(command)) {
-                        List<AbstractProject> jobs = Hudson.getInstance()
-                                .getAllItems(AbstractProject.class);
-                        if (jobs.isEmpty()) {
-                            sendNotice(sender, "No jobs configured");
-                        } else {
-                            for (AbstractProject job : jobs) {
-                                if (!job.isDisabled()) {
-                                    if (job.getLastBuild() != null) {
-                                        sendNotice(
-                                                sender,
-                                                job.getName()
-                                                        + ": "
-                                                        + job.getLastBuild()
-                                                                .getResult()
-                                                                .toString()
-                                                        + " ("
-                                                        + Hudson.getInstance()
-                                                                .getRootUrl()
-                                                        + job.getLastBuild()
-                                                                .getUrl()
-                                                        + ")"
-                                                        + (job.isInQueue() ? ": BUILDING"
-                                                                : ""));
-                                    } else {
-                                        sendNotice(sender, job.getName()
-                                                + ": no build");
-                                    }
-                                }
-                            }
+                    String[] tokens = command.split("\\s+", 2);
+                    try {
+                        BotCommands commandInstance = BotCommands.valueOf(tokens[0]);
+                        String parameter = null;
+                        if(tokens.length > 1){
+                            parameter = tokens[1];
                         }
-                    } else if (command.startsWith("build")) {
-                        String jobName = command.substring(5).trim();
-                        if (jobName.length() == 0) {
-                            sendNotice(sender,
-                                    "You must specify a project name");
-                        } else {
-                            if (jobName.length() > 0) {
-                                Project project = Hudson.getInstance()
-                                        .getItemByFullName(jobName,
-                                                Project.class);
-                                if (project != null) {
-                                    if (project.isInQueue()) {
-                                        sendNotice(sender, jobName
-                                                + " is already in build queue");
-                                    } else {
-                                        if (project.isDisabled()) {
-                                            sendNotice(sender, jobName
-                                                    + " is disabled");
-                                        } else {
-                                            project.scheduleBuild();
-                                            sendNotice(sender, jobName
-                                                    + " build scheduled");
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
+                        commandInstance.execute(this, parameter, channel, sender, channels);
+                    } catch(IllegalArgumentException e){
+                        sendNotice(sender, "Invalid command: " + tokens[0]);
                     }
                 }
             }

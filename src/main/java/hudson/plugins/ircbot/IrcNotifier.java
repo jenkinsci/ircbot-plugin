@@ -13,19 +13,26 @@ import hudson.scm.ChangeLogSet.Entry;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author bruyeron
- * @version $Id: IrcNotifier.java 5179 2007-10-08 08:24:15Z bruyeron $
+ * @version $Id: IrcNotifier.java 7173 2008-02-21 14:39:33Z bruyeron $
  */
 public class IrcNotifier {
 
+    private static final Logger LOGGER = Logger.getLogger(IrcNotifier.class.getName());
+    
     static final void perform(AbstractBuild build, List<String> channels) {
         if (build.getPreviousBuild() != null) {
             // only broadcast change of status
-            if (!build.getResult().toString().equals(
-                    build.getPreviousBuild().getResult().toString())) {
-                publish(build, channels);
+            if(build.getResult() != null && build.getPreviousBuild().getResult() != null){
+                if (!build.getResult().toString().equals(
+                        build.getPreviousBuild().getResult().toString())) {
+                    publish(build, channels);
+                }
+            } else {
+                LOGGER.warning("results should not be null! current: " + build.getResult() + " previous: " + build.getPreviousBuild().getResult());
             }
         } else {
             // if first build, only broadcast failure/unstable
