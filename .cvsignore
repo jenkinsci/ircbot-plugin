@@ -1,3 +1,5 @@
 work
 target
 *.iml
+.project
+.settings
