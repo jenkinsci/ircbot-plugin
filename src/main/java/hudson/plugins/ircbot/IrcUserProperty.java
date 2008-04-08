@@ -14,7 +14,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcUserProperty.java 5101 2007-10-04 22:20:46Z bruyeron $
+ * @version $Id: IrcUserProperty.java 8381 2008-04-08 06:37:10Z redsolo $
  */
 public class IrcUserProperty extends hudson.model.UserProperty {
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
@@ -36,7 +36,7 @@ public class IrcUserProperty extends hudson.model.UserProperty {
     /**
      * @see hudson.model.Describable#getDescriptor()
      */
-    public Descriptor<UserProperty> getDescriptor() {
+    public UserPropertyDescriptor getDescriptor() {
         return DESCRIPTOR;
     }
 
