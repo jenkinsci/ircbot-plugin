@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 8682 2008-04-16 22:54:09Z kohsuke $ -->
+<!-- $Id: pom.xml 8742 2008-04-19 02:17:54Z kohsuke $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.209</version>
+    <version>1.210</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.jvnet.hudson.plugins</groupId>
