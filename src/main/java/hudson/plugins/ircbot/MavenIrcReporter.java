@@ -21,7 +21,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: MavenIrcReporter.java 7170 2008-02-20 21:53:14Z bruyeron $
+ * @version $Id: MavenIrcReporter.java 10807 2008-07-14 18:56:05Z btosabre $
  */
 public class MavenIrcReporter extends MavenReporter {
 

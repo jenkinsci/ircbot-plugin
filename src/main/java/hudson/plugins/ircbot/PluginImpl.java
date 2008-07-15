@@ -9,7 +9,7 @@ import hudson.tasks.BuildStep;
  * Entry point of the plugin.
  * 
  * @author Renaud Bruyeron
- * @version $Id: PluginImpl.java 5101 2007-10-04 22:20:46Z bruyeron $
+ * @version $Id: PluginImpl.java 10807 2008-07-14 18:56:05Z btosabre $
  * @plugin
  */
 public class PluginImpl extends Plugin {

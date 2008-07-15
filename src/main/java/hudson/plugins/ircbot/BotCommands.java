@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Commands for the IrcBot
  * 
  * @author bruyeron
- * @version $Id: BotCommands.java 7173 2008-02-21 14:39:33Z bruyeron $
+ * @version $Id: BotCommands.java 10807 2008-07-14 18:56:05Z btosabre $
  */
 public enum BotCommands {
 

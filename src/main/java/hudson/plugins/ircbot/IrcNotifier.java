@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 /**
  * @author bruyeron
- * @version $Id: IrcNotifier.java 7173 2008-02-21 14:39:33Z bruyeron $
+ * @version $Id: IrcNotifier.java 10807 2008-07-14 18:56:05Z btosabre $
  */
 public class IrcNotifier {
 

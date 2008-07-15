@@ -14,7 +14,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcUserProperty.java 8381 2008-04-08 06:37:10Z redsolo $
+ * @version $Id: IrcUserProperty.java 10807 2008-07-14 18:56:05Z btosabre $
  */
 public class IrcUserProperty extends hudson.model.UserProperty {
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
