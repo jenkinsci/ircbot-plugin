@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Commands for the IrcBot
  * 
  * @author bruyeron
- * @version $Id: BotCommands.java 10807 2008-07-14 18:56:05Z btosabre $
+ * @version $Id: BotCommands.java 22199 2009-09-25 23:22:46Z mindless $
  */
 public enum BotCommands {
 
@@ -92,7 +92,7 @@ public enum BotCommands {
                                 bot.sendNotice(sender, jobName
                                         + " is disabled");
                             } else {
-                                project.scheduleBuild();
+                                project.scheduleBuild(new IrcCause(sender));
                                 bot.sendNotice(sender, jobName
                                         + " build scheduled");
                             }

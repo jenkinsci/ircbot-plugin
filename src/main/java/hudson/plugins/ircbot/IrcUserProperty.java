@@ -5,18 +5,18 @@
  */
 package hudson.plugins.ircbot;
 
-import hudson.model.Descriptor;
+import hudson.Extension;
 import hudson.model.User;
-import hudson.model.UserProperty;
 import hudson.model.UserPropertyDescriptor;
 
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcUserProperty.java 10807 2008-07-14 18:56:05Z btosabre $
+ * @version $Id: IrcUserProperty.java 22199 2009-09-25 23:22:46Z mindless $
  */
 public class IrcUserProperty extends hudson.model.UserProperty {
+    @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     private final String nick;
@@ -36,6 +36,7 @@ public class IrcUserProperty extends hudson.model.UserProperty {
     /**
      * @see hudson.model.Describable#getDescriptor()
      */
+    @Override
     public UserPropertyDescriptor getDescriptor() {
         return DESCRIPTOR;
     }

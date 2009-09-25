@@ -3,13 +3,15 @@
  */
 package hudson.plugins.ircbot;
 
+import hudson.Extension;
 import hudson.Launcher;
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
-import hudson.model.Project;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.json.JSONObject;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;
@@ -26,13 +29,14 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 10807 2008-07-14 18:56:05Z btosabre $
+ * @version $Id: IrcPublisher.java 22199 2009-09-25 23:22:46Z mindless $
  */
-public class IrcPublisher extends Publisher {
+public class IrcPublisher extends Notifier {
 
     /**
      * Descriptor should be singleton.
      */
+    @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     /**
@@ -51,7 +55,8 @@ public class IrcPublisher extends Publisher {
      * @see hudson.tasks.BuildStep#perform(hudson.model.Build, hudson.Launcher,
      *      hudson.model.BuildListener)
      */
-    public boolean perform(Build<?, ?> build, Launcher launcher,
+    @Override
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
             BuildListener listener) throws InterruptedException, IOException {
         IrcNotifier.perform(build, channelList());
         return true;
@@ -77,10 +82,15 @@ public class IrcPublisher extends Publisher {
         return sb.toString().trim();
     }
 
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.BUILD;
+    }
+
     /**
      * @see hudson.model.Describable#getDescriptor()
      */
-    public Descriptor<Publisher> getDescriptor() {
+    @Override
+    public BuildStepDescriptor<Publisher> getDescriptor() {
         return DESCRIPTOR;
     }
 
@@ -88,12 +98,12 @@ public class IrcPublisher extends Publisher {
      * Descriptor for {@link IrcPublisher}
      * 
      * @author bruyeron
-     * @version $Id: IrcPublisher.java 10807 2008-07-14 18:56:05Z btosabre $
+     * @version $Id: IrcPublisher.java 22199 2009-09-25 23:22:46Z mindless $
      */
-    public static final class DescriptorImpl extends Descriptor<Publisher> {
+    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
-        private static final Logger LOGGER = Logger
-                .getLogger(DescriptorImpl.class.getName());
+        private static final Logger LOGGER =
+                Logger.getLogger(DescriptorImpl.class.getName());
 
         boolean enabled = false;
 
@@ -158,7 +168,7 @@ public class IrcPublisher extends Publisher {
          * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest)
          */
         @Override
-        public boolean configure(StaplerRequest req) throws FormException {
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             enabled = "on".equals(req.getParameter("irc_publisher.enabled"))
                     || "true".equals(req.getParameter("irc_publisher.enabled"));
             if (enabled) {
@@ -199,7 +209,7 @@ public class IrcPublisher extends Publisher {
                 throw new FormException("Impossible to connect to IRC server",
                         e, null);
             }
-            return super.configure(req);
+            return super.configure(req, formData);
         }
 
         /**
@@ -232,7 +242,7 @@ public class IrcPublisher extends Publisher {
          * @see hudson.model.Descriptor#newInstance(org.kohsuke.stapler.StaplerRequest)
          */
         @Override
-        public Publisher newInstance(StaplerRequest req) throws FormException {
+        public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             IrcPublisher result = new IrcPublisher();
             String channelParam = req.getParameter("channels");
             if (channelParam != null) {
@@ -243,6 +253,11 @@ public class IrcPublisher extends Publisher {
                 }
             }
             return result;
+        }
+
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+            return true;
         }
 
         /**

@@ -5,6 +5,7 @@
  */
 package hudson.plugins.ircbot;
 
+import hudson.Extension;
 import hudson.Launcher;
 import hudson.maven.MavenBuild;
 import hudson.maven.MavenReporter;
@@ -17,11 +18,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: MavenIrcReporter.java 10807 2008-07-14 18:56:05Z btosabre $
+ * @version $Id: MavenIrcReporter.java 22199 2009-09-25 23:22:46Z mindless $
  */
 public class MavenIrcReporter extends MavenReporter {
 
@@ -71,9 +73,10 @@ public class MavenIrcReporter extends MavenReporter {
 
     public static final class DescriptorImpl extends MavenReporterDescriptor {
 
-        private static final Logger LOGGER = Logger
-        .getLogger(DescriptorImpl.class.getName());
+        private static final Logger LOGGER =
+                Logger.getLogger(DescriptorImpl.class.getName());
 
+        @Extension
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
         private DescriptorImpl() {
@@ -84,11 +87,13 @@ public class MavenIrcReporter extends MavenReporter {
             return "IRC Notification";
         }
 
+        @Override
         public String getHelpFile() {
             return "/plugin/ircbot/help.html";
         }
 
-        public MavenIrcReporter newInstance(StaplerRequest req) throws FormException {
+        @Override
+        public MavenIrcReporter newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             MavenIrcReporter result = new MavenIrcReporter();
             String channelParam = req.getParameter("channels");
             if (channelParam != null) {
