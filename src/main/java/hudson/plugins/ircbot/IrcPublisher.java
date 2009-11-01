@@ -8,7 +8,6 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
-import hudson.model.Descriptor;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
@@ -29,7 +28,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 22199 2009-09-25 23:22:46Z mindless $
+ * @version $Id: IrcPublisher.java 23404 2009-11-01 12:47:17Z kutzi $
  */
 public class IrcPublisher extends Notifier {
 
@@ -98,7 +97,7 @@ public class IrcPublisher extends Notifier {
      * Descriptor for {@link IrcPublisher}
      * 
      * @author bruyeron
-     * @version $Id: IrcPublisher.java 22199 2009-09-25 23:22:46Z mindless $
+     * @version $Id: IrcPublisher.java 23404 2009-11-01 12:47:17Z kutzi $
      */
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
@@ -256,6 +255,7 @@ public class IrcPublisher extends Notifier {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
             return true;
         }

@@ -4,5 +4,5 @@
   Since we don't really have anything dynamic here, let's just use static HTML. 
 -->
 <div>
-  This plugin is an IRC bot that can publish build failures to IRC channels.
+  This plugin is an IRC bot that can publish build results to IRC channels.
 </div>

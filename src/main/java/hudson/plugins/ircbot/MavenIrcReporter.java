@@ -16,14 +16,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
-
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: MavenIrcReporter.java 22199 2009-09-25 23:22:46Z mindless $
+ * @version $Id: MavenIrcReporter.java 23404 2009-11-01 12:47:17Z kutzi $
  */
 public class MavenIrcReporter extends MavenReporter {
 
@@ -73,9 +71,6 @@ public class MavenIrcReporter extends MavenReporter {
 
     public static final class DescriptorImpl extends MavenReporterDescriptor {
 
-        private static final Logger LOGGER =
-                Logger.getLogger(DescriptorImpl.class.getName());
-
         @Extension
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
@@ -83,7 +78,8 @@ public class MavenIrcReporter extends MavenReporter {
             super(MavenIrcReporter.class);
         }
 
-        public String getDisplayName() {
+        @Override
+		public String getDisplayName() {
             return "IRC Notification";
         }
 

@@ -11,13 +11,12 @@ import hudson.model.Project;
 import hudson.plugins.ircbot.IrcPublisher.DescriptorImpl.IrcBot;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Commands for the IrcBot
  * 
  * @author bruyeron
- * @version $Id: BotCommands.java 22199 2009-09-25 23:22:46Z mindless $
+ * @version $Id: BotCommands.java 23404 2009-11-01 12:47:17Z kutzi $
  */
 public enum BotCommands {
 
@@ -28,13 +27,14 @@ public enum BotCommands {
          */
         @Override
         void execute(IrcBot bot, String parameter, String channel, String sender, List<String> channels) {
+        	@SuppressWarnings("unchecked")
             List<AbstractProject> jobs = Hudson.getInstance()
             .getAllItems(AbstractProject.class);
             if (jobs.isEmpty()) {
                 bot.sendNotice(sender, "No jobs configured");
             } else {
                 if(jobs.size() < 5){
-                    for (AbstractProject job : jobs) {
+                    for (AbstractProject<?, ?> job : jobs) {
                         if (!job.isDisabled()) {
                             if (job.getLastBuild() != null) {
                                 bot.sendNotice(
@@ -80,7 +80,7 @@ public enum BotCommands {
                 "You must specify a project name");
             } else {
                 if (jobName.length() > 0) {
-                    Project project = Hudson.getInstance()
+                    Project<?, ?> project = Hudson.getInstance()
                     .getItemByFullName(jobName,
                             Project.class);
                     if (project != null) {
@@ -109,7 +109,5 @@ public enum BotCommands {
 
     };
     
-    private static final Logger LOGGER = Logger.getLogger(BotCommands.class.getName());
-
     abstract void execute(IrcBot bot, String parameter, String channel, String sender, List<String> channels);
 }
