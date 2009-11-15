@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 23412 2009-11-02 16:48:21Z mindless $ -->
+<!-- $Id: pom.xml 23738 2009-11-15 18:36:59Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -20,7 +20,7 @@
   </licenses>
   
     <properties>
-      <version.instant-messaging.plugin>1.2</version.instant-messaging.plugin>
+      <version.instant-messaging.plugin>1.3-SNAPSHOT</version.instant-messaging.plugin>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
   
@@ -44,6 +44,7 @@
   </dependencies>
   
   <repositories>
+    <!-- Contains the latest version of pircbot -->
   	<repository>
         <id>JA-SIG</id>
         <url>http://developer.jasig.org/repo/content/groups/m2-legacy/</url>

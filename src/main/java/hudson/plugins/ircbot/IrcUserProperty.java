@@ -13,7 +13,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcUserProperty.java 22199 2009-09-25 23:22:46Z mindless $
+ * @version $Id: IrcUserProperty.java 23738 2009-11-15 18:36:59Z kutzi $
  */
 public class IrcUserProperty extends hudson.model.UserProperty {
     @Extension
@@ -46,14 +46,17 @@ public class IrcUserProperty extends hudson.model.UserProperty {
             super(IrcUserProperty.class);
         }
 
+        @Override
         public String getDisplayName() {
             return "IRC";
         }
 
+        @Override
         public IrcUserProperty newInstance(User user) {
             return new IrcUserProperty(null);
         }
 
+        @Override
         public IrcUserProperty newInstance(StaplerRequest req)
                 throws FormException {
             return new IrcUserProperty(req.getParameter("irc.nick"));

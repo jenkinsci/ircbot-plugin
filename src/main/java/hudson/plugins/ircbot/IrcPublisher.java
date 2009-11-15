@@ -4,33 +4,40 @@
 package hudson.plugins.ircbot;
 
 import hudson.Extension;
-import hudson.Launcher;
-import hudson.model.AbstractBuild;
+import hudson.Util;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
+import hudson.model.User;
+import hudson.plugins.im.IMConnection;
+import hudson.plugins.im.IMException;
+import hudson.plugins.im.IMMessageTarget;
+import hudson.plugins.im.IMMessageTargetConversionException;
+import hudson.plugins.im.IMMessageTargetConverter;
+import hudson.plugins.im.IMPublisher;
+import hudson.plugins.im.IMPublisherDescriptor;
+import hudson.plugins.im.NotificationStrategy;
+import hudson.plugins.im.tools.ExceptionHelper;
+import hudson.plugins.ircbot.v2.IRCConnectionProvider;
+import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
-import org.jibble.pircbot.IrcException;
-import org.jibble.pircbot.NickAlreadyInUseException;
-import org.jibble.pircbot.PircBot;
+
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author bruyeron
- * @version $Id: IrcPublisher.java 23404 2009-11-01 12:47:17Z kutzi $
+ * @version $Id: IrcPublisher.java 23738 2009-11-15 18:36:59Z kutzi $
  */
-public class IrcPublisher extends Notifier {
+public class IrcPublisher extends IMPublisher {
+
+    private static final Logger LOGGER = Logger.getLogger(IrcPublisher.class.getName());
 
     /**
      * Descriptor should be singleton.
@@ -38,47 +45,22 @@ public class IrcPublisher extends Notifier {
     @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
+	private static final IMMessageTargetConverter CONVERTER = new IRCMessageTargetConverter();
+
     /**
      * channels to notify with build status If not empty, this replaces the main
      * channels defined at the descriptor level.
      */
     public List<String> channels = new ArrayList<String>();
 
-    /**
-     * 
-     */
-    public IrcPublisher() {
-    }
-
-    /**
-     * @see hudson.tasks.BuildStep#perform(hudson.model.Build, hudson.Launcher,
-     *      hudson.model.BuildListener)
-     */
-    @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-            BuildListener listener) throws InterruptedException, IOException {
-        IrcNotifier.perform(build, channelList());
-        return true;
-    }
-
-    private List<String> channelList() {
-        return (channels == null || channels.isEmpty()) ? DESCRIPTOR.channels
-                : channels;
-    }
-
-    /**
-     * For the UI redisplay
-     * 
-     * @return
-     */
-    public String getChannels() {
-        StringBuilder sb = new StringBuilder();
-        if (channels != null) {
-            for (String c : channels) {
-                sb.append(c).append(" ");
-            }
-        }
-        return sb.toString().trim();
+    public IrcPublisher(final String targetsAsString, final String notificationStrategy,
+    		final boolean notifyGroupChatsOnBuildStart,
+    		final boolean notifySuspects,
+    		final boolean notifyCulprits,
+    		final boolean notifyFixers) throws IMMessageTargetConversionException
+    {
+        super(targetsAsString, notificationStrategy, notifyGroupChatsOnBuildStart,
+        		notifySuspects, notifyCulprits, notifyFixers);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -93,18 +75,94 @@ public class IrcPublisher extends Notifier {
         return DESCRIPTOR;
     }
 
-    /**
+    // from IMPublisher:
+	@Override
+	protected String getConfiguredIMId(User user) {
+		IrcUserProperty jabberUserProperty = (IrcUserProperty) user.getProperties().get(IrcUserProperty.DESCRIPTOR);
+		if (jabberUserProperty != null) {
+			return jabberUserProperty.getNick();
+		}
+		return null;
+	}
+
+	@Override
+	protected IMConnection getIMConnection() throws IMException {
+		return IRCConnectionProvider.getInstance().currentConnection();
+	}
+
+	@Override
+	protected String getPluginName() {
+		return "IRC notifier plugin";
+	}
+    
+    @Override
+    protected IMMessageTargetConverter getIMMessageTargetConverter() {
+        return CONVERTER;
+    }
+    
+    @Override
+    protected List<IMMessageTarget> getNotificationTargets() {
+    	List<IMMessageTarget> perJobTargets = super.getNotificationTargets();
+    	if (perJobTargets == null || perJobTargets.isEmpty()) {
+    		// get the ones from the descriptor
+    		List<String> descChannels = DESCRIPTOR.channels;
+    		
+    		List<IMMessageTarget> result = new ArrayList<IMMessageTarget>(descChannels.size());
+    		for (String s : descChannels) {
+    			try {
+					IMMessageTarget target = getIMMessageTargetConverter().fromString(s);
+					if (target != null) {
+						result.add(target);
+					}
+				} catch (IMMessageTargetConversionException e) {
+					// ignore
+				}
+    		}
+    		return result;
+    	} else {
+    		return perJobTargets;
+    	}
+    }
+    
+    // deserialize/migrate old instances
+    private Object readResolve() {
+    	if (this.getTargets().length() == 0) {
+    		if (this.channels != null) {
+    			StringBuilder targets = new StringBuilder();
+    			for (String channel : channels) {
+    				targets.append(channel).append(" ");
+    			}
+    			try {
+					setTargets(targets.toString().trim());
+				} catch (IMMessageTargetConversionException e) {
+					LOGGER.warning(ExceptionHelper.dump(e));
+				}
+    		}
+    	}
+    	
+    	if (getNotificationStrategy() == null) {
+    		// set to the fixed strategy in ircbot <= 1.7
+    		setNotificationStrategy(NotificationStrategy.STATECHANGE_ONLY);
+    	}
+    	return this;
+    }
+
+	/**
      * Descriptor for {@link IrcPublisher}
-     * 
-     * @author bruyeron
-     * @version $Id: IrcPublisher.java 23404 2009-11-01 12:47:17Z kutzi $
      */
-    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> implements IMPublisherDescriptor {
 
-        private static final Logger LOGGER =
-                Logger.getLogger(DescriptorImpl.class.getName());
+    	private static final String PREFIX = "irc_publisher.";
+        public static final String PARAMETERNAME_TARGETS = PREFIX + "targets";
+        public static final String PARAMETERNAME_STRATEGY = PREFIX + "strategy";
+        public static final String PARAMETERNAME_NOTIFY_START = PREFIX + "notifyStart";
+        public static final String PARAMETERNAME_NOTIFY_SUSPECTS = PREFIX + "notifySuspects";
+        public static final String PARAMETERNAME_NOTIFY_CULPRITS = PREFIX + "notifyCulprits";
+        public static final String PARAMETERNAME_NOTIFY_FIXERS = PREFIX + "notifyFixers";
+		public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
+		public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
 
-        boolean enabled = false;
+		boolean enabled = false;
 
         String hostname = null;
 
@@ -122,44 +180,24 @@ public class IrcPublisher extends Notifier {
         String commandPrefix = null;
 
         /**
-         * the IRC bot
-         */
-        transient volatile IrcBot bot;
-
-        /**
          */
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
-            try {
-                initBot();
-            } catch (Exception e) {
-                LOGGER
-                        .log(
-                                Level.WARNING,
-                                "IRC bot could not connect - please review connection details",
-                                e);
-            }
-        }
-
-        public void initBot() throws NickAlreadyInUseException, IOException,
-                IrcException {
-            if (enabled) {
-                bot = new IrcBot(nick);
-                bot.connect(hostname, port, password);
-                for (String channel : channels) {
-                    bot.joinChannel(channel);
+            
+            if (isEnabled()) {
+                try {
+                	IRCConnectionProvider.setDesc(this);
+                } catch (final Exception e) {
+                    // Server temporarily unavailable or misconfigured?
+                    LOGGER.warning(ExceptionHelper.dump(e));
                 }
-                LOGGER.info("IRC bot connected and channels joined");
-            }
-        }
-
-        public void stop() {
-            if (bot != null && bot.isConnected()) {
-                bot.quitServer("mama grounded me!");
-                bot.dispose();
-                bot = null;
-                LOGGER.info("IRC bot stopped");
+            } else {
+                try {
+                	IRCConnectionProvider.setDesc(null);
+    			} catch (IMException e) {
+    				// ignore
+    			}
             }
         }
 
@@ -175,39 +213,34 @@ public class IrcPublisher extends Notifier {
                 password = req.getParameter("irc_publisher.password");
                 nick = req.getParameter("irc_publisher.nick");
                 try {
-                    port = Integer.valueOf(req
-                            .getParameter("irc_publisher.port"));
-                    if (port == null) {
-                        port = 194;
-                    }
+                    port = Integer.valueOf(req.getParameter("irc_publisher.port"));
                 } catch (NumberFormatException e) {
                     throw new FormException("port field must be an Integer",
                             "irc_publisher.port");
                 }
                 commandPrefix = req.getParameter("irc_publisher.commandPrefix");
-                if (commandPrefix == null || "".equals(commandPrefix.trim())) {
-                    commandPrefix = null;
-                } else {
-                    commandPrefix = commandPrefix.trim() + " ";
-                }
+                commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 channels = Arrays.asList(req.getParameter(
                         "irc_publisher.channels").split(" "));
+
+                // try to establish the connection
+                try {
+                	IRCConnectionProvider.setDesc(this);
+                	IRCConnectionProvider.getInstance().currentConnection();
+                } catch (final Exception e) {
+                    //throw new FormException("Unable to create Client: " + ExceptionHelper.dump(e), null);
+                	LOGGER.warning(ExceptionHelper.dump(e));
+                }
+            } else {
+            	IRCConnectionProvider.getInstance().releaseConnection();
+            	try {
+            		IRCConnectionProvider.setDesc(null);
+    			} catch (IMException e) {
+    				// ignore
+    			}
             }
+            
             save();
-            stop();
-            try {
-                initBot();
-            } catch (NickAlreadyInUseException e) {
-                throw new FormException("Nick <" + nick
-                        + "> already in use on this server",
-                        "irc_publisher.nick");
-            } catch (IOException e) {
-                throw new FormException("Impossible to connect to IRC server",
-                        e, null);
-            } catch (IrcException e) {
-                throw new FormException("Impossible to connect to IRC server",
-                        e, null);
-            }
             return super.configure(req, formData);
         }
 
@@ -236,22 +269,41 @@ public class IrcPublisher extends Notifier {
             }
             return sb.toString().trim();
         }
-
+        
         /**
          * @see hudson.model.Descriptor#newInstance(org.kohsuke.stapler.StaplerRequest)
          */
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            IrcPublisher result = new IrcPublisher();
-            String channelParam = req.getParameter("channels");
-            if (channelParam != null) {
-                for (String c : Arrays.asList(channelParam.split(" "))) {
-                    if (c.trim().length() > 0) {
-                        result.channels.add(c.trim());
-                    }
-                }
+        	final String t = req.getParameter(PARAMETERNAME_TARGETS);
+            String n = req.getParameter(PARAMETERNAME_STRATEGY);
+            if (n == null) {
+            	n = PARAMETERVALUE_STRATEGY_DEFAULT;
+            } else {
+            	boolean foundStrategyValueMatch = false;
+            	for (final String strategyValue : PARAMETERVALUE_STRATEGY_VALUES) {
+            		if (strategyValue.equals(n)) {
+            			foundStrategyValueMatch = true;
+            			break;
+            		}
+            	}
+            	if (! foundStrategyValueMatch) {
+            		n = PARAMETERVALUE_STRATEGY_DEFAULT;
+            	}
             }
-            return result;
+            boolean notifyStart = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_START));
+            boolean notifySuspects = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_SUSPECTS));
+            boolean notifyCulprits = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_CULPRITS));
+            boolean notifyFixers = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_FIXERS));
+            try
+            {
+                return new IrcPublisher(t, n, notifyStart, notifySuspects, notifyCulprits,
+                		notifyFixers);
+            }
+            catch (final IMMessageTargetConversionException e)
+            {
+                throw new FormException(e, PARAMETERNAME_TARGETS);
+            }
         }
 
         @Override
@@ -281,82 +333,56 @@ public class IrcPublisher extends Notifier {
             return nick;
         }
 
-        /**
-         * @return the password
-         */
+        @Override
         public String getPassword() {
             return password;
         }
 
-        class IrcBot extends PircBot {
-
-            IrcBot(String name) {
-                setName(name);
-                setMessageDelay(5);
-            }
-
-            protected void sendNotice(List<String> channels, String message) {
-                for (String channel : channels) {
-                    LOGGER.info("sending notice to channel " + channel);
-                    sendNotice(channel, message);
-                }
-            }
-
-            /**
-             * @see org.jibble.pircbot.PircBot#onMessage(java.lang.String,
-             *      java.lang.String, java.lang.String, java.lang.String,
-             *      java.lang.String)
-             */
-            @Override
-            protected void onMessage(String channel, String sender,
-                    String login, String hostname, String message) {
-                if (commandPrefix != null && message.startsWith(commandPrefix)) {
-                    final String command = message.substring(
-                            commandPrefix.length()).trim();
-                    String[] tokens = command.split("\\s+", 2);
-                    try {
-                        BotCommands commandInstance = BotCommands.valueOf(tokens[0]);
-                        String parameter = null;
-                        if(tokens.length > 1){
-                            parameter = tokens[1];
-                        }
-                        commandInstance.execute(this, parameter, channel, sender, channels);
-                    } catch(IllegalArgumentException e){
-                        sendNotice(sender, "Invalid command: " + tokens[0]);
-                    }
-                }
-            }
-
-            /**
-             * @see org.jibble.pircbot.PircBot#onPrivateMessage(java.lang.String,
-             *      java.lang.String, java.lang.String, java.lang.String)
-             */
-            @Override
-            protected void onPrivateMessage(String sender, String login,
-                    String hostname, String message) {
-                if (commandPrefix == null) {
-                    sendNotice(sender,
-                            "the property <commandPrefix> must be set on the Hudson configuration screen");
-                } else {
-                    onMessage(null, sender, login, hostname, message);
-                }
-            }
-
-        }
-
-        /**
-         * @return the port
-         */
+        @Override
         public int getPort() {
             return port;
         }
 
-        /**
-         * @return the enabled
-         */
+        @Override
         public boolean isEnabled() {
             return enabled;
         }
 
+        @Override
+		public String getDefaultIdSuffix() {
+			// not implemented for IRC, yet
+			return null;
+		}
+
+		@Override
+		public String getHost() {
+			return this.hostname;
+		}
+		@Override
+		public String getHudsonUserName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public String getHudsonPassword() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getPluginDescription() {
+			return "IRC notifier plugin";
+		}
+
+		@Override
+		public String getUserName() {
+			return this.nick;
+		}
+
+		@Override
+		public boolean isExposePresence() {
+			return true;
+		}
     }
 }

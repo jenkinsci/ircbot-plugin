@@ -4,10 +4,27 @@
 
     See global.jelly for a general discussion about jelly script.
   -->
-  <f:entry title="Channels"
-  	description="Whitespace-separated list of IRC channels"
+  <f:entry title="Channels"	description="Whitespace-separated list of IRC channels"
   	help="/plugin/ircbot/help-instanceConfigChannels.html">
-  	<input class="setting-input" name="channels"
-      type="text" value="${instance.channels}"/>
+  	<f:textbox name="${descriptor.PARAMETERNAME_TARGETS}" value="${instance.targets}" />
+  </f:entry>
+    <f:entry title="Notification Strategy" description="When to send notifications (all = always, failure = on any failure, failure and fixed = on failure and fixes, change = only on state change)">
+    <select class="setting-input" name="${descriptor.PARAMETERNAME_STRATEGY}">
+       <j:forEach var="value" items="${descriptor.PARAMETERVALUE_STRATEGY_VALUES}">
+          <f:option selected="${instance.strategy==value}">${value}</f:option>
+       </j:forEach>
+    </select>
+  </f:entry>
+  <f:entry title="Notify on build starts" description="Whether to send notifications to channels when a build starts">
+    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_START}" checked="${instance.notifyOnStart}"/>
+  </f:entry>
+  <f:entry title="Notify SCM committers" description="Whether to send notifications to the users that are suspected of having broken this build">
+    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_SUSPECTS}" checked="${instance.notifySuspects}"/>
+  </f:entry>
+  <f:entry title="Notify SCM culprits" description="Also send notifications to 'culprits' from previous unstable/failed builds">
+    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_CULPRITS}" checked="${instance.notifyCulprits}"/>
+  </f:entry>
+  <f:entry title="Notify SCM fixers" description="Whether to send notifications to the users that have fixed a broken build">
+    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_FIXERS}" checked="${instance.notifyFixers}"/>
   </f:entry>
 </j:jelly>
