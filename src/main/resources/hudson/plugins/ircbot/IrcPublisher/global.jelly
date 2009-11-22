@@ -34,6 +34,12 @@
       help="/plugin/ircbot/help-globalConfigPort.html">
       <f:textbox name="irc_publisher.port" value="${descriptor.getPort()}" />
     </f:entry>
+        <f:entry title="Channels"
+      description="Channels the bot should join"
+      help="/plugin/ircbot/help-globalConfigChannels.html">
+      <f:textbox name="irc_publisher.channels" value="${descriptor.getChannels()}" />
+    </f:entry>
+    <f:advanced>
     <f:entry title="Password"
       description="Password to the IRC server">
       <f:textbox name="irc_publisher.password" value="${descriptor.getPassword()}" />
@@ -41,11 +47,6 @@
     <f:entry title="Nickname"
       description="Nickname of the bot">
       <f:textbox name="irc_publisher.nick" value="${descriptor.getNick()}" />
-    </f:entry>
-    <f:entry title="Channels"
-      description="Channels the bot should join"
-      help="/plugin/ircbot/help-globalConfigChannels.html">
-      <f:textbox name="irc_publisher.channels" value="${descriptor.getChannels()}" />
     </f:entry>
     <f:entry title="Command prefix"
       description="The prefix for the commands"
@@ -60,6 +61,7 @@
         <f:password name="${descriptor.PARAMETERNAME_HUDSON_PASSWORD}"
           value="${descriptor.hudsonPassword}" />
     </f:entry>
+    </f:advanced>
    </f:optionalBlock>
   </f:section>
 </j:jelly>
