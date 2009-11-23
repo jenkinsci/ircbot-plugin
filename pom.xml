@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 23970 2009-11-22 18:22:25Z kutzi $ -->
+<!-- $Id: pom.xml 23984 2009-11-23 17:46:03Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -20,7 +20,7 @@
   </licenses>
   
     <properties>
-      <version.instant-messaging.plugin>1.3-SNAPSHOT</version.instant-messaging.plugin>
+      <version.instant-messaging.plugin>1.3</version.instant-messaging.plugin>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
