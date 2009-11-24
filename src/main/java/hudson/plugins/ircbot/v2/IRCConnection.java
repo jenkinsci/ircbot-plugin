@@ -144,7 +144,7 @@ public class IRCConnection implements IMConnection, JoinListener {
 		public void onMessage(IMMessage message) {
 			if(!message.getTo().equals(descriptor.getNick())) {
 				throw new IllegalStateException("Intercepted message to '" + message.getTo()
-						+ "'. That shouldn' happen!");
+						+ "'. That shouldn't happen!");
 			}
 			
 			synchronized (privateChats) {
