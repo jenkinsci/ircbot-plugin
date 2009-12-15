@@ -22,9 +22,12 @@ public class PircConnection extends PircBot {
 	
 	private final List<JoinListener> joinListeners = new CopyOnWriteArrayList<JoinListener>();
 	
+	private final boolean useNotice;
+	
 	private volatile boolean explicitDisconnect = false;
 
-	public PircConnection(String name) {
+	public PircConnection(String name, boolean useNotice) {
+	    this.useNotice = useNotice;
         setName(name);
         //setMessageDelay(5);
     }
@@ -39,7 +42,11 @@ public class PircConnection extends PircBot {
 		
 		String[] lines = message.split("\\r?\\n|\\r");
 		for (String line : lines) {
-			sendNotice(target, line);
+		    if (this.useNotice) {
+		        sendNotice(target, line);
+		    } else {
+		        sendMessage(target, line);
+		    }
 		}
 	}
 	

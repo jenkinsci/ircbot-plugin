@@ -25,6 +25,9 @@
 	  <f:entry title="Notify SCM culprits" description="Also send notifications to 'culprits' from previous unstable/failed builds">
 	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_CULPRITS}" checked="${instance.notifyCulprits}"/>
 	  </f:entry>
+      <f:entry title="Notify upstream committers" description="Whether to send notifications to upstream committers if no committers were found for a broken build">
+        <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS}" checked="${instance.notifyUpstreamCommitters}"/>
+      </f:entry>
 	  <f:entry title="Notify SCM fixers" description="Whether to send notifications to the users that have fixed a broken build">
 	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_FIXERS}" checked="${instance.notifyFixers}"/>
 	  </f:entry>

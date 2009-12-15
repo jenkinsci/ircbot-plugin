@@ -64,7 +64,7 @@ public class IRCConnection implements IMConnection, JoinListener {
 	@Override
 	public boolean connect() {
 		try {
-			this.pircConnection = new PircConnection(this.descriptor.getNick());
+			this.pircConnection = new PircConnection(this.descriptor.getNick(), this.descriptor.isUseNotice());
 			
 			this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getPassword());
 			LOGGER.info("connected to IRC");
@@ -95,6 +95,7 @@ public class IRCConnection implements IMConnection, JoinListener {
 	}
 	
 	private void getGroupChat(String groupChatName) {
+	    LOGGER.info("Trying to join channel " + groupChatName);
 		this.pircConnection.joinChannel(groupChatName);
 		// TODO: how to check that join was successful (channelJoined is called later -
 		// how long should we possibly wait until we declare that join was unsuccessful?)

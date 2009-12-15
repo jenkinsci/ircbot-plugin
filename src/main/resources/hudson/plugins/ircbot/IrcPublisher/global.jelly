@@ -60,7 +60,10 @@
       <f:entry title="Hudson Password">
         <f:password name="${descriptor.PARAMETERNAME_HUDSON_PASSWORD}"
           value="${descriptor.hudsonPassword}" />
-    </f:entry>
+      </f:entry>
+      <f:entry title="Use /notice command" description="Use /notice command instead of /msg (default in ircbot &lt;= 2.0)">
+        <f:checkbox name="${descriptor.PARAMETERNAME_USE_NOTICE}" checked="${descriptor.useNotice}"/>
+      </f:entry>
     </f:advanced>
    </f:optionalBlock>
   </f:section>

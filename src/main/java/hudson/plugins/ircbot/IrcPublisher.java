@@ -36,7 +36,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author bruyeron
  * @author $Author: kutzi $ (last change)
- * @version $Id: IrcPublisher.java 23967 2009-11-22 12:18:29Z kutzi $
+ * @version $Id: IrcPublisher.java 24639 2009-12-15 22:25:59Z kutzi $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -56,14 +56,15 @@ public class IrcPublisher extends IMPublisher {
      */
     public List<String> channels = new ArrayList<String>();
 
-    public IrcPublisher(final String targetsAsString, final String notificationStrategy,
-    		final boolean notifyGroupChatsOnBuildStart,
-    		final boolean notifySuspects,
-    		final boolean notifyCulprits,
-    		final boolean notifyFixers) throws IMMessageTargetConversionException
+    public IrcPublisher(String targetsAsString, String notificationStrategy,
+    		boolean notifyGroupChatsOnBuildStart,
+    		boolean notifySuspects,
+    		boolean notifyCulprits,
+    		boolean notifyFixers,
+    		boolean notifyUpstreamCommitters) throws IMMessageTargetConversionException
     {
         super(targetsAsString, notificationStrategy, notifyGroupChatsOnBuildStart,
-        		notifySuspects, notifyCulprits, notifyFixers);
+        		notifySuspects, notifyCulprits, notifyFixers, notifyUpstreamCommitters);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -168,10 +169,13 @@ public class IrcPublisher extends IMPublisher {
         public static final String PARAMETERNAME_NOTIFY_SUSPECTS = PREFIX + "notifySuspects";
         public static final String PARAMETERNAME_NOTIFY_CULPRITS = PREFIX + "notifyCulprits";
         public static final String PARAMETERNAME_NOTIFY_FIXERS = PREFIX + "notifyFixers";
+        public static final String PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS = PREFIX + "notifyUpstreamCommitters";
+        
 		public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
 		public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
 		public static final String PARAMETERNAME_HUDSON_LOGIN = PREFIX + "hudsonLogin";
 	    public static final String PARAMETERNAME_HUDSON_PASSWORD = PREFIX + "hudsonPassword";
+	    public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
 
 		boolean enabled = false;
 
@@ -192,6 +196,8 @@ public class IrcPublisher extends IMPublisher {
         
         private String hudsonLogin;
         private String hudsonPassword;
+        
+        private boolean useNotice;
 
         /**
          */
@@ -220,24 +226,26 @@ public class IrcPublisher extends IMPublisher {
          */
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-            enabled = "on".equals(req.getParameter("irc_publisher.enabled"))
+            this.enabled = "on".equals(req.getParameter("irc_publisher.enabled"))
                     || "true".equals(req.getParameter("irc_publisher.enabled"));
-            if (enabled) {
-                hostname = req.getParameter("irc_publisher.hostname");
-                password = req.getParameter("irc_publisher.password");
-                nick = req.getParameter("irc_publisher.nick");
+            if (this.enabled) {
+                this.hostname = req.getParameter("irc_publisher.hostname");
+                this.password = req.getParameter("irc_publisher.password");
+                this.nick = req.getParameter("irc_publisher.nick");
                 try {
-                    port = Integer.valueOf(req.getParameter("irc_publisher.port"));
+                    this.port = Integer.valueOf(req.getParameter("irc_publisher.port"));
                 } catch (NumberFormatException e) {
                     throw new FormException("port field must be an Integer",
                             "irc_publisher.port");
                 }
-                commandPrefix = req.getParameter("irc_publisher.commandPrefix");
-                commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
-                channels = Arrays.asList(req.getParameter("irc_publisher.channels").split(" "));
+                this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
+                this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
+                this.channels = Arrays.asList(req.getParameter("irc_publisher.channels").split(" "));
 
-                hudsonLogin = req.getParameter(PARAMETERNAME_HUDSON_LOGIN);
-                hudsonPassword = req.getParameter(PARAMETERNAME_HUDSON_PASSWORD);
+                this.hudsonLogin = req.getParameter(PARAMETERNAME_HUDSON_LOGIN);
+                this.hudsonPassword = req.getParameter(PARAMETERNAME_HUDSON_PASSWORD);
+                
+                this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
                 
                 // try to establish the connection
                 try {
@@ -310,10 +318,11 @@ public class IrcPublisher extends IMPublisher {
             boolean notifySuspects = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_SUSPECTS));
             boolean notifyCulprits = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_CULPRITS));
             boolean notifyFixers = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_FIXERS));
+            boolean notifyUpstream = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS));
             try
             {
                 return new IrcPublisher(t, n, notifyStart, notifySuspects, notifyCulprits,
-                		notifyFixers);
+                		notifyFixers, notifyUpstream);
             }
             catch (final IMMessageTargetConversionException e)
             {
@@ -396,6 +405,10 @@ public class IrcPublisher extends IMPublisher {
 		@Override
 		public boolean isExposePresence() {
 			return true;
+		}
+		
+		public boolean isUseNotice() {
+		    return this.useNotice;
 		}
     }
 }
