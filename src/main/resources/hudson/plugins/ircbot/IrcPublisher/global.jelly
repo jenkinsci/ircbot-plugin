@@ -40,13 +40,13 @@
       <f:textbox name="irc_publisher.channels" value="${descriptor.getChannels()}" />
     </f:entry>
     <f:advanced>
-    <f:entry title="Password"
-      description="Password to the IRC server">
-      <f:textbox name="irc_publisher.password" value="${descriptor.getPassword()}" />
-    </f:entry>
     <f:entry title="Nickname"
       description="Nickname of the bot">
       <f:textbox name="irc_publisher.nick" value="${descriptor.getNick()}" />
+    </f:entry>
+    <f:entry title="Password"
+      description="Password to the IRC server">
+      <f:password name="irc_publisher.password" value="${descriptor.getPassword()}" />
     </f:entry>
     <f:entry title="Command prefix"
       description="The prefix for the commands"
