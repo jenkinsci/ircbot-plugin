@@ -1,5 +1,6 @@
 package hudson.plugins.ircbot.v2;
 
+import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
 import hudson.plugins.im.IMConnectionListener;
 import hudson.plugins.im.IMException;
@@ -14,6 +15,7 @@ import hudson.plugins.ircbot.v2.PircConnection.JoinListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,7 @@ public class IRCConnection implements IMConnection, JoinListener {
 	private final Authentication authentication;
 	private PircConnection pircConnection;
 
-	private String[] groupChats;
+	private List<IMMessageTarget> groupChats;
 
 	private final List<Bot> bots = new ArrayList<Bot>();
 	
@@ -41,10 +43,10 @@ public class IRCConnection implements IMConnection, JoinListener {
 		this.descriptor = descriptor;
 		this.authentication = authentication;
 		
-		if (descriptor.getChannels() != null) {
-			this.groupChats = descriptor.getChannels().trim().split("\\s");
+		if (descriptor.getDefaultTargets() != null) {
+			this.groupChats = descriptor.getDefaultTargets();
 		} else {
-			this.groupChats = new String[0];
+			this.groupChats = Collections.emptyList();
 		}
 	}
 	
@@ -70,9 +72,9 @@ public class IRCConnection implements IMConnection, JoinListener {
 			LOGGER.info("connected to IRC");
 			this.pircConnection.addJoinListener(this);
 			
-			for (String groupChatName : this.groupChats) {
+			for (IMMessageTarget groupChatName : this.groupChats) {
 				try {
-					getGroupChat(groupChatName.trim());
+					getGroupChat(groupChatName);
 				} catch (Exception e) {
 					// if we got here, the IRC connection could be established, but probably the channel name
 					// is invalid
@@ -94,12 +96,23 @@ public class IRCConnection implements IMConnection, JoinListener {
 		return false;
 	}
 	
-	private void getGroupChat(String groupChatName) {
-	    LOGGER.info("Trying to join channel " + groupChatName);
-		this.pircConnection.joinChannel(groupChatName);
+	private void getGroupChat(IMMessageTarget groupChat) {
+		if (! (groupChat instanceof GroupChatIMMessageTarget)) {
+			LOGGER.warning(groupChat + " is no channel. Cannot join.");
+			return;
+		}
+		
+		GroupChatIMMessageTarget channel = (GroupChatIMMessageTarget)groupChat;
+	    LOGGER.info("Trying to join channel " + channel.getName());
+	    
+	    if (channel.hasPassword()) {
+	    	this.pircConnection.joinChannel(channel.getName(), channel.getPassword());
+	    } else {
+	    	this.pircConnection.joinChannel(channel.getName());
+	    }
 		// TODO: how to check that join was successful (channelJoined is called later -
 		// how long should we possibly wait until we declare that join was unsuccessful?)
-		this.bots.add(new Bot(new IRCChannel(groupChatName, this.pircConnection),
+		this.bots.add(new Bot(new IRCChannel(channel.getName(), this.pircConnection),
 				this.descriptor.getNick(), this.descriptor.getHost(),
 				this.descriptor.getCommandPrefix(), this.authentication));
 	}

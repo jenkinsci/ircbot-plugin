@@ -34,10 +34,20 @@
       help="/plugin/ircbot/help-globalConfigPort.html">
       <f:textbox name="irc_publisher.port" value="${descriptor.getPort()}" />
     </f:entry>
-        <f:entry title="Channels"
+    <f:entry title="Channels"
       description="Channels the bot should join"
       help="/plugin/ircbot/help-globalConfigChannels.html">
-      <f:textbox name="irc_publisher.channels" value="${descriptor.getChannels()}" />
+ 	  <f:repeatable name="irc_publisher.channels" var="ch" items="${descriptor.defaultTargets}">
+	  	  <table width="100%">
+			<tr>
+		  	  	<td><input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" /></td>
+		  	  	<td><input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" /></td>
+		  	  	<td>
+    		        <div align="right"><f:repeatableDeleteButton /></div>
+                </td>
+	  	  	</tr>
+        </table>
+	  	</f:repeatable>
     </f:entry>
     <f:advanced>
     <f:entry title="Nickname"

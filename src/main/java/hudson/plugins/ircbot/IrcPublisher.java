@@ -7,10 +7,10 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.model.User;
+import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessageTarget;
-import hudson.plugins.im.IMMessageTargetConversionException;
 import hudson.plugins.im.IMMessageTargetConverter;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.IMPublisherDescriptor;
@@ -23,7 +23,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,7 +36,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author bruyeron
  * @author $Author: kutzi $ (last change)
- * @version $Id: IrcPublisher.java 24639 2009-12-15 22:25:59Z kutzi $
+ * @version $Id: IrcPublisher.java 26294 2010-01-23 10:20:31Z kutzi $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -53,17 +53,19 @@ public class IrcPublisher extends IMPublisher {
     /**
      * channels to notify with build status If not empty, this replaces the main
      * channels defined at the descriptor level.
+     * @deprecated only used to deserialize old instances. please use {@link #getNotificationTargets()}
      */
+	@Deprecated
     public List<String> channels = new ArrayList<String>();
 
-    public IrcPublisher(String targetsAsString, String notificationStrategy,
+    public IrcPublisher(List<IMMessageTarget> defaultTargets, String notificationStrategy,
     		boolean notifyGroupChatsOnBuildStart,
     		boolean notifySuspects,
     		boolean notifyCulprits,
     		boolean notifyFixers,
-    		boolean notifyUpstreamCommitters) throws IMMessageTargetConversionException
+    		boolean notifyUpstreamCommitters)
     {
-        super(targetsAsString, notificationStrategy, notifyGroupChatsOnBuildStart,
+        super(defaultTargets, notificationStrategy, notifyGroupChatsOnBuildStart,
         		notifySuspects, notifyCulprits, notifyFixers, notifyUpstreamCommitters);
     }
 
@@ -99,56 +101,21 @@ public class IrcPublisher extends IMPublisher {
 		return "IRC notifier plugin";
 	}
     
-    @Override
-    protected IMMessageTargetConverter getIMMessageTargetConverter() {
-        return CONVERTER;
-    }
-    
-    @Override
-    protected List<IMMessageTarget> getNotificationTargets() {
-    	List<IMMessageTarget> perJobTargets = super.getNotificationTargets();
-    	if (perJobTargets == null || perJobTargets.isEmpty()) {
-    		// get the ones from the descriptor
-    		List<String> descChannels = DESCRIPTOR.channels;
-    		
-    		List<IMMessageTarget> result = new ArrayList<IMMessageTarget>(descChannels.size());
-    		for (String s : descChannels) {
-    			try {
-					IMMessageTarget target = getIMMessageTargetConverter().fromString(s);
-					if (target != null) {
-						result.add(target);
-					}
-				} catch (IMMessageTargetConversionException e) {
-					// ignore
-				}
-    		}
-    		return result;
-    	} else {
-    		return perJobTargets;
-    	}
-    }
-    
     // deserialize/migrate old instances
+    @SuppressWarnings("deprecation")
     private Object readResolve() {
     	if (this.getNotificationTargets() == null) {
     		if (this.channels != null) {
-    			StringBuilder targets = new StringBuilder();
+    			List<IMMessageTarget> targets = new ArrayList<IMMessageTarget>(this.channels.size());
     			for (String channel : channels) {
-    				targets.append(channel).append(" ");
+    				targets.add(new GroupChatIMMessageTarget(channel));
     			}
-    			try {
-					setTargets(targets.toString().trim());
-				} catch (IMMessageTargetConversionException e) {
-					LOGGER.warning(ExceptionHelper.dump(e));
-				}
+    			setNotificationTargets(targets);
     		} else {
-    			try {
-					setTargets("");
-				} catch (IMMessageTargetConversionException e) {
-					LOGGER.warning(ExceptionHelper.dump(e));
-				}
+    			setNotificationTargets(Collections.<IMMessageTarget>emptyList());
     		}
     	}
+    	this.channels = null;
     	
     	if (getNotificationStrategy() == null) {
     		// set to the fixed strategy in ircbot <= 1.7
@@ -163,7 +130,6 @@ public class IrcPublisher extends IMPublisher {
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> implements IMPublisherDescriptor {
 
     	private static final String PREFIX = "irc_publisher.";
-        public static final String PARAMETERNAME_TARGETS = PREFIX + "targets";
         public static final String PARAMETERNAME_STRATEGY = PREFIX + "strategy";
         public static final String PARAMETERNAME_NOTIFY_START = PREFIX + "notifyStart";
         public static final String PARAMETERNAME_NOTIFY_SUSPECTS = PREFIX + "notifySuspects";
@@ -189,8 +155,13 @@ public class IrcPublisher extends IMPublisher {
 
         /**
          * channels to join
+         * 
+         * @deprecated Only to deserialize old descriptors
          */
-        List<String> channels;
+        @Deprecated
+		List<String> channels;
+        
+        private List<IMMessageTarget> defaultTargets;
 
         String commandPrefix = null;
         
@@ -199,8 +170,6 @@ public class IrcPublisher extends IMPublisher {
         
         private boolean useNotice;
 
-        /**
-         */
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
@@ -240,8 +209,28 @@ public class IrcPublisher extends IMPublisher {
                 }
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
-                this.channels = Arrays.asList(req.getParameter("irc_publisher.channels").split(" "));
-
+                
+            	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
+            	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
+            	
+            	List<IMMessageTarget> targets = Collections.emptyList();
+            	if (channelsNames != null) {
+            		targets = new ArrayList<IMMessageTarget>(channelsNames.length);
+            		for (int i=0; i < channelsNames.length; i++) {
+            			
+            			if (Util.fixEmptyAndTrim(channelsNames[i]) == null) {
+            				throw new FormException("Channel name must not be empty", "channel.name");
+            			}
+            			
+            			if (Util.fixEmpty(channelsNames[i]) != null) {
+            				targets.add(new GroupChatIMMessageTarget(channelsNames[i], channelsPasswords[i]));
+            			} else {
+            				targets.add(new GroupChatIMMessageTarget(channelsNames[i]));
+            			}
+            		}
+            	}
+            	this.defaultTargets = targets;
+            	
                 this.hudsonLogin = req.getParameter(PARAMETERNAME_HUDSON_LOGIN);
                 this.hudsonPassword = req.getParameter(PARAMETERNAME_HUDSON_PASSWORD);
                 
@@ -283,22 +272,31 @@ public class IrcPublisher extends IMPublisher {
             return "/plugin/ircbot/help.html";
         }
 
-        public String getChannels() {
-            StringBuilder sb = new StringBuilder();
-            if (channels != null) {
-                for (String c : channels) {
-                    sb.append(c).append(" ");
-                }
-            }
-            return sb.toString().trim();
-        }
-        
         /**
          * @see hudson.model.Descriptor#newInstance(org.kohsuke.stapler.StaplerRequest)
          */
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-        	final String t = req.getParameter(PARAMETERNAME_TARGETS);
+        	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
+        	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
+        	
+        	List<IMMessageTarget> targets = Collections.emptyList();
+        	if (channelsNames != null) {
+        		targets = new ArrayList<IMMessageTarget>(channelsNames.length);
+        		for (int i=0; i < channelsNames.length; i++) {
+        			
+        			if (Util.fixEmptyAndTrim(channelsNames[i]) == null) {
+        				throw new FormException("Channel name must not be empty", "channel.name");
+        			}
+        			
+        			if (Util.fixEmpty(channelsNames[i]) != null) {
+        				targets.add(new GroupChatIMMessageTarget(channelsNames[i], channelsPasswords[i]));
+        			} else {
+        				targets.add(new GroupChatIMMessageTarget(channelsNames[i]));
+        			}
+        		}
+        	}
+        	
             String n = req.getParameter(PARAMETERNAME_STRATEGY);
             if (n == null) {
             	n = PARAMETERVALUE_STRATEGY_DEFAULT;
@@ -319,15 +317,9 @@ public class IrcPublisher extends IMPublisher {
             boolean notifyCulprits = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_CULPRITS));
             boolean notifyFixers = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_FIXERS));
             boolean notifyUpstream = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS));
-            try
-            {
-                return new IrcPublisher(t, n, notifyStart, notifySuspects, notifyCulprits,
+
+            return new IrcPublisher(targets, n, notifyStart, notifySuspects, notifyCulprits,
                 		notifyFixers, notifyUpstream);
-            }
-            catch (final IMMessageTargetConversionException e)
-            {
-                throw new FormException(e, PARAMETERNAME_TARGETS);
-            }
         }
 
         @Override
@@ -339,6 +331,7 @@ public class IrcPublisher extends IMPublisher {
         /**
          * @return the commandPrefix
          */
+        @Override
         public String getCommandPrefix() {
             return commandPrefix;
         }
@@ -346,6 +339,7 @@ public class IrcPublisher extends IMPublisher {
         /**
          * @return the hostname
          */
+        @Override
         public String getHostname() {
             return hostname;
         }
@@ -407,8 +401,46 @@ public class IrcPublisher extends IMPublisher {
 			return true;
 		}
 		
+		@Override
+		public List<IMMessageTarget> getDefaultTargets() {
+			if (this.defaultTargets == null) {
+				return Collections.emptyList();
+			}
+			
+			return this.defaultTargets;
+		}
+		
+	    @Override
+	    public IMMessageTargetConverter getIMMessageTargetConverter() {
+	        return CONVERTER;
+	    }
+		
+		/**
+		 * Specifies if the bot should use the /notice command
+		 * instead of the /msg command to notify.
+		 */
 		public boolean isUseNotice() {
 		    return this.useNotice;
 		}
+		
+		/**
+		 * Deserialize old descriptors.
+		 */
+		private Object readResolve() {
+			if (this.defaultTargets == null) {
+				if (this.channels != null) {
+					this.defaultTargets = new ArrayList<IMMessageTarget>(this.channels.size());
+					for (String channel : this.channels) {
+						this.defaultTargets.add(new GroupChatIMMessageTarget(channel));
+					}
+					
+					this.channels = null;
+					save();
+				}
+			}
+			
+			return this;
+		}
+		
     }
 }

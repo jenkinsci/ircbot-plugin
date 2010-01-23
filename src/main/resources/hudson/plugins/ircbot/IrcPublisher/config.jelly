@@ -5,9 +5,19 @@
     See global.jelly for a general discussion about jelly script.
   -->
   <f:advanced>
-	  <f:entry title="Channels"	description="Whitespace-separated list of IRC channels"
+	  <f:entry title="Channels"	description="Name/password pairs of IRC channels (Password is optional)"
 	  	help="/plugin/ircbot/help-instanceConfigChannels.html">
-	  	<f:textbox name="${descriptor.PARAMETERNAME_TARGETS}" value="${instance.targets}" />
+	  	<f:repeatable name="irc_publisher.channels" var="ch" items="${instance.notificationTargets}">
+	  	  <table width="100%">
+			<tr>
+		  	  	<td><input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" /></td>
+		  	  	<td><input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" /></td>
+		  	  	<td>
+    		        <div align="right"><f:repeatableDeleteButton /></div>
+                </td>
+	  	  	</tr>
+        </table>
+	  	</f:repeatable>
 	  </f:entry>
 	    <f:entry title="Notification Strategy" description="When to send notifications (all = always, failure = on any failure, failure and fixed = on failure and fixes, change = only on state change)">
 	    <select class="setting-input" name="${descriptor.PARAMETERNAME_STRATEGY}">
