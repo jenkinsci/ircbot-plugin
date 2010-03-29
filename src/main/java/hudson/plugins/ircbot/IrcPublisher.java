@@ -36,7 +36,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author bruyeron
  * @author $Author: kutzi $ (last change)
- * @version $Id: IrcPublisher.java 26294 2010-01-23 10:20:31Z kutzi $
+ * @version $Id: IrcPublisher.java 29417 2010-03-29 16:54:26Z kutzi $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -142,6 +142,7 @@ public class IrcPublisher extends IMPublisher {
 		public static final String PARAMETERNAME_HUDSON_LOGIN = PREFIX + "hudsonLogin";
 	    public static final String PARAMETERNAME_HUDSON_PASSWORD = PREFIX + "hudsonPassword";
 	    public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
+	    public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
 
 		boolean enabled = false;
 
@@ -152,6 +153,8 @@ public class IrcPublisher extends IMPublisher {
         String password = null;
 
         String nick = null;
+        
+        String nickServPassword = null;
 
         /**
          * channels to join
@@ -201,6 +204,7 @@ public class IrcPublisher extends IMPublisher {
                 this.hostname = req.getParameter("irc_publisher.hostname");
                 this.password = req.getParameter("irc_publisher.password");
                 this.nick = req.getParameter("irc_publisher.nick");
+                this.nickServPassword = req.getParameter(PARAMETERNAME_NICKSERV_PASSWORD);
                 try {
                     this.port = Integer.valueOf(req.getParameter("irc_publisher.port"));
                 } catch (NumberFormatException e) {
@@ -345,10 +349,20 @@ public class IrcPublisher extends IMPublisher {
         }
 
         /**
+         * Returns the nickname that should be used to identify against the IRC server.
+         *
          * @return the nick
          */
         public String getNick() {
             return nick;
+        }
+        
+        /**
+         * Returns the password that should be used to try and identify
+         * with NickServ.
+         */
+        public String getNickServPassword() {
+            return nickServPassword;
         }
 
         @Override

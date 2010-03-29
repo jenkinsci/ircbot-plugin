@@ -58,6 +58,9 @@
       description="Password to the IRC server">
       <f:password name="irc_publisher.password" value="${descriptor.getPassword()}" />
     </f:entry>
+    <f:entry title="NickServ Password" description="On connection, try to identify with NickServ with this password" help="/plugin/ircbot/help-globalConfigNickServ.html">
+        <f:password name="irc_publisher.nickServPassword" value="${descriptor.nickServPassword}"/>
+    </f:entry>
     <f:entry title="Command prefix"
       description="The prefix for the commands"
       help="/plugin/ircbot/help-globalConfigCommandPrefix.html">

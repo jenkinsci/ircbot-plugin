@@ -1,5 +1,6 @@
 package hudson.plugins.ircbot.v2;
 
+import hudson.Util;
 import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
 import hudson.plugins.im.IMConnectionListener;
@@ -71,6 +72,11 @@ public class IRCConnection implements IMConnection, JoinListener {
 			this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getPassword());
 			LOGGER.info("connected to IRC");
 			this.pircConnection.addJoinListener(this);
+			
+	        final String nickServPassword = this.descriptor.getNickServPassword();
+            if(Util.fixEmpty(nickServPassword) != null) {
+                this.pircConnection.identify(nickServPassword);
+            }
 			
 			for (IMMessageTarget groupChatName : this.groupChats) {
 				try {

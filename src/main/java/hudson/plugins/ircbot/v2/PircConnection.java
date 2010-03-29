@@ -77,6 +77,16 @@ public class PircConnection extends PircBot {
     }
     
     /**
+     * Someone send me a notice. Possibly NickServ after identifying.
+     */
+    @Override
+	protected void onNotice(String sourceNick, String sourceLogin,
+			String sourceHostname, String target, String notice) {
+		super.onNotice(sourceNick, sourceLogin, sourceHostname, target, notice);
+		LOGGER.info("Notice from " + sourceNick + ": '" + normalize(notice) + "'");
+	}
+
+	/**
      * {@inheritDoc}
      */
     @Override
@@ -179,6 +189,21 @@ public class PircConnection extends PircBot {
 				return false;
 			return true;
 		}
+	}
+	
+	/**
+	 * Removes any IRC special characters (I know of. Where is a authorative guide for them??)
+	 * for the message.
+	 * 
+	 * http://oreilly.com/pub/h/1953
+	 */
+	private static String normalize(String ircMessage) {
+		String msg = ircMessage.replace("\u0001", "");
+		msg = msg.replace("\u0002", "");
+		msg = msg.replace("\u0016", "");
+		msg = msg.replace("\u000F", "");
+		
+		return msg;
 	}
 	
 	public interface JoinListener {
