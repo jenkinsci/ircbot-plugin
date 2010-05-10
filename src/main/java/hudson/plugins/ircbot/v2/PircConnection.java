@@ -29,7 +29,10 @@ public class PircConnection extends PircBot {
 	public PircConnection(String name, boolean useNotice) {
 	    this.useNotice = useNotice;
         setName(name);
-        //setMessageDelay(5);
+        
+        // lower delay between sending 2 messages to 100ms as we will sometimes send
+        // output which will consist of multiple lines (see comment in sendIMMessage)
+        setMessageDelay(100);
     }
 
 	public void sendIMMessage(String target, String message) {
@@ -109,10 +112,18 @@ public class PircConnection extends PircBot {
     public final void closeConnection() {
     	this.explicitDisconnect = true;
     	super.disconnect();
+    	
+    	// PircBot#disconnect is brain-dead as it doesn't do the opposite of connect.
+    	// Specifically: it doesn't stop the input- and output-threads!
+    	// Therefore we do it ourselves in #onDisconnect
     }
     
     @Override
 	protected void onDisconnect() {
+        
+        // clean up resources. make sure that no old input/output thread survive
+        super.dispose();
+        
     	if (!explicitDisconnect) {
 	    	for (IMConnectionListener l : this.listeners) {
 	    		l.connectionBroken(null);
