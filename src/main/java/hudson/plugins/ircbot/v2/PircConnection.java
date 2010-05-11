@@ -16,6 +16,8 @@ public class PircConnection extends PircBot {
 
 	private static final Logger LOGGER = Logger.getLogger(PircConnection.class.getName());
 	
+	public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
+	
 	private final List<IMConnectionListener> listeners = new CopyOnWriteArrayList<IMConnectionListener>();
 	
 	private final List<MessageListener> msgListeners = new CopyOnWriteArrayList<MessageListener>();
@@ -30,9 +32,11 @@ public class PircConnection extends PircBot {
 	    this.useNotice = useNotice;
         setName(name);
         
-        // lower delay between sending 2 messages to 100ms as we will sometimes send
+        // lower delay between sending 2 messages to 500ms as we will sometimes send
         // output which will consist of multiple lines (see comment in sendIMMessage)
-        setMessageDelay(100);
+        // (lower than this doesn't seem to work as we will otherwise be easily
+        // be throttled by IRC servers)
+        setMessageDelay(500);
     }
 
 	public void sendIMMessage(String target, String message) {
@@ -74,7 +78,9 @@ public class PircConnection extends PircBot {
             String hostname, String message) {
     	for (MessageListener l : this.msgListeners) {
     		if (getName().equals(l.target)) {
-    			l.listener.onMessage(new IMMessage(sender, getNick(), message));
+    		    if (l.sender == CHAT_ESTABLISHER || sender.equals(l.sender)) {
+    		        l.listener.onMessage(new IMMessage(sender, getNick(), message));
+    		    }
     		}
     	}
     }
@@ -142,9 +148,13 @@ public class PircConnection extends PircBot {
     public void removeConnectionListener(IMConnectionListener listener) {
     	this.listeners.remove(listener);
     }
+    
+    public void addMessageListener(String target, IMMessageListener listener) {
+        this.msgListeners.add(new MessageListener(target, listener));
+    }
 
-	public void addMessageListener(String target, IMMessageListener listener) {
-		this.msgListeners.add(new MessageListener(target, listener));
+	public void addMessageListener(String target, String sender, IMMessageListener listener) {
+		this.msgListeners.add(new MessageListener(target, sender, listener));
 	}
 
 	public void removeMessageListener(String target, IMMessageListener listener) {
@@ -161,14 +171,23 @@ public class PircConnection extends PircBot {
 	
 	private static final class MessageListener {
 		private final String target;
+		private final String sender;
 		private final IMMessageListener listener;
 
 		public MessageListener(String expectedMessageTarget, IMMessageListener listener) {
 			this.target = expectedMessageTarget;
+			this.sender = null;
 			this.listener = listener;
 		}
 
-		@Override
+		public MessageListener(String expectedMessageTarget, String expectedMessageSender,
+                IMMessageListener listener) {
+		    this.target = expectedMessageTarget;
+		    this.sender = expectedMessageSender;
+            this.listener = listener;
+        }
+
+        @Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;

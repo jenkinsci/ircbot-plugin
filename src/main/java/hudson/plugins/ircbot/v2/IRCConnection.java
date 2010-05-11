@@ -89,7 +89,8 @@ public class IRCConnection implements IMConnection, JoinListener {
 				}
 			}
 			
-			pircConnection.addMessageListener(this.descriptor.getNick(), new ChatEstablishedListener());
+			pircConnection.addMessageListener(this.descriptor.getNick(),
+			        PircConnection.CHAT_ESTABLISHER, new ChatEstablishedListener());
 			
 			return true;
 		} catch (NickAlreadyInUseException e) {
@@ -179,6 +180,9 @@ public class IRCConnection implements IMConnection, JoinListener {
 						descriptor.getCommandPrefix(), authentication);
 			
 				privateChats.put(message.getFrom(), bot);
+				
+				// we must replay this message as it could contain a command
+				bot.onMessage(message);
 			}
 		}
 	}

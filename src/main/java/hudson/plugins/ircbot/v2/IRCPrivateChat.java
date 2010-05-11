@@ -28,7 +28,7 @@ public class IRCPrivateChat implements IMChat {
 	}
 	@Override
 	public void addMessageListener(IMMessageListener listener) {
-		this.connection.addMessageListener(this.nick, listener);
+		this.connection.addMessageListener(this.nick, this.chatPartner, listener);
 	}
 	
 	@Override
