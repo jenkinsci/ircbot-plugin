@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 30845 2010-05-08 14:08:41Z kutzi $ -->
+<!-- $Id: pom.xml 31117 2010-05-18 16:40:16Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -20,7 +20,7 @@
   </licenses>
   
     <properties>
-      <version.instant-messaging.plugin>1.8-SNAPSHOT</version.instant-messaging.plugin>
+      <version.instant-messaging.plugin>1.7</version.instant-messaging.plugin>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
@@ -45,7 +45,7 @@
     <plugin>
         <groupId>org.jvnet.hudson.tools</groupId>
         <artifactId>maven-hpi-plugin</artifactId>
-        <version>1.48</version>
+        <version>1.52</version>
         <extensions>true</extensions>
     </plugin>
    </plugins>
