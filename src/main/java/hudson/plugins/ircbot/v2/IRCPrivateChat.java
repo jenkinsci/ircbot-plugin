@@ -21,6 +21,11 @@ public class IRCPrivateChat implements IMChat {
 	public String getNickName(String senderId) {
 		return senderId;
 	}
+	
+	@Override
+	public String getIMId(String senderId) {
+		return senderId;
+	}
 
 	@Override
 	public boolean isMultiUserChat() {
