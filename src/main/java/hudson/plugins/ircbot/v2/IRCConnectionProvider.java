@@ -22,6 +22,7 @@ public class IRCConnectionProvider extends IMConnectionProvider {
 
     private IRCConnectionProvider() {
     	super();
+    	init();
     }
 
     @Override
@@ -29,7 +30,7 @@ public class IRCConnectionProvider extends IMConnectionProvider {
         releaseConnection();
 
         if (getDescriptor() == null) {
-        	return null;
+        	throw new IMException("Descriptor not set");
         }
         
         IMConnection imConnection = new IRCConnection((IrcPublisher.DescriptorImpl)getDescriptor(),
@@ -37,7 +38,7 @@ public class IRCConnectionProvider extends IMConnectionProvider {
         if (imConnection.connect()) {
         	return imConnection;
         }
-        return null;
+        throw new IMException("Connection failed");
     }
 
 }
