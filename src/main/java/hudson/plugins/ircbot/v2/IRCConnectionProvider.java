@@ -17,7 +17,6 @@ public class IRCConnectionProvider extends IMConnectionProvider {
     public static final synchronized void setDesc(IMPublisherDescriptor desc) throws IMException {
     	INSTANCE.setDescriptor(desc);
     	INSTANCE.releaseConnection();
-    	INSTANCE.currentConnection();
     }
 
     private IRCConnectionProvider() {
