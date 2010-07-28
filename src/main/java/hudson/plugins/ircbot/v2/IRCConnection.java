@@ -1,6 +1,7 @@
 package hudson.plugins.ircbot.v2;
 
 import hudson.Util;
+import hudson.plugins.im.AuthenticationHolder;
 import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
 import hudson.plugins.im.IMConnectionListener;
@@ -31,7 +32,7 @@ public class IRCConnection implements IMConnection, JoinListener {
 	private static final Logger LOGGER = Logger.getLogger(IRCConnection.class.getName());
 	
 	private final DescriptorImpl descriptor;
-	private final Authentication authentication;
+	private final AuthenticationHolder authentication;
 	private PircConnection pircConnection;
 
 	private List<IMMessageTarget> groupChats;
@@ -40,7 +41,7 @@ public class IRCConnection implements IMConnection, JoinListener {
 	
 	private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
 
-	public IRCConnection(DescriptorImpl descriptor, Authentication authentication) {
+	public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
 		this.descriptor = descriptor;
 		this.authentication = authentication;
 		

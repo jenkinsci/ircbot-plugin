@@ -33,7 +33,7 @@ public class IRCConnectionProvider extends IMConnectionProvider {
         }
         
         IMConnection imConnection = new IRCConnection((IrcPublisher.DescriptorImpl)getDescriptor(),
-        		getAuthentication());
+        		getAuthenticationHolder());
         if (imConnection.connect()) {
         	return imConnection;
         }
