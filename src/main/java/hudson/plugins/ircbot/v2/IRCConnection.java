@@ -70,6 +70,9 @@ public class IRCConnection implements IMConnection, JoinListener {
 		try {
 			this.pircConnection = new PircConnection(this.descriptor.getNick(), this.descriptor.isUseNotice());
 			
+			// always use UTF-8; don't depend on the JVM's default encoding
+			this.pircConnection.setEncoding("UTF-8");
+			
 			this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getPassword());
 			LOGGER.info("connected to IRC");
 			this.pircConnection.addJoinListener(this);
