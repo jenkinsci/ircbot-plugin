@@ -15,6 +15,7 @@ import hudson.plugins.im.IMMessageTargetConverter;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.IMPublisherDescriptor;
 import hudson.plugins.im.NotificationStrategy;
+import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
@@ -35,8 +36,8 @@ import org.kohsuke.stapler.StaplerRequest;
  * Publishes build results to IRC channels.
  * 
  * @author bruyeron
- * @author $Author: kutzi $ (last change)
- * @version $Id: IrcPublisher.java 29417 2010-03-29 16:54:26Z kutzi $
+ * @author $Author: kohsuke $ (last change)
+ * @version $Id: IrcPublisher.java 34242 2010-09-01 00:17:50Z kohsuke $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -63,10 +64,11 @@ public class IrcPublisher extends IMPublisher {
     		boolean notifySuspects,
     		boolean notifyCulprits,
     		boolean notifyFixers,
-    		boolean notifyUpstreamCommitters)
+    		boolean notifyUpstreamCommitters,
+            BuildToChatNotifier buildToChatNotifier)
     {
         super(defaultTargets, notificationStrategy, notifyGroupChatsOnBuildStart,
-        		notifySuspects, notifyCulprits, notifyFixers, notifyUpstreamCommitters);
+        		notifySuspects, notifyCulprits, notifyFixers, notifyUpstreamCommitters,buildToChatNotifier);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -323,7 +325,8 @@ public class IrcPublisher extends IMPublisher {
             boolean notifyUpstream = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS));
 
             return new IrcPublisher(targets, n, notifyStart, notifySuspects, notifyCulprits,
-                		notifyFixers, notifyUpstream);
+                		notifyFixers, notifyUpstream,
+                    req.bindJSON(BuildToChatNotifier.class,formData.getJSONObject("buildToChatNotifier")));
         }
 
         @Override
