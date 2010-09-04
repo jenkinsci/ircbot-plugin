@@ -17,8 +17,8 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 /**
  * Our implementation of {@link PircBot}.
  *
- * @author kutzi
- * @author $Author: kutzi $
+ * @author kutzi (original)
+ * @author $Author: kutzi $ (last change)
  */
 public class PircConnection extends PircBot {
 
