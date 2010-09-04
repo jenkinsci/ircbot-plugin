@@ -12,10 +12,19 @@ import java.util.logging.Logger;
 
 import org.jibble.pircbot.PircBot;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
+/**
+ * Our implementation of {@link PircBot}.
+ *
+ * @author kutzi
+ * @author $Author: kutzi $
+ */
 public class PircConnection extends PircBot {
 
 	private static final Logger LOGGER = Logger.getLogger(PircConnection.class.getName());
 	
+	@SuppressWarnings(value = "DM_STRING_CTOR", justification = "we want a new instance here to enable reference comparison")
 	public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
 	
 	private final List<IMConnectionListener> listeners = new CopyOnWriteArrayList<IMConnectionListener>();
