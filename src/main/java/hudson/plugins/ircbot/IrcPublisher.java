@@ -36,8 +36,8 @@ import org.kohsuke.stapler.StaplerRequest;
  * Publishes build results to IRC channels.
  * 
  * @author bruyeron
- * @author $Author: kohsuke $ (last change)
- * @version $Id: IrcPublisher.java 34242 2010-09-01 00:17:50Z kohsuke $
+ * @author $Author: kutzi $ (last change)
+ * @version $Id: IrcPublisher.java 34524 2010-09-07 20:09:12Z kutzi $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -68,7 +68,8 @@ public class IrcPublisher extends IMPublisher {
             BuildToChatNotifier buildToChatNotifier)
     {
         super(defaultTargets, notificationStrategy, notifyGroupChatsOnBuildStart,
-        		notifySuspects, notifyCulprits, notifyFixers, notifyUpstreamCommitters,buildToChatNotifier);
+        		notifySuspects, notifyCulprits, notifyFixers, notifyUpstreamCommitters,
+        		buildToChatNotifier);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -326,7 +327,7 @@ public class IrcPublisher extends IMPublisher {
 
             return new IrcPublisher(targets, n, notifyStart, notifySuspects, notifyCulprits,
                 		notifyFixers, notifyUpstream,
-                    req.bindJSON(BuildToChatNotifier.class,formData.getJSONObject("buildToChatNotifier")));
+                		req.bindJSON(BuildToChatNotifier.class,formData.getJSONObject("buildToChatNotifier")));
         }
 
         @Override
