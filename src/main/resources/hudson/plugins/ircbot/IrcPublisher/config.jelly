@@ -41,6 +41,5 @@
 	  <f:entry title="Notify SCM fixers" description="Whether to send notifications to the users that have fixed a broken build">
 	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_FIXERS}" checked="${instance.notifyFixers}"/>
 	  </f:entry>
-      <super:config-buildToChatNotifier xmlns:super="/hudson/plugins/im/IMPublisher" />
   </f:advanced>
 </j:jelly>
