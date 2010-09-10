@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 34670 2010-09-10 20:02:57Z kutzi $ -->
+<!-- $Id: pom.xml 34676 2010-09-10 20:13:54Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging-parent</artifactId>
-    <version>1.9</version>
+    <version>1.9.1</version>
     <relativePath>../instant-messaging-parent/pom.xml</relativePath>
   </parent>
   <artifactId>ircbot</artifactId>
