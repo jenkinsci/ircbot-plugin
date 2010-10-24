@@ -14,20 +14,21 @@ import hudson.plugins.im.bot.Bot;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.ircbot.IrcPublisher.DescriptorImpl;
 import hudson.plugins.ircbot.v2.PircConnection.JoinListener;
+import hudson.plugins.ircbot.v2.PircConnection.InviteListener;
+import hudson.plugins.ircbot.v2.PircConnection.PartListener;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.acegisecurity.Authentication;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 
-public class IRCConnection implements IMConnection, JoinListener {
+public class IRCConnection implements IMConnection, JoinListener, InviteListener, PartListener {
 
 	private static final Logger LOGGER = Logger.getLogger(IRCConnection.class.getName());
 	
@@ -37,7 +38,7 @@ public class IRCConnection implements IMConnection, JoinListener {
 
 	private List<IMMessageTarget> groupChats;
 
-	private final List<Bot> bots = new ArrayList<Bot>();
+    private final Map<String, Bot> bots = new HashMap<String, Bot>();
 	
 	private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
 
@@ -55,6 +56,9 @@ public class IRCConnection implements IMConnection, JoinListener {
 	@Override
 	public void close() {
 		if (this.pircConnection != null && this.pircConnection.isConnected()) {
+                    this.pircConnection.removeJoinListener(this);
+                    this.pircConnection.removePartListener(this);
+                    this.pircConnection.removeInviteListener(this);
 			this.pircConnection.disconnect();
 			this.pircConnection.dispose();
 		}
@@ -76,6 +80,8 @@ public class IRCConnection implements IMConnection, JoinListener {
 			this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getPassword());
 			LOGGER.info("connected to IRC");
 			this.pircConnection.addJoinListener(this);
+            this.pircConnection.addInviteListener(this);
+            this.pircConnection.addPartListener(this);
 			
 	        final String nickServPassword = this.descriptor.getNickServPassword();
             if(Util.fixEmpty(nickServPassword) != null) {
@@ -106,7 +112,20 @@ public class IRCConnection implements IMConnection, JoinListener {
 		}
 		return false;
 	}
-	
+
+    private GroupChatIMMessageTarget getGroupChatForChannelName(String channelName) {
+        for (IMMessageTarget messageTarget : groupChats) {
+            if (!(messageTarget instanceof GroupChatIMMessageTarget)) {
+                continue;
+            }
+            GroupChatIMMessageTarget groupChat = (GroupChatIMMessageTarget) messageTarget;
+            if (groupChat.getName().equals(channelName)) {
+                return groupChat;
+            }
+        }
+        return null;
+    }
+    
 	private void getGroupChat(IMMessageTarget groupChat) {
 		if (! (groupChat instanceof GroupChatIMMessageTarget)) {
 			LOGGER.warning(groupChat + " is no channel. Cannot join.");
@@ -121,17 +140,48 @@ public class IRCConnection implements IMConnection, JoinListener {
 	    } else {
 	    	this.pircConnection.joinChannel(channel.getName());
 	    }
-		// TODO: how to check that join was successful (channelJoined is called later -
-		// how long should we possibly wait until we declare that join was unsuccessful?)
-		this.bots.add(new Bot(new IRCChannel(channel.getName(), this.pircConnection),
-				this.descriptor.getNick(), this.descriptor.getHost(),
-				this.descriptor.getCommandPrefix(), this.authentication));
 	}
 	
-	@Override
-	public void channelJoined(String channelName) {
-		LOGGER.info("Joined channel " + channelName);
-	}
+    @Override
+    public void channelJoined(String channelName) {
+        GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
+        if (groupChat == null) {
+            LOGGER.log(Level.INFO, "Joined to channel {0} but I don''t seem to belong here", channelName);
+            return;
+        }
+        Bot bot = new Bot(new IRCChannel(channelName, this.pircConnection),
+                this.descriptor.getNick(), this.descriptor.getHost(),
+                this.descriptor.getCommandPrefix(), this.authentication);
+        bots.put(channelName, bot);
+        LOGGER.log(Level.INFO, "Joined channel {0} and bot registered", channelName);
+    }
+
+    @Override
+    public void inviteReceived(String channelName, String inviter) {
+        GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
+        if (groupChat == null) {
+            LOGGER.log(Level.INFO, "Invited to channel {0} but I don''t seem to belong here", channelName);
+            return;
+        }
+        LOGGER.log(Level.INFO, "Invited to join {0}", channelName);
+        getGroupChat(groupChat);
+    }
+
+    @Override
+    public void channelParted(String channelName) {
+        GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
+        if (groupChat == null) {
+            LOGGER.log(Level.INFO, "I''m leaving {0} but I never seemed to belong there in the first place", channelName);
+            return;
+        }
+        if (bots.containsKey(channelName)) {
+            Bot bot = bots.remove(channelName);
+            bot.shutdown();
+            LOGGER.log(Level.INFO, "I have left {0}", channelName);
+        } else {
+            LOGGER.log(Level.INFO, "No bot ever registered for {0}", channelName);
+        }
+    }
 
 	@Override
 	public void addConnectionListener(IMConnectionListener listener) {
@@ -162,7 +212,12 @@ public class IRCConnection implements IMConnection, JoinListener {
 			this.pircConnection.sendRawLineViaQueue("AWAY");
 		}
 	}
-	
+
+	/**
+	 * Listens for chat requests from singular users (i.e. private chat requests).
+	 * Creates a new bot for each request, if we're not already in a chat with
+	 * that user.
+	 */
 	private class ChatEstablishedListener implements IMMessageListener {
 
 		@Override

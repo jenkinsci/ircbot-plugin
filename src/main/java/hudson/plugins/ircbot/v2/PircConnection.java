@@ -32,7 +32,11 @@ public class PircConnection extends PircBot {
 	private final List<MessageListener> msgListeners = new CopyOnWriteArrayList<MessageListener>();
 	
 	private final List<JoinListener> joinListeners = new CopyOnWriteArrayList<JoinListener>();
-	
+
+    private final List<InviteListener> inviteListeners = new CopyOnWriteArrayList<InviteListener>();
+
+    private final List<PartListener> partListeners = new CopyOnWriteArrayList<PartListener>();
+    
 	private final boolean useNotice;
 	
 	private volatile boolean explicitDisconnect = false;
@@ -115,6 +119,24 @@ public class PircConnection extends PircBot {
     		}
     	}
     }
+
+    @Override
+    protected void onPart(String channel, String sender, String login, String hostname) {
+        for (PartListener l : this.partListeners) {
+            if (getNick().equals(sender)) {
+                l.channelParted(channel);
+            }
+        }
+    }
+
+    @Override
+    protected void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason) {
+        for(PartListener l : this.partListeners) {
+            if (getNick().equals(recipientNick)) {
+                l.channelParted(channel);
+            }
+        }
+    }
     
     @Override
     protected void onServerResponse(int code, String response) {
@@ -148,6 +170,16 @@ public class PircConnection extends PircBot {
 		super.onDisconnect();
 	}
 
+    @Override
+    protected void onInvite(String targetNick, String sourceNick, String sourceLogin, String sourceHostname, String channel) {
+        if (getNick().equals(targetNick)) {
+            for (InviteListener listener : inviteListeners) {
+                listener.inviteReceived(channel, sourceNick);
+            }
+        }
+    }
+
+
     // Note that the add/removeXyzListener methods needn't be synchronized because of the CopyOnWriteLists
     
 	public void addConnectionListener(IMConnectionListener listener) {
@@ -177,6 +209,22 @@ public class PircConnection extends PircBot {
 	public void removeJoinListener(JoinListener listener) {
 		this.joinListeners.remove(listener);
 	}
+
+    public void addInviteListener(InviteListener listener) {
+        this.inviteListeners.add(listener);
+    }
+
+    public void removeInviteListener(InviteListener listener) {
+        this.inviteListeners.remove(listener);
+    }
+
+    public void addPartListener(PartListener listener) {
+        this.partListeners.add(listener);
+    }
+
+    public void removePartListener(PartListener listener) {
+        this.partListeners.remove(listener);
+    }
 	
 	private static final class MessageListener {
 		private final String target;
@@ -246,6 +294,24 @@ public class PircConnection extends PircBot {
 	}
 	
 	public interface JoinListener {
+		/**
+		 * Is called when the ircbot joins a channel.
+		 */
 		void channelJoined(String channelName);
 	}
+
+    public interface InviteListener {
+    	/**
+		 * Is called when the ircbot is invited to a channel.
+		 */
+        void inviteReceived(String channelName, String inviter);
+    }
+
+    public interface PartListener {
+    	/**
+		 * Is called when the ircbot is disconnected (leaves or is kicked) from a channel.
+		 */
+        void channelParted(String channelName);
+    }
+
 }
