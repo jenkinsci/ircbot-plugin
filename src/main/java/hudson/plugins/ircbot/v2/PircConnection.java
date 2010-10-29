@@ -70,6 +70,15 @@ public class PircConnection extends PircBot {
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    protected void handleLine(String line) {
+        LOGGER.fine(line);
+        super.handleLine(line);
+    }
+
     /**
      * {@inheritDoc} 
      */
