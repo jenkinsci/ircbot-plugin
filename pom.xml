@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 37338 2010-12-10 21:34:37Z kutzi $ -->
+<!-- $Id: pom.xml 37960 2011-01-08 14:45:48Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging-parent</artifactId>
-    <version>1.13-SNAPSHOT</version>
+    <version>1.12</version>
     <relativePath>../instant-messaging-parent/pom.xml</relativePath>
   </parent>
   <artifactId>ircbot</artifactId>
@@ -19,7 +19,7 @@
   </licenses>
   
   <properties>
-  	<version.instant-messaging.plugin>1.14-SNAPSHOT</version.instant-messaging.plugin>
+  	<version.instant-messaging.plugin>1.13</version.instant-messaging.plugin>
   </properties>
   
   <dependencies>
@@ -65,4 +65,11 @@
     <developerConnection>scm:svn:https://svn.java.net/svn/hudson~svn/trunk/hudson/plugins/ircbot</developerConnection>
     <url>http://fisheye4.atlassian.com/browse/hudson/trunk/hudson/plugins/ircbot</url>
   </scm>
+  
+   <distributionManagement>
+    <repository>
+      <id>java.net-m2-repository</id>
+      <url>http://maven.hudson-labs.org:8081/content/repositories/releases/</url>
+    </repository>
+  </distributionManagement>
 </project>
