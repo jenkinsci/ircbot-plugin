@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,6 +87,19 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	        final String nickServPassword = this.descriptor.getNickServPassword();
             if(Util.fixEmpty(nickServPassword) != null) {
                 this.pircConnection.identify(nickServPassword);
+                
+                if (!this.groupChats.isEmpty()) {
+	                // Sleep some time so chances are good we're already identified
+	                // when we try to join the channels.
+	                // Unfortunately there seems to be no standard way in IRC to recognize
+	                // if one has been identified already.
+	                LOGGER.fine("Sleeping some time to wait for being authenticated");
+	                try {
+						Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+					} catch (InterruptedException e) {
+						// ignore
+					}
+                }
             }
 			
 			for (IMMessageTarget groupChatName : this.groupChats) {
@@ -146,7 +160,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     public void channelJoined(String channelName) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
         if (groupChat == null) {
-            LOGGER.log(Level.INFO, "Joined to channel {0} but I don''t seem to belong here", channelName);
+            LOGGER.log(Level.INFO, "Joined to channel {0} but I don't seem to belong here", channelName);
             return;
         }
         Bot bot = new Bot(new IRCChannel(channelName, this.pircConnection),
@@ -160,7 +174,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     public void inviteReceived(String channelName, String inviter) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
         if (groupChat == null) {
-            LOGGER.log(Level.INFO, "Invited to channel {0} but I don''t seem to belong here", channelName);
+            LOGGER.log(Level.INFO, "Invited to channel {0} but I don't seem to belong here", channelName);
             return;
         }
         LOGGER.log(Level.INFO, "Invited to join {0}", channelName);
@@ -171,7 +185,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     public void channelParted(String channelName) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
         if (groupChat == null) {
-            LOGGER.log(Level.INFO, "I''m leaving {0} but I never seemed to belong there in the first place", channelName);
+            LOGGER.log(Level.INFO, "I'm leaving {0} but I never seemed to belong there in the first place", channelName);
             return;
         }
         if (bots.containsKey(channelName)) {
