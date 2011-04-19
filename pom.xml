@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 39350 2011-04-19 20:44:51Z kutzi $ -->
+<!-- $Id: pom.xml 39351 2011-04-19 20:47:04Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -75,8 +75,8 @@
   </developers>
   
   <scm>
-    <connection>scm:svn:https://guest@svn.jenkins-ci.org/tags/ircbot-2.10</connection>
-    <developerConnection>scm:svn:https://svn.jenkins-ci.org/tags/ircbot-2.10</developerConnection>
-    <url>http://fisheye.jenkins-ci.org/browse/Jenkins/tags/ircbot-2.10</url>
+    <connection>scm:svn:https://guest@svn.jenkins-ci.org/trunk/hudson/plugins/ircbot</connection>
+    <developerConnection>scm:svn:https://svn.jenkins-ci.org/trunk/hudson/plugins/ircbot</developerConnection>
+    <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/hudson/plugins/ircbot</url>
   </scm>
 </project>
