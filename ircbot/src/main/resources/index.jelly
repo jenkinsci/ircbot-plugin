@@ -1,0 +1,10 @@
+<!--
+  This view is used to render the plugin list page.
+
+  Since we don't really have anything dynamic here, let's just use static HTML. 
+-->
+<div>
+  <p>This plugin is an IRC bot that can publish build results to IRC channels.</p>
+  <p>Note that the <b>instant-messaging plugin ${version.instant-messaging.plugin}</b> is required for this plugin.
+  <em>Please make sure that it is installed, too!</em></p>
+</div>

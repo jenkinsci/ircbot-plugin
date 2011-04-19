@@ -1,0 +1,46 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <!--
+    This jelly script is used for per-project configuration.
+
+    See global.jelly for a general discussion about jelly script.
+  -->
+  <f:advanced>
+	  <f:entry title="Channels"	description="Name/password pairs of IRC channels (Password is optional)"
+	  	help="/plugin/ircbot/help-instanceConfigChannels.html">
+	  	<f:repeatable name="irc_publisher.channels" var="ch" items="${instance.notificationTargets}">
+	  	  <table width="100%">
+			<tr>
+		  	  	<td><input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" /></td>
+		  	  	<td><input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" /></td>
+		  	  	<td>
+    		        <div align="right"><f:repeatableDeleteButton /></div>
+                </td>
+	  	  	</tr>
+        </table>
+	  	</f:repeatable>
+	  </f:entry>
+	    <f:entry title="Notification Strategy" description="When to send notifications (all = always, failure = on any failure, failure and fixed = on failure and fixes, change = only on state change)">
+	    <select class="setting-input" name="${descriptor.PARAMETERNAME_STRATEGY}">
+	       <j:forEach var="value" items="${descriptor.PARAMETERVALUE_STRATEGY_VALUES}">
+	          <f:option selected="${instance.strategy==value}">${value}</f:option>
+	       </j:forEach>
+	    </select>
+	  </f:entry>
+	  <f:entry title="Notify on build starts" description="Whether to send notifications to channels when a build starts">
+	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_START}" checked="${instance.notifyOnStart}"/>
+	  </f:entry>
+	  <f:entry title="Notify SCM committers" description="Whether to send notifications to the users that are suspected of having broken this build">
+	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_SUSPECTS}" checked="${instance.notifySuspects}"/>
+	  </f:entry>
+	  <f:entry title="Notify SCM culprits" description="Also send notifications to 'culprits' from previous unstable/failed builds">
+	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_CULPRITS}" checked="${instance.notifyCulprits}"/>
+	  </f:entry>
+      <f:entry title="Notify upstream committers" description="Whether to send notifications to upstream committers if no committers were found for a broken build">
+        <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS}" checked="${instance.notifyUpstreamCommitters}"/>
+      </f:entry>
+	  <f:entry title="Notify SCM fixers" description="Whether to send notifications to the users that have fixed a broken build">
+	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_FIXERS}" checked="${instance.notifyFixers}"/>
+	  </f:entry>
+      <super:config-buildToChatNotifier xmlns:super="/hudson/plugins/im/IMPublisher" />
+  </f:advanced>
+</j:jelly>

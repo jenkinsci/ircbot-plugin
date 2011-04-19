@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: pom.xml 39336 2011-04-19 20:17:54Z kutzi $ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jvnet.hudson.plugins</groupId>
+    <artifactId>instant-messaging-parent</artifactId>
+    <version>1.13</version>
+    <relativePath>../instant-messaging-parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>ircbot</artifactId>
+  <packaging>hpi</packaging>
+  <version>2.10</version>
+  <name>Jenkins IRC Plugin</name>
+  <description>A Build status publisher that notifies channels on a IRC server</description>
+  <url>http://wiki.jenkins-ci.org/display/JENKINS/IRC+Plugin</url>
+  <licenses>
+  	<license>
+        <name>MIT license</name>
+        <comments>All source code is under the MIT license.</comments>
+    </license>
+  </licenses>
+  
+  <properties>
+  	<version.instant-messaging.plugin>1.14</version.instant-messaging.plugin>
+  </properties>
+  
+  <dependencies>
+     <dependency>
+     	<groupId>org.jvnet.hudson.plugins</groupId>
+     	<artifactId>instant-messaging</artifactId>
+     	<version>${version.instant-messaging.plugin}</version>
+	    <scope>compile</scope>
+     </dependency>
+    <dependency>
+      <groupId>pircbot</groupId>
+      <artifactId>pircbot</artifactId>
+      <version>1.4.6</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+	    <plugins>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
+		</plugins>
+  </build>
+  
+  <repositories>
+    <!-- Contains the latest version of pircbot -->
+  	<repository>
+        <id>JA-SIG</id>
+        <url>http://developer.jasig.org/repo/content/groups/m2-legacy/</url>
+        <releases>
+           <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+     </repository>
+  </repositories>
+  
+  <developers>
+    <developer>
+        <id>kutzi</id>
+        <name>Christoph Kutzinski</name>
+        <email>kutzi@gmx.de</email>
+        <timezone>1</timezone>
+    </developer>
+  </developers>
+  
+  <scm>
+    <connection>scm:svn:https://guest@svn.jenkins-ci.org/tags/ircbot-2.10</connection>
+    <developerConnection>scm:svn:https://svn.jenkins-ci.org/tags/ircbot-2.10</developerConnection>
+    <url>http://fisheye.jenkins-ci.org/browse/Jenkins/tags/ircbot-2.10</url>
+  </scm>
+</project>
