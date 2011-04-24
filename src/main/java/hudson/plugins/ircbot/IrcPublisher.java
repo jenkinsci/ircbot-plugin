@@ -37,7 +37,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author bruyeron
  * @author $Author: kutzi $ (last change)
- * @version $Id: IrcPublisher.java 36912 2010-11-14 15:49:57Z kutzi $
+ * @version $Id: IrcPublisher.java 39372 2011-04-24 18:23:42Z kutzi $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -156,7 +156,7 @@ public class IrcPublisher extends IMPublisher {
 
         String password = null;
 
-        String nick = null;
+        String nick = "jenkins-bot";
         
         String nickServPassword = null;
 
@@ -170,7 +170,7 @@ public class IrcPublisher extends IMPublisher {
         
         private List<IMMessageTarget> defaultTargets;
 
-        String commandPrefix = null;
+        String commandPrefix = "!jenkins";
         
         private String hudsonLogin;
         private String hudsonPassword;
