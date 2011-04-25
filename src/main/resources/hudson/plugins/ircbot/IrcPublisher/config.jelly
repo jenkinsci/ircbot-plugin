@@ -42,5 +42,13 @@
 	    <f:checkbox name="${descriptor.PARAMETERNAME_NOTIFY_FIXERS}" checked="${instance.notifyFixers}"/>
 	  </f:entry>
       <super:config-buildToChatNotifier xmlns:super="/hudson/plugins/im/IMPublisher" />
+      
+      <j:if test="${instance.isMatrixProject(it)}">
+          <f:entry title="${%Notify for matrix projects}" field="matrixNotifier" help="/plugin/instant-messaging/help-matrix_notify.html">
+              <f:enum field="matrixNotifier">
+                 ${it.getLabel()}
+              </f:enum>
+          </f:entry>
+      </j:if>
   </f:advanced>
 </j:jelly>

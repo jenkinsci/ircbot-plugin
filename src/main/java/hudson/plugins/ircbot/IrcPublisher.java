@@ -4,8 +4,13 @@
 package hudson.plugins.ircbot;
 
 import hudson.Extension;
+import hudson.Launcher;
 import hudson.Util;
+import hudson.matrix.MatrixAggregator;
+import hudson.matrix.MatrixRun;
+import hudson.matrix.MatrixBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 import hudson.model.User;
 import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
@@ -14,6 +19,7 @@ import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.IMMessageTargetConverter;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.IMPublisherDescriptor;
+import hudson.plugins.im.MatrixJobMultiplier;
 import hudson.plugins.im.NotificationStrategy;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.tools.ExceptionHelper;
@@ -23,6 +29,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +44,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author bruyeron
  * @author $Author: kutzi $ (last change)
- * @version $Id: IrcPublisher.java 39372 2011-04-24 18:23:42Z kutzi $
+ * @version $Id: IrcPublisher.java 39378 2011-04-25 17:04:03Z kutzi $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -65,11 +72,12 @@ public class IrcPublisher extends IMPublisher {
     		boolean notifyCulprits,
     		boolean notifyFixers,
     		boolean notifyUpstreamCommitters,
-            BuildToChatNotifier buildToChatNotifier)
+            BuildToChatNotifier buildToChatNotifier,
+            MatrixJobMultiplier matrixMultiplier)
     {
         super(defaultTargets, notificationStrategy, notifyGroupChatsOnBuildStart,
         		notifySuspects, notifyCulprits, notifyFixers, notifyUpstreamCommitters,
-        		buildToChatNotifier);
+        		buildToChatNotifier, matrixMultiplier);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -325,10 +333,17 @@ public class IrcPublisher extends IMPublisher {
             boolean notifyCulprits = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_CULPRITS));
             boolean notifyFixers = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_FIXERS));
             boolean notifyUpstream = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS));
+            
+            MatrixJobMultiplier matrixJobMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
+            if (formData.has("matrixNotifier")) {
+                String o = formData.getString("matrixNotifier");
+                matrixJobMultiplier = MatrixJobMultiplier.valueOf(o);
+            }
 
             return new IrcPublisher(targets, n, notifyStart, notifySuspects, notifyCulprits,
                 		notifyFixers, notifyUpstream,
-                		req.bindJSON(BuildToChatNotifier.class,formData.getJSONObject("buildToChatNotifier")));
+                		req.bindJSON(BuildToChatNotifier.class,formData.getJSONObject("buildToChatNotifier")),
+                		matrixJobMultiplier);
         }
 
         @Override
