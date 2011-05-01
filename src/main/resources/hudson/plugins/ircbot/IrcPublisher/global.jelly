@@ -66,11 +66,11 @@
       help="/plugin/ircbot/help-globalConfigCommandPrefix.html">
       <f:textbox name="irc_publisher.commandPrefix" value="${descriptor.getCommandPrefix()}" />
     </f:entry>
-    <f:entry title="Hudson Username" help="/plugin/ircbot/help-hudson-login.html">
+    <f:entry title="Jenkins Username" help="/plugin/ircbot/help-hudson-login.html">
         <f:textbox name="${descriptor.PARAMETERNAME_HUDSON_LOGIN}"
           value="${descriptor.hudsonUserName}" />
       </f:entry>
-      <f:entry title="Hudson Password">
+      <f:entry title="Jenkins Password">
         <f:password name="${descriptor.PARAMETERNAME_HUDSON_PASSWORD}"
           value="${descriptor.hudsonPassword}" />
       </f:entry>
