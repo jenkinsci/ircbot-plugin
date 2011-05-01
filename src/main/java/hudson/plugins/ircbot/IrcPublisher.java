@@ -44,7 +44,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author bruyeron
  * @author $Author: kutzi $ (last change)
- * @version $Id: IrcPublisher.java 39378 2011-04-25 17:04:03Z kutzi $
+ * @version $Id: IrcPublisher.java 39408 2011-05-01 10:52:54Z kutzi $
  */
 public class IrcPublisher extends IMPublisher {
 
@@ -141,18 +141,6 @@ public class IrcPublisher extends IMPublisher {
      */
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> implements IMPublisherDescriptor {
 
-    	private static final String PREFIX = "irc_publisher.";
-        public static final String PARAMETERNAME_STRATEGY = PREFIX + "strategy";
-        public static final String PARAMETERNAME_NOTIFY_START = PREFIX + "notifyStart";
-        public static final String PARAMETERNAME_NOTIFY_SUSPECTS = PREFIX + "notifySuspects";
-        public static final String PARAMETERNAME_NOTIFY_CULPRITS = PREFIX + "notifyCulprits";
-        public static final String PARAMETERNAME_NOTIFY_FIXERS = PREFIX + "notifyFixers";
-        public static final String PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS = PREFIX + "notifyUpstreamCommitters";
-        
-		public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
-		public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
-		public static final String PARAMETERNAME_HUDSON_LOGIN = PREFIX + "hudsonLogin";
-	    public static final String PARAMETERNAME_HUDSON_PASSWORD = PREFIX + "hudsonPassword";
 	    public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
 	    public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
 
