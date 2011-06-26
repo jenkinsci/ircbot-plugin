@@ -53,6 +53,13 @@
         
         <super:global-jenkinsLogin />
       
+        <f:entry title="Notification charset" description="The character set to use for notifications">
+            <select name="charset">
+               <j:forEach var="cs" items="${descriptor.CHARSETS}">
+                  <f:option selected="${instance.charset.toString()==cs}">${cs}</f:option>
+               </j:forEach>
+            </select>
+        </f:entry>
         <f:entry title="Use /notice command" description="Use /notice command instead of /msg (default in ircbot &lt;= 2.0)">
           <f:checkbox name="${descriptor.PARAMETERNAME_USE_NOTICE}" checked="${descriptor.useNotice}"/>
         </f:entry>

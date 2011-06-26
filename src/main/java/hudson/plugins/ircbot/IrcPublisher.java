@@ -4,13 +4,8 @@
 package hudson.plugins.ircbot;
 
 import hudson.Extension;
-import hudson.Launcher;
 import hudson.Util;
-import hudson.matrix.MatrixAggregator;
-import hudson.matrix.MatrixRun;
-import hudson.matrix.MatrixBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
 import hudson.model.User;
 import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
@@ -29,10 +24,11 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 
-import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
@@ -42,7 +38,7 @@ import org.kohsuke.stapler.StaplerRequest;
 /**
  * Publishes build results to IRC channels.
  * 
- * @author bruyeron
+ * @author bruyeron (original author)
  * @author $Author: kutzi $ (last change)
  * @version $Id: IrcPublisher.java 39408 2011-05-01 10:52:54Z kutzi $
  */
@@ -130,7 +126,7 @@ public class IrcPublisher extends IMPublisher {
     	this.channels = null;
     	
     	if (getNotificationStrategy() == null) {
-    		// set to the fixed strategy in ircbot <= 1.7
+    		// set to the only available strategy in ircbot <= 1.7
     		setNotificationStrategy(NotificationStrategy.STATECHANGE_ONLY);
     	}
     	return this;
@@ -143,6 +139,21 @@ public class IrcPublisher extends IMPublisher {
 
 	    public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
 	    public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
+	    
+	    public static final String[] CHARSETS;
+	    
+	    static {
+	        SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
+	        String[] cs = new String[availableCharsets.size()];
+	        cs[0] = "UTF-8";
+	        int i = 1;
+	        for (String csName : availableCharsets.keySet()) {
+	            if (!"UTF-8".equals(csName)) {
+	                cs[i++] = csName;
+	            }
+	        }
+	        CHARSETS = cs;
+	    }
 
 		boolean enabled = false;
 
@@ -172,6 +183,8 @@ public class IrcPublisher extends IMPublisher {
         private String hudsonPassword;
         
         private boolean useNotice;
+        
+        private String charset;
 
         DescriptorImpl() {
             super(IrcPublisher.class);
@@ -239,6 +252,8 @@ public class IrcPublisher extends IMPublisher {
                 this.hudsonPassword = req.getParameter(PARAMETERNAME_HUDSON_PASSWORD);
                 
                 this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
+                
+                this.charset = req.getParameter("charset");
                 
                 // try to establish the connection
                 try {
@@ -335,8 +350,7 @@ public class IrcPublisher extends IMPublisher {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+        public boolean isApplicable(@SuppressWarnings("rawtypes") Class<? extends AbstractProject> jobType) {
             return true;
         }
 
@@ -445,6 +459,10 @@ public class IrcPublisher extends IMPublisher {
 		    return this.useNotice;
 		}
 		
+		public String getCharset() {
+		    return this.charset;
+		}
+		
 		/**
 		 * Deserialize old descriptors.
 		 */
@@ -459,6 +477,10 @@ public class IrcPublisher extends IMPublisher {
 					this.channels = null;
 					save();
 				}
+			}
+			
+			if (this.charset == null) {
+			    this.charset = "UTF-8";
 			}
 			
 			return this;
