@@ -9,10 +9,15 @@ import hudson.Extension;
 import hudson.model.User;
 import hudson.model.UserPropertyDescriptor;
 
+import net.sf.json.JSONObject;
+
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- * @author bruyeron
+ * User property to assign an IRC nickname to a Jenkins user.
+ * 
+ * @author bruyeron (original author)
+ * @author $Author$ (last change)
  * @version $Id: IrcUserProperty.java 23738 2009-11-15 18:36:59Z kutzi $
  */
 public class IrcUserProperty extends hudson.model.UserProperty {
@@ -57,7 +62,7 @@ public class IrcUserProperty extends hudson.model.UserProperty {
         }
 
         @Override
-        public IrcUserProperty newInstance(StaplerRequest req)
+        public IrcUserProperty newInstance(StaplerRequest req, JSONObject formData)
                 throws FormException {
             return new IrcUserProperty(req.getParameter("irc.nick"));
         }
