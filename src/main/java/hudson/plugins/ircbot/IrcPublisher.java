@@ -160,6 +160,8 @@ public class IrcPublisher extends IMPublisher {
         String hostname = null;
 
         Integer port = 194;
+        
+        private boolean ssl;
 
         String password = null;
 
@@ -185,7 +187,7 @@ public class IrcPublisher extends IMPublisher {
         private boolean useNotice;
         
         private String charset;
-
+        
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
@@ -224,6 +226,7 @@ public class IrcPublisher extends IMPublisher {
                     throw new FormException("port field must be an Integer",
                             "irc_publisher.port");
                 }
+                this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 
@@ -253,7 +256,7 @@ public class IrcPublisher extends IMPublisher {
                 
                 this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
                 
-                this.charset = req.getParameter("charset");
+                this.charset = req.getParameter("irc_publisher.charset");
                 
                 // try to establish the connection
                 try {
@@ -395,6 +398,10 @@ public class IrcPublisher extends IMPublisher {
         @Override
         public int getPort() {
             return port;
+        }
+        
+        public boolean isSsl() {
+            return this.ssl;
         }
 
         @Override

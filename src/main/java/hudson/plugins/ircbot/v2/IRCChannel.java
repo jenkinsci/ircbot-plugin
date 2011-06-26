@@ -7,11 +7,13 @@ import hudson.plugins.im.IMMessageListener;
 public class IRCChannel implements IMChat {
 
 	private final String channelName;
-	private final PircConnection connection;
+	private final PircListener listener;
+    private IRCConnection connection;
 
-	public IRCChannel(String channelName, PircConnection connection) {
+	public IRCChannel(String channelName, IRCConnection connection, PircListener listener) {
 		this.channelName = channelName;
 		this.connection = connection;
+		this.listener = listener;
 	}
 	
 	@Override
@@ -31,16 +33,16 @@ public class IRCChannel implements IMChat {
 
 	@Override
 	public void addMessageListener(IMMessageListener listener) {
-		this.connection.addMessageListener(this.channelName, listener);
+		this.listener.addMessageListener(this.channelName, listener);
 	}
 	
 	@Override
 	public void removeMessageListener(IMMessageListener listener) {
-		this.connection.removeMessageListener(this.channelName, listener);
+		this.listener.removeMessageListener(this.channelName, listener);
 	}
 
 	@Override
 	public void sendMessage(String message) throws IMException {
-		this.connection.sendIMMessage(channelName, message);
+		this.connection.send(channelName, message);
 	}
 }

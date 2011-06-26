@@ -13,9 +13,9 @@ import hudson.plugins.im.IMPresence;
 import hudson.plugins.im.bot.Bot;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.ircbot.IrcPublisher.DescriptorImpl;
-import hudson.plugins.ircbot.v2.PircConnection.JoinListener;
-import hudson.plugins.ircbot.v2.PircConnection.InviteListener;
-import hudson.plugins.ircbot.v2.PircConnection.PartListener;
+import hudson.plugins.ircbot.v2.PircListener.InviteListener;
+import hudson.plugins.ircbot.v2.PircListener.JoinListener;
+import hudson.plugins.ircbot.v2.PircListener.PartListener;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -26,8 +26,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jibble.pircbot.IrcException;
-import org.jibble.pircbot.NickAlreadyInUseException;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
+
+import org.pircbotx.Channel;
+import org.pircbotx.PircBotX;
+import org.pircbotx.exception.IrcException;
+import org.pircbotx.exception.NickAlreadyInUseException;
 
 public class IRCConnection implements IMConnection, JoinListener, InviteListener, PartListener {
 
@@ -35,7 +40,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	
 	private final DescriptorImpl descriptor;
 	private final AuthenticationHolder authentication;
-	private PircConnection pircConnection;
+	private final PircBotX pircConnection = new PircBotX();
+	private final PircListener listener;
 
 	private List<IMMessageTarget> groupChats;
 
@@ -52,14 +58,26 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		} else {
 			this.groupChats = Collections.emptyList();
 		}
+		
+        this.pircConnection.setName(this.descriptor.getNick());
+        
+        // lower delay between sending 2 messages to 500ms as we will sometimes send
+        // output which will consist of multiple lines (see comment in send method)
+        // (lowering further than this doesn't seem to work as we will otherwise be easily
+        // be throttled by IRC servers)
+        this.pircConnection.setMessageDelay(500);
+        
+        this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
 	}
 	
 	@Override
 	public void close() {
+	    this.listener.explicitDisconnect = true;
+	    
 		if (this.pircConnection != null && this.pircConnection.isConnected()) {
-                    this.pircConnection.removeJoinListener(this);
-                    this.pircConnection.removePartListener(this);
-                    this.pircConnection.removeInviteListener(this);
+                    this.listener.removeJoinListener(this);
+                    this.listener.removePartListener(this);
+                    this.listener.removeInviteListener(this);
 			this.pircConnection.disconnect();
 			this.pircConnection.dispose();
 		}
@@ -73,17 +91,27 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	@Override
 	public boolean connect() {
 		try {
-			this.pircConnection = new PircConnection(this.descriptor.getNick(), this.descriptor.isUseNotice());
-			
 			this.pircConnection.setEncoding(this.descriptor.getCharset());
 
 			LOGGER.info(String.format("Connecting to %s:%s as %s using charset %s",
 			        this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getNick(), this.descriptor.getCharset()));
-			this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getPassword());
+			
+			String password = Util.fixEmpty(this.descriptor.getPassword());
+			
+			final SocketFactory sf;
+			if (this.descriptor.isSsl()) {
+			    sf = SSLSocketFactory.getDefault();
+			} else {
+			    sf = SocketFactory.getDefault();
+			}
+			
+		    this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
+			
 			LOGGER.info("connected to IRC");
-			this.pircConnection.addJoinListener(this);
-            this.pircConnection.addInviteListener(this);
-            this.pircConnection.addPartListener(this);
+			this.pircConnection.getListenerManager().addListener(this.listener);
+			this.listener.addJoinListener(this);
+            this.listener.addInviteListener(this);
+            this.listener.addPartListener(this);
 			
 	        final String nickServPassword = this.descriptor.getNickServPassword();
             if(Util.fixEmpty(nickServPassword) != null) {
@@ -114,8 +142,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 				}
 			}
 			
-			pircConnection.addMessageListener(this.descriptor.getNick(),
-			        PircConnection.CHAT_ESTABLISHER, new ChatEstablishedListener());
+			listener.addMessageListener(this.descriptor.getNick(),
+			        PircListener.CHAT_ESTABLISHER, new ChatEstablishedListener());
 			
 			return true;
 		} catch (NickAlreadyInUseException e) {
@@ -164,7 +192,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
             LOGGER.log(Level.INFO, "Joined to channel {0} but I don't seem to belong here", channelName);
             return;
         }
-        Bot bot = new Bot(new IRCChannel(channelName, this.pircConnection),
+        Bot bot = new Bot(new IRCChannel(channelName, this, this.listener),
                 this.descriptor.getNick(), this.descriptor.getHost(),
                 this.descriptor.getCommandPrefix(), this.authentication);
         bots.put(channelName, bot);
@@ -200,19 +228,36 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
 	@Override
 	public void addConnectionListener(IMConnectionListener listener) {
-		if (this.pircConnection != null)
-		 this.pircConnection.addConnectionListener(listener);
+	    this.listener.addConnectionListener(listener);
 	}
 
 	@Override
 	public void removeConnectionListener(IMConnectionListener listener) {
-		if (this.pircConnection != null)
-			this.pircConnection.removeConnectionListener(listener);
+		this.listener.removeConnectionListener(listener);
 	}
 
 	@Override
-	public void send(IMMessageTarget target, String text) throws IMException {
-		this.pircConnection.sendIMMessage(target.toString(), text);
+    public void send(IMMessageTarget target, String text) throws IMException {
+	    send(target.toString(), text);
+	}
+	
+	public void send(String target, String text) throws IMException {
+	       // many IRC clients don't seem to handle new lines well (see e.g. https://bugzilla.redhat.com/show_bug.cgi?id=136542)
+        // Therefore the following won't work most of the time:
+	    //      message = message.replace("\n", "\020n");
+	    //      sendNotice(target, message);
+        
+        // send multiple messages instead: 
+	    Channel channel = this.pircConnection.getChannel(target);
+        
+        String[] lines = text.split("\\r?\\n|\\r");
+        for (String line : lines) {
+            if (this.descriptor.isUseNotice()) {
+                this.pircConnection.sendNotice(channel, line);
+            } else {
+                this.pircConnection.sendMessage(channel, line);
+            }
+        }
 	}
 
 	@Override
@@ -248,7 +293,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 					return;
 				}
 				
-				IRCPrivateChat chat = new IRCPrivateChat(pircConnection, descriptor.getUserName(), message.getFrom());
+				IRCPrivateChat chat = new IRCPrivateChat(IRCConnection.this, listener, descriptor.getUserName(), message.getFrom());
 				Bot bot = new Bot(chat,
 						descriptor.getNick(), descriptor.getHost(),
 						descriptor.getCommandPrefix(), authentication);

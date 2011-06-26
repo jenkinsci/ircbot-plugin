@@ -6,23 +6,34 @@ package hudson.plugins.ircbot.v2;
 import hudson.plugins.im.IMConnectionListener;
 import hudson.plugins.im.IMMessage;
 import hudson.plugins.im.IMMessageListener;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-import org.jibble.pircbot.PircBot;
+import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.DisconnectEvent;
+import org.pircbotx.hooks.events.InviteEvent;
+import org.pircbotx.hooks.events.JoinEvent;
+import org.pircbotx.hooks.events.KickEvent;
+import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.NoticeEvent;
+import org.pircbotx.hooks.events.PartEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
+import org.pircbotx.hooks.events.ServerResponseEvent;
 
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 /**
- * Our implementation of {@link PircBot}.
+ * PircBot listener to react to certain IRC events.
  *
  * @author kutzi (original)
  * @author $Author: kutzi $ (last change)
  */
-public class PircConnection extends PircBot {
+public class PircListener extends ListenerAdapter<PircBotX> {
 
-	private static final Logger LOGGER = Logger.getLogger(PircConnection.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(PircListener.class.getName());
 	
 	@SuppressWarnings(value = "DM_STRING_CTOR", justification = "we want a new instance here to enable reference comparison")
 	public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
@@ -37,57 +48,36 @@ public class PircConnection extends PircBot {
 
     private final List<PartListener> partListeners = new CopyOnWriteArrayList<PartListener>();
     
-	private final boolean useNotice;
 	
-	private volatile boolean explicitDisconnect = false;
+	volatile boolean explicitDisconnect = false;
+	
+	
+	private final PircBotX pircBot;
+    private final String nick;
 
-	public PircConnection(String name, boolean useNotice) {
-	    this.useNotice = useNotice;
-        setName(name);
-        
-        // lower delay between sending 2 messages to 500ms as we will sometimes send
-        // output which will consist of multiple lines (see comment in sendIMMessage)
-        // (lower than this doesn't seem to work as we will otherwise be easily
-        // be throttled by IRC servers)
-        setMessageDelay(500);
+	public PircListener(PircBotX pircBot, String nick) {
+	    this.pircBot = pircBot;
+	    this.nick = nick;
     }
 
-	public void sendIMMessage(String target, String message) {
-		// many IRC clients don't seem to handle new lines well (see e.g. https://bugzilla.redhat.com/show_bug.cgi?id=136542)
-		// Therefore the following won't work most of the time:
-//		message = message.replace("\n", "\020n");
-//		sendNotice(target, message);
-		
-		// send multiple messages instead: 
-		
-		String[] lines = message.split("\\r?\\n|\\r");
-		for (String line : lines) {
-		    if (this.useNotice) {
-		        sendNotice(target, line);
-		    } else {
-		        sendMessage(target, line);
-		    }
-		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-    @Override
-    protected void handleLine(String line) {
-        LOGGER.fine(line);
-        super.handleLine(line);
-    }
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//    @Override
+//    protected void handleLine(String line) {
+//        LOGGER.fine(line);
+//        super.handleLine(line);
+//    }
 
     /**
      * {@inheritDoc} 
      */
     @Override
-    protected void onMessage(String channel, String sender,
-            String login, String hostname, String message) {
+    public void onMessage(MessageEvent<PircBotX> event) {
     	for (MessageListener l : this.msgListeners) {
-    		if(l.target.equals(channel)) {
-    			l.listener.onMessage(new IMMessage(sender, channel, message));
+    		if(l.target.equals(event.getChannel().getName())) {
+    			l.listener.onMessage(new IMMessage(event.getUser().getNick(),
+    			        event.getChannel().getName(), event.getMessage()));
     		}
     	}
     }
@@ -96,12 +86,13 @@ public class PircConnection extends PircBot {
      * {@inheritDoc} 
      */
     @Override
-    protected void onPrivateMessage(String sender, String login,
-            String hostname, String message) {
+    public void onPrivateMessage(PrivateMessageEvent<PircBotX> event) {
+        String sender = event.getUser().getNick();
+        String message = event.getMessage();
     	for (MessageListener l : this.msgListeners) {
-    		if (getName().equals(l.target)) {
+    		if (this.nick.equals(l.target)) {
     		    if (l.sender == CHAT_ESTABLISHER || sender.equals(l.sender)) {
-    		        l.listener.onMessage(new IMMessage(sender, getNick(), message));
+    		        l.listener.onMessage(new IMMessage(sender, this.nick, message));
     		    }
     		}
     	}
@@ -111,9 +102,9 @@ public class PircConnection extends PircBot {
      * Someone send me a notice. Possibly NickServ after identifying.
      */
     @Override
-	protected void onNotice(String sourceNick, String sourceLogin,
-			String sourceHostname, String target, String notice) {
-		super.onNotice(sourceNick, sourceLogin, sourceHostname, target, notice);
+	public void onNotice(NoticeEvent<PircBotX> event) {
+        String sourceNick = event.getUser().getNick();
+        String notice = event.getMessage();
 		LOGGER.info("Notice from " + sourceNick + ": '" + normalize(notice) + "'");
 	}
 
@@ -121,54 +112,49 @@ public class PircConnection extends PircBot {
      * {@inheritDoc}
      */
     @Override
-    protected void onJoin(String channel, String sender, String login, String hostname) {
+    public void onJoin(JoinEvent<PircBotX> event) {
+        String sender = event.getUser().getNick();
     	for (JoinListener l : this.joinListeners) {
-    		if (getName().equals(sender)) {
-    			l.channelJoined(channel);
+    		if (this.nick.equals(sender)) {
+    			l.channelJoined(event.getChannel().getName());
     		}
     	}
     }
 
     @Override
-    protected void onPart(String channel, String sender, String login, String hostname) {
+    public void onPart(PartEvent<PircBotX> event) {
+        String sender = event.getUser().getNick();
         for (PartListener l : this.partListeners) {
-            if (getNick().equals(sender)) {
-                l.channelParted(channel);
+            if (this.nick.equals(sender)) {
+                l.channelParted(event.getChannel().getName());
             }
         }
     }
 
     @Override
-    protected void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason) {
+    public void onKick(KickEvent<PircBotX> event) {
+        String recipientNick = event.getRecipient().getNick();
         for(PartListener l : this.partListeners) {
-            if (getNick().equals(recipientNick)) {
-                l.channelParted(channel);
+            if (this.nick.equals(recipientNick)) {
+                l.channelParted(event.getChannel().getName());
             }
         }
     }
     
     @Override
-    protected void onServerResponse(int code, String response) {
+    public void onServerResponse(ServerResponseEvent<PircBotX> event) {
+        int code = event.getCode();
     	if (code >= 400 && code <= 599) {
     		LOGGER.warning("IRC server responded error " + code + " Message:\n" +
-    				response);
+    				event.getResponse());
     	}
     }
     
-    public final void closeConnection() {
-    	this.explicitDisconnect = true;
-    	super.disconnect();
-    	
-    	// PircBot#disconnect is brain-dead as it doesn't do the opposite of connect.
-    	// Specifically: it doesn't stop the input- and output-threads!
-    	// Therefore we do it ourselves in #onDisconnect
-    }
-    
     @Override
-	protected void onDisconnect() {
+	public void onDisconnect(DisconnectEvent<PircBotX> event) {
         
         // clean up resources. make sure that no old input/output thread survive
-        super.dispose();
+        this.pircBot.dispose();
         
     	if (!explicitDisconnect) {
 	    	for (IMConnectionListener l : this.listeners) {
@@ -176,15 +162,12 @@ public class PircConnection extends PircBot {
 	    	}
     	}
     	explicitDisconnect = false;
-		super.onDisconnect();
 	}
 
     @Override
-    protected void onInvite(String targetNick, String sourceNick, String sourceLogin, String sourceHostname, String channel) {
-        if (getNick().equals(targetNick)) {
-            for (InviteListener listener : inviteListeners) {
-                listener.inviteReceived(channel, sourceNick);
-            }
+    public void onInvite(InviteEvent<PircBotX> event) {
+        for (InviteListener listener : inviteListeners) {
+            listener.inviteReceived(event.getChannel(), event.getUser());
         }
     }
 
