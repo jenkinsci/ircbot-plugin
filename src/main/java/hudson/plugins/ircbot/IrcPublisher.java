@@ -136,7 +136,8 @@ public class IrcPublisher extends IMPublisher {
      * Descriptor for {@link IrcPublisher}
      */
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> implements IMPublisherDescriptor {
-
+        
+        private static final String PREFIX = "irc_publisher.";
 	    public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
 	    public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
 	    
