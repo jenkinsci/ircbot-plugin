@@ -52,17 +52,12 @@
   </build>
   
   <repositories>
-    <!-- Contains the latest version of pircbot -->
-  	<repository>
-        <id>JA-SIG</id>
-        <url>http://developer.jasig.org/repo/content/groups/m2-legacy/</url>
-        <releases>
-           <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-     </repository>
+      <!-- get every artifact through maven.glassfish.org, which proxies all 
+        the artifacts that we need -->
+    <repository>
+        <id>m.g.o-public</id>
+        <url>http://maven.glassfish.org/content/groups/public/</url>
+    </repository>
   </repositories>
   
   <developers>
