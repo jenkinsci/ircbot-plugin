@@ -53,8 +53,8 @@
             <plugin>
                 <groupId>org.jenkins-ci.tools</groupId>
                 <artifactId>maven-hpi-plugin</artifactId>
-                <!-- 1.73+ requires Jenkins 1.420+ -->
-                <version>1.72</version>
+                <!-- 1.72+ requires Jenkins 1.420+ -->
+                <version>1.71</version>
                 <extensions>true</extensions>
             </plugin>
 		</plugins>
