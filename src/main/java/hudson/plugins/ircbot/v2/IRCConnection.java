@@ -50,6 +50,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
 
 	public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
+	    if (LOGGER.isLoggable(Level.FINEST)) {
+	        this.pircConnection.setVerbose(true);
+	    }
 		this.descriptor = descriptor;
 		this.authentication = authentication;
 		
@@ -267,9 +270,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			if (statusMessage == null || statusMessage.trim().length() == 0) {
 				statusMessage = "away";
 			}
-			this.pircConnection.sendRawLineViaQueue("AWAY " + statusMessage);
+			this.pircConnection.sendRawLineNow("AWAY " + statusMessage);
 		} else {
-			this.pircConnection.sendRawLineViaQueue("AWAY");
+			this.pircConnection.sendRawLineNow("AWAY");
 		}
 	}
 
