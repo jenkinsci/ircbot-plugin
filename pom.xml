@@ -6,9 +6,7 @@
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging-parent</artifactId>
     <version>1.15-SNAPSHOT</version>
-    <!-- doesn't mean something in the case of github
     <relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
-    -->
   </parent>
   <artifactId>ircbot</artifactId>
   <packaging>hpi</packaging>
