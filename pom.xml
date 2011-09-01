@@ -48,6 +48,15 @@
 					<goals>deploy</goals>
 				</configuration>
 			</plugin>
+            
+            <!--  for some reason the J-o-J job refused to pick up the new im-parent version. Therefore: -->
+            <plugin>
+                <groupId>org.jenkins-ci.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <!-- 1.73+ requires Jenkins 1.420+ -->
+                <version>1.72</version>
+                <extensions>true</extensions>
+            </plugin>
 		</plugins>
   </build>
   
