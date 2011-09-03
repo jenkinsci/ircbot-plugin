@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging-parent</artifactId>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.16</version>
     <relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
   </parent>
   <artifactId>ircbot</artifactId>
@@ -22,7 +22,7 @@
   </licenses>
   
   <properties>
-  	<version.instant-messaging.plugin>1.17</version.instant-messaging.plugin>
+  	<version.instant-messaging.plugin>1.18</version.instant-messaging.plugin>
   </properties>
   
   <dependencies>
@@ -48,15 +48,6 @@
 					<goals>deploy</goals>
 				</configuration>
 			</plugin>
-            
-            <!--  for some reason the J-o-J job refused to pick up the new im-parent version. Therefore: -->
-            <plugin>
-                <groupId>org.jenkins-ci.tools</groupId>
-                <artifactId>maven-hpi-plugin</artifactId>
-                <!-- 1.72+ requires Jenkins 1.420+ -->
-                <version>1.71</version>
-                <extensions>true</extensions>
-            </plugin>
 		</plugins>
   </build>
   
