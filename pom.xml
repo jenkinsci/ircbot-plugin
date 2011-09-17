@@ -22,7 +22,7 @@
   </licenses>
   
   <properties>
-  	<version.instant-messaging.plugin>1.18</version.instant-messaging.plugin>
+  	<version.instant-messaging.plugin>1.19</version.instant-messaging.plugin>
   </properties>
   
   <dependencies>
