@@ -4,6 +4,11 @@ import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessageListener;
 
+/**
+ * Representation of an IRC channel.
+ * 
+ * @author kutzi
+ */
 public class IRCChannel implements IMChat {
 
 	private final String channelName;

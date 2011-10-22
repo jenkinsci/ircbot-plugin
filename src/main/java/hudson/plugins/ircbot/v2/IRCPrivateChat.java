@@ -4,6 +4,11 @@ import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessageListener;
 
+/**
+ * Representation of an IRC private (user-to-user) chat.
+ * 
+ * @author kutzi
+ */
 public class IRCPrivateChat implements IMChat {
 	
 	private final PircListener listener;

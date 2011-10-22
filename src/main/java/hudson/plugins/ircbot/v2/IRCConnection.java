@@ -34,6 +34,11 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
 
+/**
+ * IRC specific implementation of an {@link IMConnection}.
+ * 
+ * @author kutzi
+ */
 public class IRCConnection implements IMConnection, JoinListener, InviteListener, PartListener {
 
 	private static final Logger LOGGER = Logger.getLogger(IRCConnection.class.getName());
@@ -134,13 +139,13 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
                 }
             }
 			
-			for (IMMessageTarget groupChatName : this.groupChats) {
+			for (IMMessageTarget groupChat : this.groupChats) {
 				try {
-					getGroupChat(groupChatName);
+					getGroupChat(groupChat);
 				} catch (Exception e) {
 					// if we got here, the IRC connection could be established, but probably the channel name
 					// is invalid
-					LOGGER.warning("Unable to connect to channel '" + groupChatName + "'.\n"
+					LOGGER.warning("Unable to connect to channel '" + groupChat + "'.\n"
 							+ "Message: " + ExceptionHelper.dump(e));
 				}
 			}
