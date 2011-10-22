@@ -243,7 +243,7 @@ public class IrcPublisher extends IMPublisher {
             				throw new FormException("Channel name must not be empty", "channel.name");
             			}
             			
-            			if (Util.fixEmpty(channelsNames[i]) != null) {
+            			if (Util.fixEmpty(channelsPasswords[i]) != null) {
             				targets.add(new GroupChatIMMessageTarget(channelsNames[i], channelsPasswords[i]));
             			} else {
             				targets.add(new GroupChatIMMessageTarget(channelsNames[i]));
