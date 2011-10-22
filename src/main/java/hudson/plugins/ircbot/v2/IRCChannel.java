@@ -16,32 +16,32 @@ public class IRCChannel implements IMChat {
 		this.listener = listener;
 	}
 	
-	@Override
+	//@Override
 	public String getNickName(String senderId) {
 		return senderId;
 	}
 	
-	@Override
+	//@Override
 	public String getIMId(String senderId) {
 		return senderId;
 	}
 
-	@Override
+	//@Override
 	public boolean isMultiUserChat() {
 		return true;
 	}
 
-	@Override
+	//@Override
 	public void addMessageListener(IMMessageListener listener) {
 		this.listener.addMessageListener(this.channelName, listener);
 	}
 	
-	@Override
+	//@Override
 	public void removeMessageListener(IMMessageListener listener) {
 		this.listener.removeMessageListener(this.channelName, listener);
 	}
 
-	@Override
+	//@Override
 	public void sendMessage(String message) throws IMException {
 		this.connection.send(channelName, message);
 	}

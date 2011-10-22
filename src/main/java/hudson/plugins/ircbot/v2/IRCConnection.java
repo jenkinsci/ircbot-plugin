@@ -73,7 +73,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
 	}
 	
-	@Override
+	//@Override
 	public void close() {
 	    this.listener.explicitDisconnect = true;
 	    
@@ -86,12 +86,12 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		}
 	}
 
-	@Override
+	//@Override
 	public boolean isConnected() {
 		return this.pircConnection != null && this.pircConnection.isConnected();
 	}
 
-	@Override
+	//@Override
 	public boolean connect() {
 		try {
 			this.pircConnection.setEncoding(this.descriptor.getCharset());
@@ -188,7 +188,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	    }
 	}
 	
-    @Override
+    //@Override
     public void channelJoined(String channelName) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
         if (groupChat == null) {
@@ -202,7 +202,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         LOGGER.log(Level.INFO, "Joined channel {0} and bot registered", channelName);
     }
 
-    @Override
+    //@Override
     public void inviteReceived(String channelName, String inviter) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
         if (groupChat == null) {
@@ -213,7 +213,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         getGroupChat(groupChat);
     }
 
-    @Override
+    //@Override
     public void channelParted(String channelName) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
         if (groupChat == null) {
@@ -229,17 +229,17 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         }
     }
 
-	@Override
+	//@Override
 	public void addConnectionListener(IMConnectionListener listener) {
 	    this.listener.addConnectionListener(listener);
 	}
 
-	@Override
+	//@Override
 	public void removeConnectionListener(IMConnectionListener listener) {
 		this.listener.removeConnectionListener(listener);
 	}
 
-	@Override
+	//@Override
     public void send(IMMessageTarget target, String text) throws IMException {
 	    send(target.toString(), text);
 	}
@@ -263,7 +263,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         }
 	}
 
-	@Override
+	//@Override
 	public void setPresence(IMPresence presence, String statusMessage)
 			throws IMException {
 		if (presence.ordinal() >= IMPresence.OCCUPIED.ordinal()) {
@@ -283,7 +283,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	 */
 	private class ChatEstablishedListener implements IMMessageListener {
 
-		@Override
+		//@Override
 		public void onMessage(IMMessage message) {
 			if(!message.getTo().equals(descriptor.getNick())) {
 				throw new IllegalStateException("Intercepted message to '" + message.getTo()

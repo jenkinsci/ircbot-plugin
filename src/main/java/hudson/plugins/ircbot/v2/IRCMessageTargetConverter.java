@@ -8,7 +8,7 @@ import hudson.plugins.im.IMMessageTargetConverter;
 
 public class IRCMessageTargetConverter implements IMMessageTargetConverter {
 
-	@Override
+	//@Override
 	public IMMessageTarget fromString(String targetAsString)
 			throws IMMessageTargetConversionException {
 		if (targetAsString == null || targetAsString.trim().length() == 0) {
@@ -24,7 +24,7 @@ public class IRCMessageTargetConverter implements IMMessageTargetConverter {
 		}
 	}
 
-	@Override
+	//@Override
 	public String toString(IMMessageTarget target) {
 		return target.toString();
 	}

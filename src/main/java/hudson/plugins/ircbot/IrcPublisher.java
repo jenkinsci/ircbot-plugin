@@ -361,7 +361,7 @@ public class IrcPublisher extends IMPublisher {
         /**
          * @return the commandPrefix
          */
-        @Override
+        //@Override
         public String getCommandPrefix() {
             return commandPrefix;
         }
@@ -369,7 +369,7 @@ public class IrcPublisher extends IMPublisher {
         /**
          * @return the hostname
          */
-        @Override
+        //@Override
         public String getHostname() {
             return hostname;
         }
@@ -391,12 +391,12 @@ public class IrcPublisher extends IMPublisher {
             return nickServPassword;
         }
 
-        @Override
+        //@Override
         public String getPassword() {
             return password;
         }
 
-        @Override
+        //@Override
         public int getPort() {
             return port;
         }
@@ -405,47 +405,47 @@ public class IrcPublisher extends IMPublisher {
             return this.ssl;
         }
 
-        @Override
+        //@Override
         public boolean isEnabled() {
             return enabled;
         }
 
-        @Override
+        //@Override
 		public String getDefaultIdSuffix() {
 			// not implemented for IRC, yet
 			return null;
 		}
 
-		@Override
+		//@Override
 		public String getHost() {
 			return this.hostname;
 		}
-		@Override
+		//@Override
 		public String getHudsonUserName() {
 			return this.hudsonLogin;
 		}
 		
-		@Override
+		//@Override
 		public String getHudsonPassword() {
 			return this.hudsonPassword;
 		}
 
-		@Override
+		//@Override
 		public String getPluginDescription() {
 			return "IRC notifier plugin";
 		}
 
-		@Override
+		//@Override
 		public String getUserName() {
 			return this.nick;
 		}
 
-		@Override
+		//@Override
 		public boolean isExposePresence() {
 			return true;
 		}
 		
-		@Override
+		//@Override
 		public List<IMMessageTarget> getDefaultTargets() {
 			if (this.defaultTargets == null) {
 				return Collections.emptyList();
@@ -454,7 +454,7 @@ public class IrcPublisher extends IMPublisher {
 			return this.defaultTargets;
 		}
 		
-	    @Override
+	    //@Override
 	    public IMMessageTargetConverter getIMMessageTargetConverter() {
 	        return CONVERTER;
 	    }
