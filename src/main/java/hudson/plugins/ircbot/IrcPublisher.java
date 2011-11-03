@@ -183,7 +183,6 @@ public class IrcPublisher extends IMPublisher {
         String commandPrefix = "!jenkins";
         
         private String hudsonLogin;
-        private String hudsonPassword;
         
         private boolean useNotice;
         
@@ -253,7 +252,6 @@ public class IrcPublisher extends IMPublisher {
             	this.defaultTargets = targets;
             	
                 this.hudsonLogin = req.getParameter(PARAMETERNAME_HUDSON_LOGIN);
-                this.hudsonPassword = req.getParameter(PARAMETERNAME_HUDSON_PASSWORD);
                 
                 this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
                 
@@ -425,11 +423,6 @@ public class IrcPublisher extends IMPublisher {
 			return this.hudsonLogin;
 		}
 		
-		//@Override
-		public String getHudsonPassword() {
-			return this.hudsonPassword;
-		}
-
 		//@Override
 		public String getPluginDescription() {
 			return "IRC notifier plugin";
