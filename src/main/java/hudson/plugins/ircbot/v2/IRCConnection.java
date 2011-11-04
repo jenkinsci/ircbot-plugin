@@ -58,6 +58,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	    if (LOGGER.isLoggable(Level.FINEST)) {
 	        this.pircConnection.setVerbose(true);
 	    }
+		// Defaults to PircBotX, but ircu doesn't allow more than two capitals.
+		this.pircConnection.setLogin("PircBotx");
 		this.descriptor = descriptor;
 		this.authentication = authentication;
 		
