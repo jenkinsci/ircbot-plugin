@@ -22,7 +22,7 @@
       <f:checkbox name="irc_publisher.ssl" checked="${descriptor.ssl}"/>
     </f:entry>
     <f:entry title="Channels"
-      description="Channels the bot should join"
+      description="Channels to join. Name and optional password. Check 'Notification only' if you want to disallow bot commands."
       help="/plugin/ircbot/help-globalConfigChannels.html">
       <!-- Note that this strange separation of the table headers into a separate table is done one purpose. I didn't find another way
                   without breaking the rendering of the whole config page! -->

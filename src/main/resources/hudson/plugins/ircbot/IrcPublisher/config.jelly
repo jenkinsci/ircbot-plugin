@@ -4,7 +4,7 @@
     Per project IRC publisher configuration.
   -->
   <f:advanced>
-	  <f:entry title="Channels"	description="Name/password pairs of IRC channels (Password is optional)"
+	  <f:entry title="Channels"	description="Channels to notify. Name and optional password. Check 'Notification only' if you want to disallow bot commands."
 	  	help="/plugin/ircbot/help-instanceConfigChannels.html">
 	  	<table width="100%">
          <tr style="text-align:left"><th width="30%">Name</th><th width="30%">Password</th><th width="10%">Notification only</th><th width="30%"/></tr>
