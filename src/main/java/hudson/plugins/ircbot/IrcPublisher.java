@@ -232,6 +232,7 @@ public class IrcPublisher extends IMPublisher {
                 
             	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
             	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
+            	String[] notifyOnlys = req.getParameterValues("irc_publisher.chat.notificationOnly");
             	
             	List<IMMessageTarget> targets = Collections.emptyList();
             	if (channelsNames != null) {
@@ -242,11 +243,10 @@ public class IrcPublisher extends IMPublisher {
             				throw new FormException("Channel name must not be empty", "channel.name");
             			}
             			
-            			if (Util.fixEmpty(channelsPasswords[i]) != null) {
-            				targets.add(new GroupChatIMMessageTarget(channelsNames[i], channelsPasswords[i]));
-            			} else {
-            				targets.add(new GroupChatIMMessageTarget(channelsNames[i]));
-            			}
+            			String password = Util.fixEmpty(channelsPasswords[i]);
+            			boolean notifyOnly = notifyOnlys != null ? "on".equalsIgnoreCase(notifyOnlys[i]) : false;
+            			
+        				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
             		}
             	}
             	this.defaultTargets = targets;
@@ -300,6 +300,7 @@ public class IrcPublisher extends IMPublisher {
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
         	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
         	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
+        	String[] notifyOnlys = req.getParameterValues("irc_publisher.chat.notificationOnly");
         	
         	List<IMMessageTarget> targets = Collections.emptyList();
         	if (channelsNames != null) {
@@ -310,11 +311,9 @@ public class IrcPublisher extends IMPublisher {
         				throw new FormException("Channel name must not be empty", "channel.name");
         			}
         			
-        			if (Util.fixEmpty(channelsNames[i]) != null) {
-        				targets.add(new GroupChatIMMessageTarget(channelsNames[i], channelsPasswords[i]));
-        			} else {
-        				targets.add(new GroupChatIMMessageTarget(channelsNames[i]));
-        			}
+        			String password = Util.fixEmpty(channelsPasswords[i]);
+        			boolean notifyOnly = notifyOnlys != null ? "on".equalsIgnoreCase(notifyOnlys[i]) : false;
+    				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
         		}
         	}
         	

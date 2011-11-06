@@ -37,6 +37,12 @@ public class IRCPrivateChat implements IMChat {
 	public boolean isMultiUserChat() {
 		return false;
 	}
+	
+	//@Overrid
+	public boolean isCommandsAccepted() {
+	    return true;
+	}
+	
 	//@Override
 	public void addMessageListener(IMMessageListener listener) {
 		this.listener.addMessageListener(this.nick, this.chatPartner, listener);

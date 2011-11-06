@@ -202,7 +202,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
             LOGGER.log(Level.INFO, "Joined to channel {0} but I don't seem to belong here", channelName);
             return;
         }
-        Bot bot = new Bot(new IRCChannel(channelName, this, this.listener),
+        Bot bot = new Bot(new IRCChannel(channelName, this, this.listener, !groupChat.isNotificationOnly()),
                 this.descriptor.getNick(), this.descriptor.getHost(),
                 this.descriptor.getCommandPrefix(), this.authentication);
         bots.put(channelName, bot);
