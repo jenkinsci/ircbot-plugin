@@ -40,17 +40,6 @@
     </dependency>
   </dependencies>
   
-  <build>
-	    <plugins>
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<goals>deploy</goals>
-				</configuration>
-			</plugin>
-		</plugins>
-  </build>
-  
   <repositories>
       <!-- get every artifact through maven.glassfish.org, which proxies all 
         the artifacts that we need -->
