@@ -5,9 +5,10 @@
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging-parent</artifactId>
-    <version>1.18</version>
+    <version>1.19</version>
     <relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
   </parent>
+
   <artifactId>ircbot</artifactId>
   <packaging>hpi</packaging>
   <version>2.19-SNAPSHOT</version>
