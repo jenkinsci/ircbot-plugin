@@ -65,7 +65,19 @@
         <timezone>1</timezone>
     </developer>
   </developers>
-  
+<build>
+<plugins>
+<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>   
+	<configuration>
+     <skip>true</skip>
+   </configuration>
+</plugin>
+</plugins>
+</build> 
+
+ 
   <scm>
     <connection>scm:git:github.com:jenkinsci/ircbot-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/ircbot-plugin.git</developerConnection>
