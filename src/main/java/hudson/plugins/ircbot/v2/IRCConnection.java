@@ -128,7 +128,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
             final SocketFactory sf;
             if (this.descriptor.isSsl()) {
-                if (this.descriptor.ignoreSslCert()) {
+                if (this.descriptor.shouldIgnoreSslCert()) {
                     SSLContext ctx = null;
                     try {
                         addProvider(new Provider());

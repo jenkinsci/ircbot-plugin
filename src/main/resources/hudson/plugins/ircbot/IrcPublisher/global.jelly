@@ -22,7 +22,7 @@
       <f:checkbox name="irc_publisher.ssl" checked="${descriptor.ssl}"/>
     </f:entry>
     <f:entry title="Ignore SSL Security Warnings">
-      <f:checkbox name="irc_publisher.sslignore" checked="${descriptor.ignoreSslCert}"/>
+      <f:checkbox name="irc_publisher.sslignore" checked="${descriptor.shouldIgnoreSslCert()}"/>
     </f:entry>
     <f:entry title="Channels"
       description="Channels to join. Name and optional password. Check 'Notification only' if you want to disallow bot commands."

@@ -406,7 +406,7 @@ public class IrcPublisher extends IMPublisher {
             return this.ssl;
         }
 
-        public boolean ignoreSslCert() {
+        public boolean shouldIgnoreSslCert() {
             return this.ignoreSslCert;
         }
 
