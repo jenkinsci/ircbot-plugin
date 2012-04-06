@@ -45,8 +45,8 @@
       <!-- get every artifact through maven.glassfish.org, which proxies all 
         the artifacts that we need -->
     <repository>
-        <id>m.g.o-public</id>
-        <url>http://maven.glassfish.org/content/groups/public/</url>
+        <id>repo.jenkins-ci.org</id>
+        <url>http://repo.jenkins-ci.org/public/</url>
     </repository>
     <repository>
         <id>jenkins-snapshots</id>
@@ -71,4 +71,12 @@
     <developerConnection>scm:git:git@github.com:jenkinsci/ircbot-plugin.git</developerConnection>
     <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/hudson/plugins/ircbot</url>
   </scm>
-</project>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>  
+
