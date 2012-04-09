@@ -1,6 +1,5 @@
 package hudson.plugins.ircbot.v2;
 
-import com.sun.net.ssl.internal.ssl.Provider;
 import hudson.Util;
 import hudson.plugins.im.AuthenticationHolder;
 import hudson.plugins.im.GroupChatIMMessageTarget;
@@ -19,6 +18,7 @@ import hudson.plugins.ircbot.v2.PircListener.JoinListener;
 import hudson.plugins.ircbot.v2.PircListener.PartListener;
 
 import java.io.IOException;
+import java.security.Provider;
 import java.security.Security;
 import java.util.Collections;
 import java.util.HashMap;
@@ -131,7 +131,6 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
                 if (this.descriptor.shouldIgnoreSslCert()) {
                     SSLContext ctx = null;
                     try {
-                        addProvider(new Provider());
                         ctx = getInstance("TLS");
                         ctx.init(null, new TrustManager[]{new AlwaysTrustManager()}, null);
                     } catch (Exception e) {
