@@ -85,11 +85,12 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	    this.listener.explicitDisconnect = true;
 	    
 		if (this.pircConnection != null && this.pircConnection.isConnected()) {
-                    this.listener.removeJoinListener(this);
-                    this.listener.removePartListener(this);
-                    this.listener.removeInviteListener(this);
+            this.listener.removeJoinListener(this);
+            this.listener.removePartListener(this);
+            this.listener.removeInviteListener(this);
+            
 			this.pircConnection.disconnect();
-			this.pircConnection.dispose();
+			//this.pircConnection.shutdown();
 		}
 	}
 
@@ -118,7 +119,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		    this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
 			
 			LOGGER.info("connected to IRC");
-			this.pircConnection.getListenerManager().addListener(this.listener);
+			if (!this.pircConnection.getListenerManager().listenerExists(this.listener)) {
+			    this.pircConnection.getListenerManager().addListener(this.listener);
+			}
 			this.listener.addJoinListener(this);
             this.listener.addInviteListener(this);
             this.listener.addPartListener(this);

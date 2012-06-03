@@ -153,9 +153,6 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     @Override
 	public void onDisconnect(DisconnectEvent<PircBotX> event) {
         
-        // clean up resources. make sure that no old input/output thread survive
-        this.pircBot.dispose();
-        
     	if (!explicitDisconnect) {
 	    	for (IMConnectionListener l : this.listeners) {
 	    		l.connectionBroken(null);
