@@ -23,6 +23,7 @@ import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
+import hudson.util.Scrambler;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -169,6 +170,13 @@ public class IrcPublisher extends IMPublisher {
         String nick = "jenkins-bot";
         
         String nickServPassword = null;
+        
+        /**
+         * Marks if passwords are already scrambled.
+         * Needed to migrate old, unscrambled passwords.
+         * @since 2.19
+         */
+        private boolean scrambledPasswords = false;
 
         /**
          * channels to join
@@ -213,13 +221,17 @@ public class IrcPublisher extends IMPublisher {
          */
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+            this.scrambledPasswords = true;
+            
             this.enabled = "on".equals(req.getParameter("irc_publisher.enabled"))
                     || "true".equals(req.getParameter("irc_publisher.enabled"));
             if (this.enabled) {
                 this.hostname = req.getParameter("irc_publisher.hostname");
-                this.password = req.getParameter("irc_publisher.password");
+                this.password = Scrambler.scramble(
+                        req.getParameter("irc_publisher.password"));
                 this.nick = req.getParameter("irc_publisher.nick");
-                this.nickServPassword = req.getParameter(PARAMETERNAME_NICKSERV_PASSWORD);
+                this.nickServPassword = Scrambler.scramble(
+                        req.getParameter(PARAMETERNAME_NICKSERV_PASSWORD));
                 try {
                     this.port = Integer.valueOf(req.getParameter("irc_publisher.port"));
                 } catch (NumberFormatException e) {
@@ -385,12 +397,12 @@ public class IrcPublisher extends IMPublisher {
          * with NickServ.
          */
         public String getNickServPassword() {
-            return nickServPassword;
+            return Scrambler.descramble(nickServPassword);
         }
 
         //@Override
         public String getPassword() {
-            return password;
+            return Scrambler.descramble(password);
         }
 
         //@Override
@@ -466,6 +478,7 @@ public class IrcPublisher extends IMPublisher {
 		/**
 		 * Deserialize old descriptors.
 		 */
+		@SuppressWarnings("deprecation")
 		private Object readResolve() {
 			if (this.defaultTargets == null) {
 				if (this.channels != null) {
@@ -481,6 +494,13 @@ public class IrcPublisher extends IMPublisher {
 			
 			if (this.charset == null) {
 			    this.charset = "UTF-8";
+			}
+			
+			if (!this.scrambledPasswords) {
+			    this.password = Scrambler.scramble(this.password);
+			    this.nickServPassword = Scrambler.scramble(this.nickServPassword);
+			    this.scrambledPasswords = true;
+			    save();
 			}
 			
 			return this;
