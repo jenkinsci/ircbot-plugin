@@ -11,7 +11,7 @@
 
   <artifactId>ircbot</artifactId>
   <packaging>hpi</packaging>
-  <version>2.19</version>
+  <version>2.20-SNAPSHOT</version>
   <name>Jenkins IRC Plugin</name>
   <description>A build status publisher that notifies channels on a IRC server</description>
   <url>http://wiki.jenkins-ci.org/display/JENKINS/IRC+Plugin</url>
