@@ -58,8 +58,6 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	    if (LOGGER.isLoggable(Level.FINEST)) {
 	        this.pircConnection.setVerbose(true);
 	    }
-		// Defaults to PircBotX, but ircu doesn't allow more than two capitals.
-		this.pircConnection.setLogin("PircBotx");
 		this.descriptor = descriptor;
 		this.authentication = authentication;
 		
@@ -69,6 +67,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			this.groupChats = Collections.emptyList();
 		}
 		
+	    this.pircConnection.setLogin(this.descriptor.getLogin());
         this.pircConnection.setName(this.descriptor.getNick());
         
         // lower delay between sending 2 messages to 500ms as we will sometimes send

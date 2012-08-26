@@ -164,6 +164,8 @@ public class IrcPublisher extends IMPublisher {
         Integer port = 194;
         
         private boolean ssl;
+        
+        private String login = "PircBotx";
 
         String password = null;
 
@@ -227,6 +229,7 @@ public class IrcPublisher extends IMPublisher {
                     || "true".equals(req.getParameter("irc_publisher.enabled"));
             if (this.enabled) {
                 this.hostname = req.getParameter("irc_publisher.hostname");
+                this.login = req.getParameter("irc_publisher.login");
                 this.password = Scrambler.scramble(
                         req.getParameter("irc_publisher.password"));
                 this.nick = req.getParameter("irc_publisher.nick");
@@ -400,6 +403,10 @@ public class IrcPublisher extends IMPublisher {
             return Scrambler.descramble(nickServPassword);
         }
 
+        public String getLogin() {
+            return this.login;
+        }
+        
         //@Override
         public String getPassword() {
             return Scrambler.descramble(password);

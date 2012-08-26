@@ -47,8 +47,12 @@
           description="Nickname of the bot">
           <f:textbox name="irc_publisher.nick" value="${descriptor.getNick()}" />
         </f:entry>
+        <f:entry title="Login"
+          description="Login for the IRC server">
+          <f:textbox name="irc_publisher.login" value="${descriptor.getLogin()}" />
+        </f:entry>
         <f:entry title="Password"
-          description="Password to the IRC server">
+          description="Password for the IRC server">
           <f:password name="irc_publisher.password" value="${descriptor.getPassword()}" />
         </f:entry>
         <f:entry title="NickServ Password" description="On connection, try to identify with NickServ with this password" help="/plugin/ircbot/help-globalConfigNickServ.html">
