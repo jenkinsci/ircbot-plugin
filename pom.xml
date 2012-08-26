@@ -23,7 +23,7 @@
   </licenses>
   
   <properties>
-  	<version.instant-messaging.plugin>1.21</version.instant-messaging.plugin>
+  	<version.instant-messaging.plugin>1.22</version.instant-messaging.plugin>
   </properties>
   
   <dependencies>

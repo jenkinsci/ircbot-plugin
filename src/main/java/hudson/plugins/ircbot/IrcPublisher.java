@@ -17,6 +17,7 @@ import hudson.plugins.im.IMPublisherDescriptor;
 import hudson.plugins.im.MatrixJobMultiplier;
 import hudson.plugins.im.NotificationStrategy;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
+import hudson.plugins.im.config.ParameterNames;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
@@ -266,7 +267,7 @@ public class IrcPublisher extends IMPublisher {
             	}
             	this.defaultTargets = targets;
             	
-                this.hudsonLogin = req.getParameter(PARAMETERNAME_HUDSON_LOGIN);
+                this.hudsonLogin = req.getParameter(getParamNames().getJenkinsLogin());
                 
                 this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
                 
@@ -332,7 +333,7 @@ public class IrcPublisher extends IMPublisher {
         		}
         	}
         	
-            String n = req.getParameter(PARAMETERNAME_STRATEGY);
+            String n = req.getParameter(getParamNames().getStrategy());
             if (n == null) {
             	n = PARAMETERVALUE_STRATEGY_DEFAULT;
             } else {
@@ -347,11 +348,11 @@ public class IrcPublisher extends IMPublisher {
             		n = PARAMETERVALUE_STRATEGY_DEFAULT;
             	}
             }
-            boolean notifyStart = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_START));
-            boolean notifySuspects = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_SUSPECTS));
-            boolean notifyCulprits = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_CULPRITS));
-            boolean notifyFixers = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_FIXERS));
-            boolean notifyUpstream = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS));
+            boolean notifyStart = "on".equals(req.getParameter(getParamNames().getNotifyStart()));
+            boolean notifySuspects = "on".equals(req.getParameter(getParamNames().getNotifySuspects()));
+            boolean notifyCulprits = "on".equals(req.getParameter(getParamNames().getNotifyCulprits()));
+            boolean notifyFixers = "on".equals(req.getParameter(getParamNames().getNotifyFixers()));
+            boolean notifyUpstream = "on".equals(req.getParameter(getParamNames().getNotifyUpstreamCommitters()));
             
             MatrixJobMultiplier matrixJobMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
             if (formData.has("matrixNotifier")) {
@@ -482,7 +483,18 @@ public class IrcPublisher extends IMPublisher {
 		    return this.charset;
 		}
 		
-		/**
+		
+		
+		public ParameterNames getParamNames() {
+            return new ParameterNames() {
+                @Override
+                protected String getPrefix() {
+                    return PREFIX;
+                }
+            };
+        }
+
+        /**
 		 * Deserialize old descriptors.
 		 */
 		@SuppressWarnings("deprecation")
