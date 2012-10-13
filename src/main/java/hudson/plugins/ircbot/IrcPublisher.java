@@ -507,7 +507,6 @@ public class IrcPublisher extends IMPublisher {
 					}
 					
 					this.channels = null;
-					save();
 				}
 			}
 			
@@ -519,7 +518,10 @@ public class IrcPublisher extends IMPublisher {
 			    this.password = Scrambler.scramble(this.password);
 			    this.nickServPassword = Scrambler.scramble(this.nickServPassword);
 			    this.scrambledPasswords = true;
-			    save();
+			    // JENKINS-15469: seems to be a bad idea to save in readResolve
+			    // as the file to be saved/replaced is currently open for reading and thus
+			    // save() will fail on Windows
+			    //save();
 			}
 			
 			return this;
