@@ -117,7 +117,6 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
 			String version = Util.fixEmptyAndTrim(this.descriptor.getVersion());
 			if (version != null) {
-			    version = version.replace("%host%", this.descriptor.getHost());
 			    this.pircConnection.setVersion(version);
 			}
 
