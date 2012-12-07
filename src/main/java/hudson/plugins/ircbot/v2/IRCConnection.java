@@ -267,6 +267,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
             if (this.descriptor.isUseNotice()) {
                 this.pircConnection.sendNotice(channel, line);
             } else {
+                if (this.descriptor.isUseColors()){
+                    IRCColor cline = new IRCColor(line);
+                    line = cline.colorize();
+                }
                 this.pircConnection.sendMessage(channel, line);
             }
         }

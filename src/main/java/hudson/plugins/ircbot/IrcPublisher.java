@@ -141,6 +141,7 @@ public class IrcPublisher extends IMPublisher {
         
         private static final String PREFIX = "irc_publisher.";
 	    public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
+	    public static final String PARAMETERNAME_USE_COLORS = PREFIX + "useColors";
 	    public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
 	    
 	    public static final String[] CHARSETS;
@@ -198,7 +199,9 @@ public class IrcPublisher extends IMPublisher {
         private boolean useNotice;
         
         private String charset;
-        
+
+        private boolean useColors;
+
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
@@ -270,9 +273,11 @@ public class IrcPublisher extends IMPublisher {
                 this.hudsonLogin = req.getParameter(getParamNames().getJenkinsLogin());
                 
                 this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
-                
+
                 this.charset = req.getParameter("irc_publisher.charset");
-                
+
+                this.useColors = "on".equals(req.getParameter(PARAMETERNAME_USE_COLORS));
+
                 // try to establish the connection
                 try {
                 	IRCConnectionProvider.setDesc(this);
@@ -477,6 +482,13 @@ public class IrcPublisher extends IMPublisher {
 		 */
 		public boolean isUseNotice() {
 		    return this.useNotice;
+		}
+
+		/**
+		 * Specifies if the bot should send message with colors.
+		 */
+		public boolean isUseColors() {
+		    return this.useColors;
 		}
 		
 		public String getCharset() {

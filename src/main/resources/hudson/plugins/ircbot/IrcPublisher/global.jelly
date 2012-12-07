@@ -76,6 +76,9 @@
         <f:entry title="Use /notice command" description="Use /notice command instead of /msg (default in ircbot &lt;= 2.0)">
           <f:checkbox name="${descriptor.PARAMETERNAME_USE_NOTICE}" checked="${descriptor.useNotice}"/>
         </f:entry>
+        <f:entry title="Use colors" description="If checked, the bot will send colorized messages depending on the current and previous states of a job." help="/plugin/ircbot/help-globalConfigUseColors.html">
+          <f:checkbox name="${descriptor.PARAMETERNAME_USE_COLORS}" checked="${descriptor.useColors}"/>
+        </f:entry>
         
     </f:advanced>
    </f:optionalBlock>
