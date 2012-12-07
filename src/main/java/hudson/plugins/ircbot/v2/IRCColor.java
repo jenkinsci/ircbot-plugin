@@ -16,31 +16,31 @@ public class IRCColor {
     }
 
     public String colorize(){
-        String color = Colors.DARK_GRAY;
-        if(this.message.startsWith("Starting")){
-            if (this.message.contains("FAIL")){
-                color = Colors.BROWN;
+        String foreground = Colors.DARK_GRAY;
+        if(this.message.contains("Starting ")){
+            if (this.message.contains("STILL FAILING")){
+                foreground = Colors.BROWN;
             }
-            else if (this.message.contains("FIXED")){
-                color = Colors.OLIVE;
+            else if (this.message.contains("FAILURE")){
+                foreground = Colors.BOLD + Colors.YELLOW;
             }
             else{
-                color = Colors.DARK_GREEN;
+                foreground = Colors.DARK_GREEN;
             }
         }
         else if(this.message.contains("FIXED")){
-           color = Colors.REVERSE + Colors.BOLD + Colors.GREEN;
+           foreground = Colors.BOLD + Colors.UNDERLINE + Colors.WHITE;
         }
         else if(this.message.contains("SUCCESS")){
-           color = Colors.BOLD + Colors.GREEN;
+           foreground = Colors.BOLD + Colors.GREEN;
         }
         else if(this.message.contains("FAILURE")){
-           color = Colors.REVERSE + Colors.BOLD + Colors.RED;
+           foreground = Colors.BOLD + Colors.UNDERLINE + Colors.WHITE;
         }
         else if(this.message.contains("STILL FAILING")){
-           color = Colors.BOLD + Colors.RED;
+           foreground = Colors.BOLD + Colors.RED;
         }
-        return color + this.message;
+        return foreground + this.message;
     }
 
 }
