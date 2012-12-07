@@ -1,0 +1,25 @@
+<div>
+  <p>
+    Checking this box allows the bot to send colorized messages depending on the
+    current and previous states of a job.
+
+    The bot tries to send <font color="green">green messages</font> for successful jobs
+    and <font color="red">red messages</font> for failures <em> but this may not be right
+    if your IRC client has defined a custom theme of colors.</em>
+  </p>
+  <p>
+    Here are the rules for coloring messages:
+    <ul>
+        <li>Starting previously successful job: <font color="green">green</font></li>
+        <li>Starting previously fixed job: <font color="olive">olive</font></li>
+        <li>Starting previously failed job: <font color="red">red</font></li>
+        <li>First successful build (fixed job): <font color="black" style="background-color: green"><strong>green background</strong></font></li>
+        <li>First failure: <font color="black" style="background-color: red"><strong>red background</strong></font></li>
+        <li>Still successful job: <font color="green"><strong>bold green</strong></font></li>
+        <li>Still failing job: <font color="red"><strong>bold red</strong></font></li>
+        <li>Default message: <font color="darkgray"><strong>bold gray</strong></font></li>
+    </ul> 
+
+    There is no support for colorblind theme for now.
+  </p>
+</div>
