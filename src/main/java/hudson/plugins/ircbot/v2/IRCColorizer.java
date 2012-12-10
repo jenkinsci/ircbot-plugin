@@ -10,47 +10,51 @@ import org.pircbotx.Colors;
  * 
  * @author syl20bnr
  */
-public class IRCColor {
+public class IRCColorizer {
+    
+    /**
+     * Very simple pattern to recognize test results.
+     */
+    private static final Pattern TEST_CLASS_PATTERN = Pattern.compile(".*test.*", Pattern.CASE_INSENSITIVE);
 
-    private final String message;
-
-    public IRCColor(String message) {
-        this.message = message;
-    }
-
-    public String colorize(){
+    /**
+     * Colorize the message line if certain keywords are found in it. 
+     */
+    public static String colorize(String message){
+        
+        // TODO: use ResultTrend.getID() instead of magic keyword strings!
+        
         String foreground = Colors.DARK_GRAY;
-        if(this.message.contains("Starting ")){
-            if (this.message.contains("STILL FAILING")){
+        if(message.contains("Starting ")){
+            if (message.contains("STILL FAILING")){
                 foreground = Colors.BROWN;
             }
-            else if (this.message.contains("FAILURE")){
+            else if (message.contains("FAILURE")){
                 foreground = Colors.BOLD + Colors.YELLOW;
             }
             else{
                 foreground = Colors.DARK_GREEN;
             }
         }
-        else if(this.message.contains("FIXED")){
+        else if(message.contains("FIXED")){
            foreground = Colors.BOLD + Colors.UNDERLINE + Colors.GREEN;
         }
-        else if(this.message.contains("SUCCESS")){
+        else if(message.contains("SUCCESS")){
            foreground = Colors.BOLD + Colors.GREEN;
         }
-        else if(this.message.contains("FAILURE")){
+        else if(message.contains("FAILURE")){
            foreground = Colors.BOLD + Colors.UNDERLINE + Colors.RED;
         }
-        else if(this.message.contains("STILL FAILING")){
+        else if(message.contains("STILL FAILING")){
            foreground = Colors.BOLD + Colors.RED;
         }
         else{
-           Pattern p = Pattern.compile(".*test.*", Pattern.CASE_INSENSITIVE);
-           Matcher m = p.matcher(this.message);
+           Matcher m = TEST_CLASS_PATTERN.matcher(message);
            if (m.matches()){
                foreground = Colors.BOLD + Colors.MAGENTA;
            }
         }
-        return foreground + this.message;
+        return foreground + message;
     }
 
 }

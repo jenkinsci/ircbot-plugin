@@ -270,8 +270,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         String[] lines = text.split("\\r?\\n|\\r");
         for (String line : lines) {
             if (useColors){
-                IRCColor cline = new IRCColor(line);
-                line = cline.colorize();
+                line = IRCColorizer.colorize(line);
             }
             if (this.descriptor.isUseNotice()) {
                 this.pircConnection.sendNotice(channel, line);
