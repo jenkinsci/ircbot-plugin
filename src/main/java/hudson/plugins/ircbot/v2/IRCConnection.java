@@ -254,23 +254,28 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	}
 	
 	public void send(String target, String text) throws IMException {
-	       // many IRC clients don't seem to handle new lines well (see e.g. https://bugzilla.redhat.com/show_bug.cgi?id=136542)
-        // Therefore the following won't work most of the time:
-	    //      message = message.replace("\n", "\020n");
-	    //      sendNotice(target, message);
-        
-        // send multiple messages instead: 
 	    Channel channel = this.pircConnection.getChannel(target);
-        
+	    
+	    boolean useColors = this.descriptor.isUseColors();
+	    if (useColors) {
+	        String mode = channel.getMode();
+	        if (mode.contains("c")) {
+	            LOGGER.warning("Bot is configured to use colors, but channel " + target + " disallows colors!");
+	            useColors = false;
+	        }
+	    }
+
+        // IRC doesn't support multiline messages (see http://stackoverflow.com/questions/7039478/linebreak-irc-protocol)
+	    // therefore we split the message on line breaks and send each line as its own message:
         String[] lines = text.split("\\r?\\n|\\r");
         for (String line : lines) {
+            if (useColors){
+                IRCColor cline = new IRCColor(line);
+                line = cline.colorize();
+            }
             if (this.descriptor.isUseNotice()) {
                 this.pircConnection.sendNotice(channel, line);
             } else {
-                if (this.descriptor.isUseColors()){
-                    IRCColor cline = new IRCColor(line);
-                    line = cline.colorize();
-                }
                 this.pircConnection.sendMessage(channel, line);
             }
         }
