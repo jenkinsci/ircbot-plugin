@@ -1,5 +1,7 @@
 package hudson.plugins.ircbot.v2;
 
+import hudson.model.ResultTrend;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,37 +26,52 @@ public class IRCColorizer {
         
         // TODO: use ResultTrend.getID() instead of magic keyword strings!
         
-        String foreground = Colors.DARK_GRAY;
-        if(message.contains("Starting ")){
-            if (message.contains("STILL FAILING")){
-                foreground = Colors.BROWN;
+        if(message.contains("Starting ")) {
+            return message;
+//            if (message.contains("STILL FAILING")) {
+//                foreground = Colors.RED;
+//            } else if (message.contains("FAILURE")) {
+//                foreground = Colors.BOLD + Colors.RED;
+//            } else {
+//                foreground = Colors.DARK_GREEN;
+//            }
+        } else {
+            String line = colorForBuildResult(message);
+            if (line == message) { // line didn't contain a build result
+                Matcher m = TEST_CLASS_PATTERN.matcher(message);
+                if (m.matches()){
+                    return Colors.BOLD + Colors.MAGENTA + line;
+                }
             }
-            else if (message.contains("FAILURE")){
-                foreground = Colors.BOLD + Colors.YELLOW;
+            return line;
+        }
+    }
+    
+    private static String colorForBuildResult(String line) {
+        for (ResultTrend result : ResultTrend.values()) {
+            
+            String keyword = result.getID();
+            
+            int index = line.indexOf(keyword);
+            if (index != -1) {
+                final String color;
+                switch (result) {
+                    case FIXED: color = Colors.BOLD + Colors.UNDERLINE + Colors.GREEN; break;
+                    case SUCCESS: color = Colors.BOLD + Colors.GREEN; break;
+                    case FAILURE: color = Colors.BOLD + Colors.UNDERLINE + Colors.RED; break;
+                    case STILL_FAILING: color = Colors.BOLD + Colors.RED; break;
+                    case UNSTABLE: color = Colors.BOLD + Colors.UNDERLINE + Colors.BROWN; break;
+                    case STILL_UNSTABLE: color = Colors.BOLD + Colors.BROWN; break;
+                    case NOW_UNSTABLE: color = Colors.BOLD + Colors.MAGENTA; break;
+                    case ABORTED: color = Colors.BOLD + Colors.LIGHT_GRAY; break;
+                    default: return line;
+                }
+                
+                return line.substring(0, index - 1) + color + keyword + Colors.NORMAL
+                        + line.substring(index + keyword.length(), line.length());
             }
-            else{
-                foreground = Colors.DARK_GREEN;
-            }
         }
-        else if(message.contains("FIXED")){
-           foreground = Colors.BOLD + Colors.UNDERLINE + Colors.GREEN;
-        }
-        else if(message.contains("SUCCESS")){
-           foreground = Colors.BOLD + Colors.GREEN;
-        }
-        else if(message.contains("FAILURE")){
-           foreground = Colors.BOLD + Colors.UNDERLINE + Colors.RED;
-        }
-        else if(message.contains("STILL FAILING")){
-           foreground = Colors.BOLD + Colors.RED;
-        }
-        else{
-           Matcher m = TEST_CLASS_PATTERN.matcher(message);
-           if (m.matches()){
-               foreground = Colors.BOLD + Colors.MAGENTA;
-           }
-        }
-        return foreground + message;
+        return line;
     }
 
 }
