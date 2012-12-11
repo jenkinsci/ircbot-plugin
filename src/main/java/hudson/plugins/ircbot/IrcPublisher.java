@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.logging.Logger;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.util.JSONUtils;
 
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -223,6 +225,30 @@ public class IrcPublisher extends IMPublisher {
         }
 
         /**
+         * Check boxes values are not passed in the posted form when they are unchecked.
+         * The workaround consists in acceding these values via the JSON representation.
+         */
+        private static List<JSONObject> fillChannelsFromJSON(JSONObject root){
+            List<JSONObject> result = null;
+            JSONObject chan = root.optJSONObject("channels");
+            if (chan != null){
+                result = new ArrayList<JSONObject>();
+                result.add(chan);
+            }
+            else{
+                JSONArray chans = root.optJSONArray("channels");
+                if (chans != null){
+                    result = new ArrayList<JSONObject>();
+                    for(int i=0; i<chans.size(); ++i){
+                        chan = chans.getJSONObject(i);
+                        result.add(chan);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**
          * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest)
          */
         @Override
@@ -251,10 +277,20 @@ public class IrcPublisher extends IMPublisher {
                 
             	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
             	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
-            	String[] notifyOnlys = req.getParameterValues("irc_publisher.chat.notificationOnly");
+            	// only checked state can be queried, unchecked state are ignored and the size of
+            	// notifyOnlys may be lower than the size of channelNames
+            	// so getting the values via stapler is unreliable.
+            	// String[] notifyOnlys = req.getParameterValues("irc_publisher.chat.notificationOnly");
             	
             	List<IMMessageTarget> targets = Collections.emptyList();
             	if (channelsNames != null) {
+            	    // JENKINS-13697: Get the data from the JSON representation which always returns
+            	    // a value. The downside is that we are dependent on the data structure.
+                    List<JSONObject> jchans = null;
+            	    JSONObject enabled = formData.optJSONObject("enabled");
+            	    if (enabled != null){
+            	        jchans = fillChannelsFromJSON(enabled);
+            	    }
             		targets = new ArrayList<IMMessageTarget>(channelsNames.length);
             		for (int i=0; i < channelsNames.length; i++) {
             			
@@ -263,7 +299,7 @@ public class IrcPublisher extends IMPublisher {
             			}
             			
             			String password = Util.fixEmpty(channelsPasswords[i]);
-            			boolean notifyOnly = notifyOnlys != null ? "on".equalsIgnoreCase(notifyOnlys[i]) : false;
+                		boolean notifyOnly = jchans.size() > 0 ? jchans.get(i).getBoolean("notificationOnly") : false;
             			
         				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
             		}
@@ -321,10 +357,10 @@ public class IrcPublisher extends IMPublisher {
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
         	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
         	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
-        	String[] notifyOnlys = req.getParameterValues("irc_publisher.chat.notificationOnly");
         	
         	List<IMMessageTarget> targets = Collections.emptyList();
         	if (channelsNames != null) {
+                List<JSONObject> jchans = fillChannelsFromJSON(formData);
         		targets = new ArrayList<IMMessageTarget>(channelsNames.length);
         		for (int i=0; i < channelsNames.length; i++) {
         			
@@ -333,7 +369,7 @@ public class IrcPublisher extends IMPublisher {
         			}
         			
         			String password = Util.fixEmpty(channelsPasswords[i]);
-        			boolean notifyOnly = notifyOnlys != null ? "on".equalsIgnoreCase(notifyOnlys[i]) : false;
+            		boolean notifyOnly = jchans.size() > 0 ? jchans.get(i).getBoolean("notificationOnly") : false;
     				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
         		}
         	}
