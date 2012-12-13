@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
 
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -299,7 +298,7 @@ public class IrcPublisher extends IMPublisher {
             			}
             			
             			String password = Util.fixEmpty(channelsPasswords[i]);
-                		boolean notifyOnly = jchans.size() > 0 ? jchans.get(i).getBoolean("notificationOnly") : false;
+                		boolean notifyOnly = jchans != null ? jchans.get(i).getBoolean("notificationOnly") : false;
             			
         				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
             		}
@@ -369,7 +368,7 @@ public class IrcPublisher extends IMPublisher {
         			}
         			
         			String password = Util.fixEmpty(channelsPasswords[i]);
-            		boolean notifyOnly = jchans.size() > 0 ? jchans.get(i).getBoolean("notificationOnly") : false;
+            		boolean notifyOnly = jchans != null ? jchans.get(i).getBoolean("notificationOnly") : false;
     				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
         		}
         	}
