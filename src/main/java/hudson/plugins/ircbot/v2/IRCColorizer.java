@@ -11,6 +11,7 @@ import org.pircbotx.Colors;
  * Simple support for IRC colors.
  * 
  * @author syl20bnr
+ * @author kutzi
  */
 public class IRCColorizer {
     
