@@ -13,6 +13,7 @@ import org.pircbotx.Colors;
  * @author syl20bnr
  * @author kutzi
  */
+// See http://flylib.com/books/en/4.74.1.47/1/ for some tips on IRC colors
 public class IRCColorizer {
     
     /**
