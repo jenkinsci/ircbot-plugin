@@ -164,6 +164,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			LOGGER.warning("Error connecting to irc: " + e);
 		} catch (IrcException e) {
 			LOGGER.warning("Error connecting to irc: " + e);
+		} catch (RuntimeException e) {
+		    // JENKINS-17017: contrary to Javadoc PircBotx (at least 1.7 and 1.8) sometimes
+		    // throw a RuntimeException instead of IOException if connecting fails
+		    LOGGER.warning("Error connecting to irc: " + e);
 		}
 		return false;
 	}
