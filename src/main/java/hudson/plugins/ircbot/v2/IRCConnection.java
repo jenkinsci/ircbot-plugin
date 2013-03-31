@@ -306,6 +306,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
 		//@Override
 		public void onMessage(IMMessage message) {
+                    if(descriptor.isDisallowPrivateChat()) {
+                        return;
+                    }
+                    
 			if(!message.getTo().equals(descriptor.getNick())) {
 				throw new IllegalStateException("Intercepted message to '" + message.getTo()
 						+ "'. That shouldn't happen!");
