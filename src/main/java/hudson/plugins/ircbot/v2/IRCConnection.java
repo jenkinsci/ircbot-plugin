@@ -27,12 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.*;
 
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
+
+import static javax.net.ssl.SSLContext.getInstance;
 
 /**
  * IRC specific implementation of an {@link IMConnection}.
@@ -107,13 +109,30 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			        this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getNick(), this.descriptor.getCharset()));
 			
 			String password = Util.fixEmpty(this.descriptor.getPassword());
-			
-			final SocketFactory sf;
-			if (this.descriptor.isSsl()) {
-			    sf = SSLSocketFactory.getDefault();
-			} else {
-			    sf = SocketFactory.getDefault();
-			}
+
+            final SocketFactory sf;
+            if (this.descriptor.isSsl()) {
+                if (this.descriptor.shouldIgnoreSslCert()) {
+                    SSLContext ctx = null;
+                    try {
+                        ctx = getInstance("TLS");
+                        ctx.init(null, new TrustManager[]{new AlwaysTrustManager()}, null);
+                    } catch (Exception e) {
+                        LOGGER.warning("Error creating trust manager,falling back to normal : " + e);
+                    }
+                    if (ctx != null) {
+                        sf = ctx.getSocketFactory();
+
+                    } else {
+                        sf = SSLSocketFactory.getDefault();
+                    }
+
+                } else {
+                    sf = SSLSocketFactory.getDefault();
+                }
+            } else {
+                sf = SocketFactory.getDefault();
+            }
 			
 		    this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
 			
@@ -329,4 +348,18 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			}
 		}
 	}
+
+    //Used for ignoring SSL certs
+    private static class AlwaysTrustManager implements X509TrustManager {
+
+        public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+        }
+
+        public void checkServerTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+        }
+
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    }
 }

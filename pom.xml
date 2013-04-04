@@ -65,7 +65,8 @@
         <timezone>1</timezone>
     </developer>
   </developers>
-  
+
+ 
   <scm>
     <connection>scm:git:github.com:jenkinsci/ircbot-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/ircbot-plugin.git</developerConnection>

@@ -170,6 +170,8 @@ public class IrcPublisher extends IMPublisher {
         
         private String login = "PircBotx";
 
+        private boolean ignoreSslCert;
+
         String password = null;
 
         String nick = "jenkins-bot";
@@ -271,6 +273,8 @@ public class IrcPublisher extends IMPublisher {
                             "irc_publisher.port");
                 }
                 this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
+                this.ignoreSslCert = "on".equals(req.getParameter("irc_publisher.sslignore"));
+
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 
@@ -460,6 +464,10 @@ public class IrcPublisher extends IMPublisher {
         
         public boolean isSsl() {
             return this.ssl;
+        }
+
+        public boolean shouldIgnoreSslCert() {
+            return this.ignoreSslCert;
         }
 
         //@Override
