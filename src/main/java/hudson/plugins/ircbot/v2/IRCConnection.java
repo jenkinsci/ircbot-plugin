@@ -31,6 +31,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
 
@@ -110,9 +111,12 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			
 			final SocketFactory sf;
 			if (this.descriptor.isSsl()) {
-			    sf = SSLSocketFactory.getDefault();
+				if (this.descriptor.trustAllCertificates())
+					sf = new UtilSSLSocketFactory().trustAllCertificates();
+				else
+					sf = SSLSocketFactory.getDefault();
 			} else {
-			    sf = SocketFactory.getDefault();
+				sf = SocketFactory.getDefault();
 			}
 			
 		    this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
