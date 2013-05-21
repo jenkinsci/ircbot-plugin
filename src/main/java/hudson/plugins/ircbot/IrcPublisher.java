@@ -167,6 +167,8 @@ public class IrcPublisher extends IMPublisher {
         Integer port = 194;
         
         private boolean ssl;
+
+        private boolean sslTrustAllCertificates;
         
         private String login = "PircBotx";
 
@@ -271,6 +273,7 @@ public class IrcPublisher extends IMPublisher {
                             "irc_publisher.port");
                 }
                 this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
+				this.sslTrustAllCertificates = "on".equals(req.getParameter("irc_publisher.ssl_trust_all_certificates"));
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 
@@ -461,6 +464,10 @@ public class IrcPublisher extends IMPublisher {
         public boolean isSsl() {
             return this.ssl;
         }
+
+		public boolean trustAllCertificates() {
+			return this.sslTrustAllCertificates;
+		}
 
         //@Override
         public boolean isEnabled() {
