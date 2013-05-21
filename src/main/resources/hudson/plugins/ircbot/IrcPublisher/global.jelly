@@ -63,6 +63,10 @@
           help="/plugin/ircbot/help-globalConfigCommandPrefix.html">
           <f:textbox name="irc_publisher.commandPrefix" value="${descriptor.getCommandPrefix()}" />
         </f:entry>
+
+        <f:entry title="Trust all SSL certificates" description="Ignore invalid (e.g. self-signed) SSL certificates">
+              <f:checkbox name="irc_publisher.ssl_trust_all_certificates" checked="${descriptor.sslTrustAllCertificates}"/>
+        </f:entry>
         
         <super:global-jenkinsLogin />
       
