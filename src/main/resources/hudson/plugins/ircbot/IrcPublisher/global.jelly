@@ -55,6 +55,10 @@
           description="Password for the IRC server">
           <f:password name="irc_publisher.password" value="${descriptor.getPassword()}" />
         </f:entry>
+        <f:entry title="Version"
+          description="Version for the IRC client (leave blank for default version)">
+          <f:textbox name="irc_publisher.version" value="${descriptor.getVersion()}" />
+        </f:entry>
         <f:entry title="NickServ Password" description="On connection, try to identify with NickServ with this password" help="/plugin/ircbot/help-globalConfigNickServ.html">
             <f:password name="irc_publisher.nickServPassword" value="${descriptor.nickServPassword}"/>
         </f:entry>

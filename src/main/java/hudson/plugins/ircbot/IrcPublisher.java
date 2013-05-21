@@ -175,6 +175,8 @@ public class IrcPublisher extends IMPublisher {
         String nick = "jenkins-bot";
         
         String nickServPassword = null;
+
+        private String version = null;
         
         /**
          * Marks if passwords are already scrambled.
@@ -264,13 +266,15 @@ public class IrcPublisher extends IMPublisher {
                 this.nick = req.getParameter("irc_publisher.nick");
                 this.nickServPassword = Scrambler.scramble(
                         req.getParameter(PARAMETERNAME_NICKSERV_PASSWORD));
+                this.version = Util.fixEmptyAndTrim(req.getParameter("irc_publisher.version"));
                 try {
                     this.port = Integer.valueOf(req.getParameter("irc_publisher.port"));
                 } catch (NumberFormatException e) {
                     throw new FormException("port field must be an Integer",
                             "irc_publisher.port");
                 }
-                this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
+                this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"))
+                    || "true".equals(req.getParameter("irc_publisher.ssl"));
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 
@@ -442,6 +446,10 @@ public class IrcPublisher extends IMPublisher {
          */
         public String getNickServPassword() {
             return Scrambler.descramble(nickServPassword);
+        }
+
+        public String getVersion() {
+            return version;
         }
 
         public String getLogin() {

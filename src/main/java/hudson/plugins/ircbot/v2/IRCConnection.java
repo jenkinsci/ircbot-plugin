@@ -114,8 +114,13 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			} else {
 			    sf = SocketFactory.getDefault();
 			}
-			
-		    this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
+
+			String version = Util.fixEmptyAndTrim(this.descriptor.getVersion());
+			if (version != null) {
+			    this.pircConnection.setVersion(version);
+			}
+
+			this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
 			
 			LOGGER.info("connected to IRC");
 			if (!this.pircConnection.getListenerManager().listenerExists(this.listener)) {
