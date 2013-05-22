@@ -171,6 +171,8 @@ public class IrcPublisher extends IMPublisher {
         private boolean disallowPrivateChat;
         
         private String login = "PircBotx";
+        
+        private boolean sslTrustAllCertificates;
 
         String password = null;
 
@@ -273,6 +275,7 @@ public class IrcPublisher extends IMPublisher {
                             "irc_publisher.port");
                 }
                 this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
+                this.sslTrustAllCertificates = "on".equals(req.getParameter("irc_publisher.ssl_trust_all_certificates"));
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 
@@ -464,6 +467,10 @@ public class IrcPublisher extends IMPublisher {
         
         public boolean isSsl() {
             return this.ssl;
+        }
+        
+        public boolean isTrustAllCertificates() {
+            return this.sslTrustAllCertificates;
         }
         
         public boolean isDisallowPrivateChat() {
