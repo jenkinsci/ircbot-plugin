@@ -42,8 +42,6 @@
   </dependencies>
   
   <repositories>
-      <!-- get every artifact through maven.glassfish.org, which proxies all 
-        the artifacts that we need -->
     <repository>
         <id>repo.jenkins-ci.org</id>
         <url>http://repo.jenkins-ci.org/public/</url>
