@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.net.Proxy;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -34,6 +35,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
+import org.pircbotx.ProxySocketFactory;
 
 /**
  * IRC specific implementation of an {@link IMConnection}.
@@ -116,6 +118,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			    } else {
 			        sf = SSLSocketFactory.getDefault();
 			    }
+			} else if (!this.descriptor.getSocksHost().equals("") && this.descriptor.getSocksPort() > 0) {
+			    sf = new ProxySocketFactory(Proxy.Type.SOCKS, this.descriptor.getSocksHost(), this.descriptor.getSocksPort());
 			} else {
 			    sf = SocketFactory.getDefault();
 			}
