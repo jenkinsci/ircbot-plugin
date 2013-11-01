@@ -47,6 +47,9 @@
           description="Nickname of the bot">
           <f:textbox name="irc_publisher.nick" value="${descriptor.getNick()}" />
         </f:entry>
+        <f:entry title="Change nickname.">
+          <f:checkbox name="irc_publisher.nickAutoChange" checked="${descriptor.nickAutoChange}"/>
+        </f:entry>
         <f:entry title="Login"
           description="Login for the IRC server">
           <f:textbox name="irc_publisher.login" value="${descriptor.getLogin()}" />
@@ -58,6 +61,9 @@
         <f:entry title="NickServ Password" description="On connection, try to identify with NickServ with this password" help="/plugin/ircbot/help-globalConfigNickServ.html">
             <f:password name="irc_publisher.nickServPassword" value="${descriptor.nickServPassword}"/>
         </f:entry>
+        <f:entry title="UserServ Password" description="On connection, will login user." help="/plugin/ircbot/help-globalConfigNickServ.html">
+            <f:password name="irc_publisher.userservPassword" value="${descriptor.getUserservPassword()}"/>
+        </f:entry>
         <f:entry title="Command prefix"
           description="The prefix for the commands"
           help="/plugin/ircbot/help-globalConfigCommandPrefix.html">
@@ -65,7 +71,7 @@
         </f:entry>
         
         <super:global-jenkinsLogin />
-      
+        
         <f:entry title="Notification charset" description="The character set to use for notifications">
             <select name="irc_publisher.charset">
                <j:forEach var="cs" items="${descriptor.CHARSETS}">

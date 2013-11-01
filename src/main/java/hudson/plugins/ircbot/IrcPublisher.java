@@ -176,6 +176,10 @@ public class IrcPublisher extends IMPublisher {
         
         String nickServPassword = null;
         
+        String userservPassword = null;
+        
+        boolean nickAutoChange = false;
+                
         /**
          * Marks if passwords are already scrambled.
          * Needed to migrate old, unscrambled passwords.
@@ -264,6 +268,8 @@ public class IrcPublisher extends IMPublisher {
                 this.nick = req.getParameter("irc_publisher.nick");
                 this.nickServPassword = Scrambler.scramble(
                         req.getParameter(PARAMETERNAME_NICKSERV_PASSWORD));
+                this.userservPassword= Scrambler.scramble(
+                        req.getParameter("irc_publisher.userservPassword"));
                 try {
                     this.port = Integer.valueOf(req.getParameter("irc_publisher.port"));
                 } catch (NumberFormatException e) {
@@ -271,6 +277,7 @@ public class IrcPublisher extends IMPublisher {
                             "irc_publisher.port");
                 }
                 this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
+                this.nickAutoChange = "on".equals(req.getParameter("irc_publisher.nickAutoChange"));
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 
@@ -443,7 +450,7 @@ public class IrcPublisher extends IMPublisher {
         public String getNickServPassword() {
             return Scrambler.descramble(nickServPassword);
         }
-
+        
         public String getLogin() {
             return this.login;
         }
@@ -451,6 +458,15 @@ public class IrcPublisher extends IMPublisher {
         //@Override
         public String getPassword() {
             return Scrambler.descramble(password);
+        }
+        
+         
+        public String getUserservPassword() {
+            return Scrambler.descramble(userservPassword);
+        }
+        
+        public boolean getNickAutoChange(){
+            return nickAutoChange;
         }
 
         //@Override

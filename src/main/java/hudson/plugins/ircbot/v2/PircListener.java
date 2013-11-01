@@ -24,6 +24,11 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import hudson.plugins.im.IMMessageTarget;
+import hudson.plugins.ircbot.IrcPublisher;
+import org.pircbotx.hooks.events.ConnectEvent;
+import org.pircbotx.hooks.events.NickAlreadyInUseEvent;
+import org.pircbotx.hooks.events.NickChangeEvent;
 
 /**
  * PircBot listener to react to certain IRC events.
@@ -44,22 +49,23 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 	
 	private final List<JoinListener> joinListeners = new CopyOnWriteArrayList<JoinListener>();
 
-    private final List<InviteListener> inviteListeners = new CopyOnWriteArrayList<InviteListener>();
+        private final List<InviteListener> inviteListeners = new CopyOnWriteArrayList<InviteListener>();
 
-    private final List<PartListener> partListeners = new CopyOnWriteArrayList<PartListener>();
+        private final List<PartListener> partListeners = new CopyOnWriteArrayList<PartListener>();
     
 	
 	volatile boolean explicitDisconnect = false;
 	
 	
-	private final PircBotX pircBot;
-    private final String nick;
-
-	public PircListener(PircBotX pircBot, String nick) {
+        private final PircBotX pircBot;
+        private final String nick;
+        private final IRCConnection connection;
+        
+	public PircListener(PircBotX pircBot, String nick, IRCConnection connection) {
 	    this.pircBot = pircBot;
 	    this.nick = nick;
+            this.connection = connection;
     }
-
 //	/**
 //	 * {@inheritDoc}
 //	 */
@@ -96,6 +102,36 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     		    }
     		}
     	}
+    }
+    
+    public void onNickChange(NickChangeEvent<PircBotX> event){
+        LOGGER.info("Nick '" + event.getOldNick() + "' was changed. Now it is used nick '" + event.getNewNick() + "'.");
+    }
+    
+    public void onNickAlreadyInUse(NickAlreadyInUseEvent<PircBotX> event){
+        LOGGER.warning("Nick '" + nick + "' is already in use ");
+        String nickservPass = IrcPublisher.DESCRIPTOR.getNickServPassword();
+        if(nickservPass!=null){
+            LOGGER.info("Nick '" + nick + "' is already in use, trying to regain it.");
+            String userservPass = IrcPublisher.DESCRIPTOR.getUserservPassword();
+            String userName = IrcPublisher.DESCRIPTOR.getUserName();
+            String nick = IrcPublisher.DESCRIPTOR.getNick();
+            if(userservPass!=null && userName!=null)
+                pircBot.sendIRC().message("USERSERV", "login " + userName + " " + userservPass);
+            pircBot.sendIRC().message("NICKSERV", "regain " + nick + " " + nickservPass);
+            pircBot.sendIRC().changeNick(nick);
+        }
+    }
+    
+   
+    public void onConnect(ConnectEvent<PircBotX> event){
+        IrcPublisher.DescriptorImpl descriptor = IrcPublisher.DESCRIPTOR;
+        List<IMMessageTarget> groupChats = null;
+        String password = descriptor.getUserservPassword();
+        String userName = descriptor.getUserName();
+        if(password!=null && userName!=null)
+            pircBot.sendIRC().message("USERSERV", "login " + userName + " " + password);
+        connection.loggedIn();
     }
     
     /**
@@ -144,9 +180,12 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     @Override
     public void onServerResponse(ServerResponseEvent<PircBotX> event) {
         int code = event.getCode();
+        if(code==433){
+            return; //should be handled by onNickAlreadyInUse 
+        }
     	if (code >= 400 && code <= 599) {
     		LOGGER.warning("IRC server responded error " + code + " Message:\n" +
-    				event.getResponse());
+    				event.getParsedResponse());
     	}
     }
     
