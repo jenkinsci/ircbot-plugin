@@ -180,6 +180,10 @@ public class IrcPublisher extends IMPublisher {
         
         String nickServPassword = null;
         
+        private String socksHost = null;
+        
+        private Integer socksPort = 1080;
+        
         /**
          * Marks if passwords are already scrambled.
          * Needed to migrate old, unscrambled passwords.
@@ -273,6 +277,13 @@ public class IrcPublisher extends IMPublisher {
                 } catch (NumberFormatException e) {
                     throw new FormException("port field must be an Integer",
                             "irc_publisher.port");
+                }
+                this.socksHost = req.getParameter("irc_publisher.socksHost");
+                try {
+                    this.socksPort = Integer.valueOf(req.getParameter("irc_publisher.socksPort"));
+                } catch (NumberFormatException e) {
+                    throw new FormException("SOCKS proxy port field must be an Integer",
+                            "irc_publisher.socksPort");
                 }
                 this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
                 this.sslTrustAllCertificates = "on".equals(req.getParameter("irc_publisher.ssl_trust_all_certificates"));
@@ -463,6 +474,14 @@ public class IrcPublisher extends IMPublisher {
         //@Override
         public int getPort() {
             return port;
+        }
+        
+        public String getSocksHost() {
+            return socksHost;
+        }
+        
+        public int getSocksPort() {
+            return socksPort;
         }
         
         public boolean isSsl() {

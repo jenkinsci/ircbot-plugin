@@ -67,6 +67,12 @@
           help="/plugin/ircbot/help-globalTrustAllCertificates.html">
           <f:checkbox name="irc_publisher.ssl_trust_all_certificates" checked="${descriptor.trustAllCertificates}"/>
         </f:entry>
+        <f:entry title="SOCKS proxy host" description="Proxy server hostname or IP (if applicable). Only supported without SSL.">
+          <f:textbox name="irc_publisher.socksHost" value="${descriptor.getSocksHost()}"/>
+        </f:entry>
+        <f:entry title="SOCKS proxy port" description="Proxy server port">
+          <f:textbox name="irc_publisher.socksPort" value="${descriptor.getSocksPort()}"/>
+        </f:entry>
         <f:entry title="Disallow Private Chat" description="Disallow bot commands from private chat.">
             <f:checkbox name="irc_publisher.disallowPrivateChat" checked="${descriptor.disallowPrivateChat}"/>
         </f:entry>
