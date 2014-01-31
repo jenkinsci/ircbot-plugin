@@ -26,16 +26,18 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.net.Proxy;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.Configuration.Builder;
 import org.pircbotx.hooks.managers.ListenerManager;
-//import org.pircbotx.exception.NickAlreadyInUseException;
+import org.pircbotx.ProxySocketFactory;
 
 /**
  * IRC specific implementation of an {@link IMConnection}.
@@ -109,10 +111,16 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
                     builder.setServer(descriptor.getHost(), descriptor.getPort(), Util.fixEmpty(this.descriptor.getPassword()));
                     SocketFactory sf;
                     if (this.descriptor.isSsl()) {
-                            sf = SSLSocketFactory.getDefault();
-                    } else {
-                            sf = SocketFactory.getDefault();
-                    }
+			    if (this.descriptor.isTrustAllCertificates()) {
+			        sf = new UtilSSLSocketFactory().trustAllCertificates();
+			    } else {
+			        sf = SSLSocketFactory.getDefault();
+			    }
+		    } else if (!this.descriptor.getSocksHost().equals("") && this.descriptor.getSocksPort() > 0) {
+			    sf = new ProxySocketFactory(Proxy.Type.SOCKS, this.descriptor.getSocksHost(), this.descriptor.getSocksPort());
+		    } else {
+		        sf = SocketFactory.getDefault();
+		    }
                     builder.setSocketFactory(sf);
                     builder.setMessageDelay(500);
                     ListenerManager listenerManager = builder.getListenerManager();
@@ -182,8 +190,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			        PircListener.CHAT_ESTABLISHER, new ChatEstablishedListener());
 			return pircConnection.isConnected();
 		} catch (Exception e) {
-			LOGGER.warning("Error connecting to irc: " + e);
-                }
+		    // JENKINS-17017: contrary to Javadoc PircBotx (at least 1.7 and 1.8) sometimes
+		    // throw a RuntimeException instead of IOException if connecting fails
+		    LOGGER.warning("Error connecting to irc: " + e);
+		}
 		return false;
 	}
 
@@ -321,6 +331,11 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
 		//@Override
 		public void onMessage(IMMessage message) {
+			if(descriptor.isDisallowPrivateChat()) {
+				// ignore private chat, if disallow private chat commands.
+				return;
+			}
+                    
 			if(!message.getTo().equals(descriptor.getNick())) {
 				throw new IllegalStateException("Intercepted message to '" + message.getTo()
 						+ "'. That shouldn't happen!");

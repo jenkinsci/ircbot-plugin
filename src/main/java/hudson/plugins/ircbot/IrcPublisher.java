@@ -168,7 +168,11 @@ public class IrcPublisher extends IMPublisher {
         
         private boolean ssl;
         
+        private boolean disallowPrivateChat;
+        
         private String login = "PircBotx";
+        
+        private boolean sslTrustAllCertificates;
 
         String password = null;
 
@@ -180,6 +184,10 @@ public class IrcPublisher extends IMPublisher {
         
         boolean nickAutoChange = false;
                 
+        private String socksHost = null;
+        
+        private Integer socksPort = 1080;
+        
         /**
          * Marks if passwords are already scrambled.
          * Needed to migrate old, unscrambled passwords.
@@ -276,10 +284,20 @@ public class IrcPublisher extends IMPublisher {
                     throw new FormException("port field must be an Integer",
                             "irc_publisher.port");
                 }
+                this.socksHost = req.getParameter("irc_publisher.socksHost");
+                try {
+                    this.socksPort = Integer.valueOf(req.getParameter("irc_publisher.socksPort"));
+                } catch (NumberFormatException e) {
+                    throw new FormException("SOCKS proxy port field must be an Integer",
+                            "irc_publisher.socksPort");
+                }
                 this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
                 this.nickAutoChange = "on".equals(req.getParameter("irc_publisher.nickAutoChange"));
+                this.sslTrustAllCertificates = "on".equals(req.getParameter("irc_publisher.ssl_trust_all_certificates"));
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
+                
+                this.disallowPrivateChat = "on".equals(req.getParameter("irc_publisher.disallowPrivateChat"));
                 
             	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
             	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
@@ -474,8 +492,24 @@ public class IrcPublisher extends IMPublisher {
             return port;
         }
         
+        public String getSocksHost() {
+            return socksHost;
+        }
+        
+        public int getSocksPort() {
+            return socksPort;
+        }
+        
         public boolean isSsl() {
             return this.ssl;
+        }
+        
+        public boolean isTrustAllCertificates() {
+            return this.sslTrustAllCertificates;
+        }
+        
+        public boolean isDisallowPrivateChat() {
+            return this.disallowPrivateChat;
         }
 
         //@Override
