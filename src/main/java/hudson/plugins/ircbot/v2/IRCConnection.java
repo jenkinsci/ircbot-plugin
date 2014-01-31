@@ -18,6 +18,7 @@ import hudson.plugins.ircbot.v2.PircListener.JoinListener;
 import hudson.plugins.ircbot.v2.PircListener.PartListener;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,8 @@ import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.exception.IrcException;
-import org.pircbotx.exception.NickAlreadyInUseException;
+import org.pircbotx.Configuration.Builder;
+import org.pircbotx.hooks.managers.ListenerManager;
 import org.pircbotx.ProxySocketFactory;
 
 /**
@@ -48,19 +50,19 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	
 	private final DescriptorImpl descriptor;
 	private final AuthenticationHolder authentication;
-	private final PircBotX pircConnection = new PircBotX();
-	private final PircListener listener;
+	private PircBotX pircConnection;
+	private PircListener listener;
+        private Thread connectionThread;
 
 	private List<IMMessageTarget> groupChats;
 
     private final Map<String, Bot> bots = new HashMap<String, Bot>();
 	
 	private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
-
-	public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
-	    if (LOGGER.isLoggable(Level.FINEST)) {
-	        this.pircConnection.setVerbose(true);
-	    }
+        
+        private boolean loggedIn = false;
+        
+	public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {          
 		this.descriptor = descriptor;
 		this.authentication = authentication;
 		
@@ -69,19 +71,13 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		} else {
 			this.groupChats = Collections.emptyList();
 		}
-		
-	    this.pircConnection.setLogin(this.descriptor.getLogin());
-        this.pircConnection.setName(this.descriptor.getNick());
-        
-        // lower delay between sending 2 messages to 500ms as we will sometimes send
-        // output which will consist of multiple lines (see comment in send method)
-        // (lowering further than this doesn't seem to work as we will otherwise be easily
-        // be throttled by IRC servers)
-        this.pircConnection.setMessageDelay(500);
-        
-        this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
 	}
 	
+        public void loggedIn(){
+            loggedIn=true;
+        }
+        
+        
 	//@Override
 	public void close() {
 	    this.listener.explicitDisconnect = true;
@@ -91,8 +87,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
             this.listener.removePartListener(this);
             this.listener.removeInviteListener(this);
             
-			this.pircConnection.disconnect();
+			connectionThread.interrupt();
 			//this.pircConnection.shutdown();
+                        loggedIn=false;
 		}
 	}
 
@@ -100,45 +97,71 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	public boolean isConnected() {
 		return this.pircConnection != null && this.pircConnection.isConnected();
 	}
-
+        
 	//@Override
 	public boolean connect() {
-		try {
-			this.pircConnection.setEncoding(this.descriptor.getCharset());
-
-			LOGGER.info(String.format("Connecting to %s:%s as %s using charset %s",
-			        this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getNick(), this.descriptor.getCharset()));
-			
-			String password = Util.fixEmpty(this.descriptor.getPassword());
-			
-			final SocketFactory sf;
-			if (this.descriptor.isSsl()) {
+            try {
+                    Builder builder = new Builder();
+                    builder.setAutoNickChange(true);
+                    builder.setAutoReconnect(false);
+                    builder.setLogin(descriptor.getLogin());
+                    builder.setName(descriptor.getNick());
+                    builder.setNickservPassword(descriptor.getNickServPassword());
+                    builder.setEncoding(Charset.forName(descriptor.getCharset()));
+                    builder.setServer(descriptor.getHost(), descriptor.getPort(), Util.fixEmpty(this.descriptor.getPassword()));
+                    SocketFactory sf;
+                    if (this.descriptor.isSsl()) {
 			    if (this.descriptor.isTrustAllCertificates()) {
 			        sf = new UtilSSLSocketFactory().trustAllCertificates();
 			    } else {
 			        sf = SSLSocketFactory.getDefault();
 			    }
-			} else if (!this.descriptor.getSocksHost().equals("") && this.descriptor.getSocksPort() > 0) {
+		    } else if (!this.descriptor.getSocksHost().equals("") && this.descriptor.getSocksPort() > 0) {
 			    sf = new ProxySocketFactory(Proxy.Type.SOCKS, this.descriptor.getSocksHost(), this.descriptor.getSocksPort());
-			} else {
-			    sf = SocketFactory.getDefault();
-			}
-			
-		    this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
-			
-			LOGGER.info("connected to IRC");
-			if (!this.pircConnection.getListenerManager().listenerExists(this.listener)) {
-			    this.pircConnection.getListenerManager().addListener(this.listener);
-			}
-			this.listener.addJoinListener(this);
-            this.listener.addInviteListener(this);
-            this.listener.addPartListener(this);
-			
-	        final String nickServPassword = this.descriptor.getNickServPassword();
-            if(Util.fixEmpty(nickServPassword) != null) {
-                this.pircConnection.identify(nickServPassword);
-                
-                if (!this.groupChats.isEmpty()) {
+		    } else {
+		        sf = SocketFactory.getDefault();
+		    }
+                    builder.setSocketFactory(sf);
+                    builder.setMessageDelay(500);
+                    ListenerManager listenerManager = builder.getListenerManager();
+                    pircConnection = new PircBotX(builder.buildConfiguration());
+                    this.listener = new PircListener(this.pircConnection, this.descriptor.getNick(), this);
+                    if (!listenerManager.listenerExists(this.listener)) {
+                            listenerManager.addListener(this.listener);
+                    }
+                    this.listener.addJoinListener(this);
+                    this.listener.addInviteListener(this);
+                    this.listener.addPartListener(this);
+
+                    LOGGER.info(String.format("Connecting to %s:%s as %s using charset %s",
+                            this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getNick(), this.descriptor.getCharset()));
+
+
+                    if(connectionThread!=null && connectionThread.isAlive()){
+                        connectionThread.interrupt();
+                    }
+                        connectionThread = new Thread("IRC bot"){
+                            public void run(){
+                                try {
+                                    pircConnection.startBot();
+                                } catch (IOException ex) {
+                                    LOGGER.warning("Error connecting to irc: " + ex);
+                                } catch (IrcException ex) {
+                                    LOGGER.warning("Error connecting to irc: " + ex);
+                                }
+                            }
+                        };
+                        connectionThread.start();
+                        for(int i=0; !loggedIn && i < 60; i++){
+                                Thread.sleep(1000);
+                        }
+                        if(!loggedIn || (!descriptor.getNickAutoChange() && !pircConnection.getNick().equals(descriptor.getNick()))){
+                                LOGGER.warning("Connecting to irc was not successful.");
+                                if(connectionThread.isAlive() || !connectionThread.isInterrupted())
+                                        connectionThread.interrupt();
+                                return false;
+                        }
+                        if (!this.groupChats.isEmpty()) {
 	                // Sleep some time so chances are good we're already identified
 	                // when we try to join the channels.
 	                // Unfortunately there seems to be no standard way in IRC to recognize
@@ -149,8 +172,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 					} catch (InterruptedException e) {
 						// ignore
 					}
-                }
-            }
+                        }
+
 			
 			for (IMMessageTarget groupChat : this.groupChats) {
 				try {
@@ -165,15 +188,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			
 			listener.addMessageListener(this.descriptor.getNick(),
 			        PircListener.CHAT_ESTABLISHER, new ChatEstablishedListener());
-			
-			return true;
-		} catch (NickAlreadyInUseException e) {
-			LOGGER.warning("Error connecting to irc: " + e);
-		} catch (IOException e) {
-			LOGGER.warning("Error connecting to irc: " + e);
-		} catch (IrcException e) {
-			LOGGER.warning("Error connecting to irc: " + e);
-		} catch (RuntimeException e) {
+			return pircConnection.isConnected();
+		} catch (Exception e) {
 		    // JENKINS-17017: contrary to Javadoc PircBotx (at least 1.7 and 1.8) sometimes
 		    // throw a RuntimeException instead of IOException if connecting fails
 		    LOGGER.warning("Error connecting to irc: " + e);
@@ -204,9 +220,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	    LOGGER.info("Trying to join channel " + channel.getName());
 	    
 	    if (channel.hasPassword()) {
-	    	this.pircConnection.joinChannel(channel.getName(), channel.getPassword());
+	    	this.pircConnection.sendIRC().joinChannel(channel.getName(), channel.getPassword());
 	    } else {
-	    	this.pircConnection.joinChannel(channel.getName());
+	    	this.pircConnection.sendIRC().joinChannel(channel.getName());
 	    }
 	}
 	
@@ -267,7 +283,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	}
 	
 	public void send(String target, String text) throws IMException {
-	    Channel channel = this.pircConnection.getChannel(target);
+	    Channel channel = this.pircConnection.getUserChannelDao().getChannel(target);
 	    
 	    boolean useColors = this.descriptor.isUseColors();
 	    if (useColors) {
@@ -286,9 +302,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
                 line = IRCColorizer.colorize(line);
             }
             if (this.descriptor.isUseNotice()) {
-                this.pircConnection.sendNotice(channel, line);
+                this.pircConnection.sendIRC().notice(target, line);
             } else {
-                this.pircConnection.sendMessage(channel, line);
+                this.pircConnection.sendIRC().message(target, line);
             }
         }
 	}
@@ -300,9 +316,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			if (statusMessage == null || statusMessage.trim().length() == 0) {
 				statusMessage = "away";
 			}
-			this.pircConnection.sendRawLineNow("AWAY " + statusMessage);
+			this.pircConnection.sendRaw().rawLineNow("AWAY " + statusMessage);
 		} else {
-			this.pircConnection.sendRawLineNow("AWAY");
+			this.pircConnection.sendRaw().rawLineNow("AWAY");
 		}
 	}
 
