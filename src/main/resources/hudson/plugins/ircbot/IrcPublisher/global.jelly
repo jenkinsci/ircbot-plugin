@@ -76,6 +76,10 @@
         <f:entry title="Disallow Private Chat" description="Disallow bot commands from private chat.">
             <f:checkbox name="irc_publisher.disallowPrivateChat" checked="${descriptor.disallowPrivateChat}"/>
         </f:entry>
+        <f:entry title="IRC Message Rate" description="Change the delay before sending the next message. WARNING: Do not change this without understanding what it does."
+          help="/plugin/ircbot/help-globalMessageRate.html">
+            <f:textbox name="irc_publisher.messageRate" value="${descriptor.getMessageRate()}" />
+        </f:entry>
         <super:global-jenkinsLogin />
       
         <f:entry title="Notification charset" description="The character set to use for notifications">

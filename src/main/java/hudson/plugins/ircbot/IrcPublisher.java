@@ -183,6 +183,8 @@ public class IrcPublisher extends IMPublisher {
         private String socksHost = null;
         
         private Integer socksPort = 1080;
+
+        private Integer messageRate = 500; // in milliseconds
         
         /**
          * Marks if passwords are already scrambled.
@@ -291,6 +293,13 @@ public class IrcPublisher extends IMPublisher {
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
                 
                 this.disallowPrivateChat = "on".equals(req.getParameter("irc_publisher.disallowPrivateChat"));
+
+                try {
+                    this.messageRate = Integer.valueOf(req.getParameter("irc_publisher.messageRate"));
+                } catch (NumberFormatException e) {
+                    throw new FormException("message rate field must be an Integer",
+                            "irc_publisher.messageRate");
+                }
                 
             	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
             	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
@@ -495,6 +504,8 @@ public class IrcPublisher extends IMPublisher {
         public boolean isDisallowPrivateChat() {
             return this.disallowPrivateChat;
         }
+
+        public Integer getMessageRate() { return this.messageRate; }
 
         //@Override
         public boolean isEnabled() {

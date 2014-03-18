@@ -72,12 +72,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		
 	    this.pircConnection.setLogin(this.descriptor.getLogin());
         this.pircConnection.setName(this.descriptor.getNick());
-        
-        // lower delay between sending 2 messages to 500ms as we will sometimes send
-        // output which will consist of multiple lines (see comment in send method)
-        // (lowering further than this doesn't seem to work as we will otherwise be easily
-        // be throttled by IRC servers)
-        this.pircConnection.setMessageDelay(500);
+        this.pircConnection.setMessageDelay(this.descriptor.getMessageRate());
         
         this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
 	}
