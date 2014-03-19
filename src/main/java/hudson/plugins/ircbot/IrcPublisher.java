@@ -605,6 +605,10 @@ public class IrcPublisher extends IMPublisher {
 			if (this.charset == null) {
 			    this.charset = "UTF-8";
 			}
+
+            if (this.messageRate == null) {
+                this.messageRate = 500; // in milliseconds.
+            }
 			
 			if (!this.scrambledPasswords) {
 			    this.password = Scrambler.scramble(this.password);
