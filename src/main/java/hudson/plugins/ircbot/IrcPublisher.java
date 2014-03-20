@@ -184,7 +184,7 @@ public class IrcPublisher extends IMPublisher {
         
         private Integer socksPort = 1080;
 
-        private Integer messageRate = 500; // in milliseconds
+        private Integer messageRate = getMessageRateFromSystemProperty();
         
         /**
          * Marks if passwords are already scrambled.
@@ -294,12 +294,7 @@ public class IrcPublisher extends IMPublisher {
                 
                 this.disallowPrivateChat = "on".equals(req.getParameter("irc_publisher.disallowPrivateChat"));
 
-                try {
-                    this.messageRate = Integer.valueOf(req.getParameter("irc_publisher.messageRate"));
-                } catch (NumberFormatException e) {
-                    throw new FormException("message rate field must be an Integer",
-                            "irc_publisher.messageRate");
-                }
+                this.messageRate = getMessageRateFromSystemProperty();
                 
             	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
             	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
@@ -587,6 +582,18 @@ public class IrcPublisher extends IMPublisher {
         }
 
         /**
+         * Fetches message rate, defaults to 0.5 second if none are set or invalid value.
+         * @return message rate in milliseconds
+         */
+        protected Integer getMessageRateFromSystemProperty() {
+            try {
+                return Integer.parseInt(System.getProperty("hudson.plugins.ircbot.messageRate", "500"));
+            } catch (NumberFormatException nfe) {
+                return new Integer(500);
+            }
+        }
+
+        /**
 		 * Deserialize old descriptors.
 		 */
 		@SuppressWarnings("deprecation")
@@ -607,7 +614,7 @@ public class IrcPublisher extends IMPublisher {
 			}
 
             if (this.messageRate == null) {
-                this.messageRate = 500; // in milliseconds.
+                this.messageRate = getMessageRateFromSystemProperty();
             }
 			
 			if (!this.scrambledPasswords) {
