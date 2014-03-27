@@ -69,7 +69,7 @@ public class IRCColorizer {
                     default: return line;
                 }
                 
-                return line.substring(0, index - 1) + color + keyword + Colors.NORMAL
+                return line.substring(0, index) + color + keyword + Colors.NORMAL
                         + line.substring(index + keyword.length(), line.length());
             }
         }
