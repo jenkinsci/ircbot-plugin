@@ -26,17 +26,8 @@ public class IRCColorizer {
      */
     public static String colorize(String message){
         
-        // TODO: use ResultTrend.getID() instead of magic keyword strings!
-        
         if(message.contains("Starting ")) {
             return message;
-//            if (message.contains("STILL FAILING")) {
-//                foreground = Colors.RED;
-//            } else if (message.contains("FAILURE")) {
-//                foreground = Colors.BOLD + Colors.RED;
-//            } else {
-//                foreground = Colors.DARK_GREEN;
-//            }
         } else {
             String line = colorForBuildResult(message);
             if (line == message) { // line didn't contain a build result
