@@ -110,7 +110,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			LOGGER.info(String.format("Connecting to %s:%s as %s using charset %s",
 			        this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getNick(), this.descriptor.getCharset()));
 			
-			String password = Util.fixEmpty(this.descriptor.getPassword());
+			String socksHost = Util.fixEmpty(this.descriptor.getSocksHost());
 			
 			final SocketFactory sf;
 			if (this.descriptor.isSsl()) {
@@ -119,12 +119,13 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			    } else {
 			        sf = SSLSocketFactory.getDefault();
 			    }
-			} else if (!this.descriptor.getSocksHost().equals("") && this.descriptor.getSocksPort() > 0) {
+			} else if (socksHost != null && this.descriptor.getSocksPort() > 0) {
 			    sf = new ProxySocketFactory(Proxy.Type.SOCKS, this.descriptor.getSocksHost(), this.descriptor.getSocksPort());
 			} else {
 			    sf = SocketFactory.getDefault();
 			}
 			
+			String password = Util.fixEmpty(this.descriptor.getPassword());
 		    this.pircConnection.connect(this.descriptor.getHost(), this.descriptor.getPort(), password, sf);
 			
 			LOGGER.info("connected to IRC");
