@@ -87,13 +87,18 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	public void close() {
 	    this.listener.explicitDisconnect = true;
 	    
-		if (this.pircConnection != null && this.pircConnection.isConnected()) {
-            this.listener.removeJoinListener(this);
-            this.listener.removePartListener(this);
-            this.listener.removeInviteListener(this);
-            
-			this.pircConnection.disconnect();
-			//this.pircConnection.shutdown();
+		if (this.pircConnection != null) {
+			if (this.pircConnection.isConnected()) {
+	            this.listener.removeJoinListener(this);
+	            this.listener.removePartListener(this);
+	            this.listener.removeInviteListener(this);
+	            
+				this.pircConnection.disconnect();
+			}
+			
+			// Perform a proper shutdown, also freeing all the resources (input-/output-thread)
+			// Note that with PircBotx 2.x the threads are gone and we can maybe simplify this
+			this.pircConnection.shutdown(true);
 		}
 	}
 
