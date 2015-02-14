@@ -79,10 +79,6 @@ public class IrcPublisher extends IMPublisher {
         		buildToChatNotifier, matrixMultiplier);
     }
 
-    public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.BUILD;
-    }
-
     /**
      * @see hudson.model.Describable#getDescriptor()
      */
