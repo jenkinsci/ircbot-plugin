@@ -91,9 +91,6 @@
         <f:entry title="Use colors" description="If checked, the bot will send colorized messages depending on the current and previous states of a job." help="/plugin/ircbot/help-globalConfigUseColors.html">
           <f:checkbox name="${descriptor.PARAMETERNAME_USE_COLORS}" checked="${descriptor.useColors}"/>
         </f:entry>
-        <f:entry title="IRC Message Rate" description="Change the delay before sending the next message can be done by changing the hudons.plugins.ircbot.messageRate system property. WARNING: Do not change this without understanding what it does."
-          help="/plugin/ircbot/help-globalMessageRate.html">
-        </f:entry>
     </f:advanced>
    </f:optionalBlock>
   </f:section>
