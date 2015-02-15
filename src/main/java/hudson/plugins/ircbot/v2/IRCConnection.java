@@ -21,6 +21,7 @@ import hudson.plugins.ircbot.v2.PircListener.PartListener;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -153,17 +154,50 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 					}
                 }
             }
-			
-			for (IMMessageTarget groupChat : this.groupChats) {
-				try {
-					getGroupChat(groupChat);
-				} catch (Exception e) {
-					// if we got here, the IRC connection could be established, but probably the channel name
-					// is invalid
-					LOGGER.warning("Unable to connect to channel '" + groupChat + "'.\n"
-							+ "Message: " + ExceptionHelper.dump(e));
-				}
-			}
+
+      // keep trying to connect to all channels up to timeout
+      final long timeout = TimeUnit.SECONDS.toMillis(120);
+      final long startTime = System.currentTimeMillis();
+      HashSet<IMMessageTarget> hash = new HashSet<IMMessageTarget>();
+
+      while (!hash.containsAll(this.groupChats)) {
+        if (System.currentTimeMillis() - startTime > timeout) {
+          LOGGER.warning("Unable to connect to all channels after timeout!");
+          break;
+        }
+        for (IMMessageTarget groupChat : this.groupChats) {
+          if (hash.contains(groupChat)) {
+            continue;
+          }
+          try {
+            getGroupChat(groupChat);
+          } catch (Exception e) {
+            // if we got here, the IRC connection could be established, but probably the channel name
+            // is invalid
+            LOGGER.warning("Unable to connect to channel '" + groupChat + "'.\n"
+                + "Message: " + ExceptionHelper.dump(e));
+          }
+        }
+
+        // wait a bit for connections to establish
+        try {
+          Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+        } catch (InterruptedException e) {
+          // ignore
+        }
+
+        // update our set of connected groupChats
+        for (org.pircbotx.Channel connected_chan : this.pircConnection.getChannels()) {
+          LOGGER.info("Connected to " + connected_chan.getName());
+          for (IMMessageTarget groupChat : this.groupChats) {
+            GroupChatIMMessageTarget expected_chan = (GroupChatIMMessageTarget)groupChat;
+            LOGGER.info("Expected connection to " + expected_chan.getName());
+            if (connected_chan.getName().equals(expected_chan.getName())) {
+              hash.add(groupChat);
+            }
+          }
+        }
+      }
 			
 			listener.addMessageListener(this.descriptor.getNick(),
 			        PircListener.CHAT_ESTABLISHER, new ChatEstablishedListener());
