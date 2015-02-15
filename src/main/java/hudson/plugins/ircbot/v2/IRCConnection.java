@@ -143,7 +143,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			
 	        final String nickServPassword = this.descriptor.getNickServPassword();
             if(Util.fixEmpty(nickServPassword) != null) {
-                this.pircConnection.identify(nickServPassword);
+                this.pircConnection.sendMessage("NickServ", "identify " + nickServPassword);
                 
                 if (!this.groupChats.isEmpty()) {
 	                // Sleep some time so chances are good we're already identified
