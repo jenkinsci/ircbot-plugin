@@ -1,5 +1,6 @@
 package hudson.plugins.ircbot.v2;
 
+import static com.google.common.collect.Collections2.transform;
 import static java.util.logging.Level.WARNING;
 import hudson.Util;
 import hudson.plugins.im.AuthenticationHolder;
@@ -19,24 +20,29 @@ import hudson.plugins.ircbot.v2.PircListener.JoinListener;
 import hudson.plugins.ircbot.v2.PircListener.PartListener;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.net.Proxy;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.ProxySocketFactory;
 import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
-import org.pircbotx.ProxySocketFactory;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 
 /**
  * IRC specific implementation of an {@link IMConnection}.
@@ -153,17 +159,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 					}
                 }
             }
-			
-			for (IMMessageTarget groupChat : this.groupChats) {
-				try {
-					getGroupChat(groupChat);
-				} catch (Exception e) {
-					// if we got here, the IRC connection could be established, but probably the channel name
-					// is invalid
-					LOGGER.warning("Unable to connect to channel '" + groupChat + "'.\n"
-							+ "Message: " + ExceptionHelper.dump(e));
-				}
-			}
+            
+            joinGroupChats();
 			
 			listener.addMessageListener(this.descriptor.getNick(),
 			        PircListener.CHAT_ESTABLISHER, new ChatEstablishedListener());
@@ -182,8 +179,63 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		}
 		return false;
 	}
+	
+	private void joinGroupChats() {
+		
+        long startTime = System.currentTimeMillis();
+        long timeout = TimeUnit.MINUTES.toMillis(2);
 
-    private GroupChatIMMessageTarget getGroupChatForChannelName(String channelName) {
+        // (Re-)try connecting to channels until timeout of 2 minutes is reached.
+        // This is because we might not be connected to nickserv, yet, even with the sleep of 5 seconds, we've done earlier
+        while ((System.currentTimeMillis() - startTime) < timeout) {
+		
+			for (IMMessageTarget groupChat : this.groupChats) {
+				try {
+					getGroupChat(groupChat);
+				} catch (Exception e) {
+					LOGGER.warning("Unable to connect to channel '" + groupChat + "'.\n"
+							+ "Message: " + ExceptionHelper.dump(e));
+				}
+			}
+			
+			try {
+				Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+			} catch (InterruptedException e) {
+				// ignore
+			}
+			
+			if (areWeConnectedToAllChannels()) {
+				break;
+			}
+			
+			LOGGER.info("Still not connected to all channels. Retrying.");
+        }
+        
+        if (!areWeConnectedToAllChannels()) {
+        	LOGGER.warning("Still not connected to all channels after " + timeout + " minutes. Giving up.");
+        }
+	}
+
+    private boolean areWeConnectedToAllChannels() {
+        Set<String> groupChatNames = new HashSet<String>(transform(this.groupChats, new Function<IMMessageTarget, String>() {
+			@Override
+			public String apply(IMMessageTarget input) {
+				GroupChatIMMessageTarget group = (GroupChatIMMessageTarget) input;
+				return group.getName();
+			}
+		}));
+        
+        Set<String> connectedToChannels = new HashSet<String>(transform(this.pircConnection.getChannels(), new Function<Channel, String>() {
+			@Override
+			public String apply(Channel input) {
+				return input.getName();
+			}
+		}));
+        
+        return groupChatNames.equals(connectedToChannels);
+	}
+
+	private GroupChatIMMessageTarget getGroupChatForChannelName(String channelName) {
         for (IMMessageTarget messageTarget : groupChats) {
             if (!(messageTarget instanceof GroupChatIMMessageTarget)) {
                 continue;
