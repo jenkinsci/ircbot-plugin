@@ -187,14 +187,18 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
         // (Re-)try connecting to channels until timeout of 2 minutes is reached.
         // This is because we might not be connected to nickserv, yet, even with the sleep of 5 seconds, we've done earlier
+        Exception ex = null;
         while ((System.currentTimeMillis() - startTime) < timeout) {
 		
 			for (IMMessageTarget groupChat : this.groupChats) {
 				try {
-					getGroupChat(groupChat);
+					joinGroupChat(groupChat);
 				} catch (Exception e) {
 					LOGGER.warning("Unable to connect to channel '" + groupChat + "'.\n"
 							+ "Message: " + ExceptionHelper.dump(e));
+					// I we got here something big is broken and we shouldn't continue trying to connect
+					ex = e;
+					break;
 				}
 			}
 			
@@ -211,7 +215,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			LOGGER.info("Still not connected to all channels. Retrying.");
         }
         
-        if (!areWeConnectedToAllChannels()) {
+        if (ex == null && !areWeConnectedToAllChannels()) {
         	LOGGER.warning("Still not connected to all channels after " + timeout + " minutes. Giving up.");
         }
 	}
@@ -248,7 +252,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         return null;
     }
     
-	private void getGroupChat(IMMessageTarget groupChat) {
+	private void joinGroupChat(IMMessageTarget groupChat) {
 		if (! (groupChat instanceof GroupChatIMMessageTarget)) {
 			LOGGER.warning(groupChat + " is no channel. Cannot join.");
 			return;
@@ -286,7 +290,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
             return;
         }
         LOGGER.log(Level.INFO, "Invited to join {0}", channelName);
-        getGroupChat(groupChat);
+        joinGroupChat(groupChat);
     }
 
     //@Override
