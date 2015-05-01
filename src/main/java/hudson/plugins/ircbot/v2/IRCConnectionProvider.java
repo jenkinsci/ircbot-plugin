@@ -36,6 +36,8 @@ public class IRCConnectionProvider extends IMConnectionProvider {
         		getAuthenticationHolder());
         if (imConnection.connect()) {
         	return imConnection;
+        } else {
+        	imConnection.close();
         }
         throw new IMException("Connection failed");
     }

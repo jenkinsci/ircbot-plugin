@@ -18,6 +18,8 @@ import org.pircbotx.hooks.events.InviteEvent;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.KickEvent;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.NickAlreadyInUseEvent;
+import org.pircbotx.hooks.events.NickChangeEvent;
 import org.pircbotx.hooks.events.NoticeEvent;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -52,6 +54,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 	volatile boolean explicitDisconnect = false;
 	
 	
+	@java.lang.SuppressWarnings("unused")
 	private final PircBotX pircBot;
     private final String nick;
 
@@ -144,10 +147,34 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     @Override
     public void onServerResponse(ServerResponseEvent<PircBotX> event) {
         int code = event.getCode();
+        
+		if (code == 433) {
+			return; // should be handled by onNickAlreadyInUse
+		}
+        
     	if (code >= 400 && code <= 599) {
     		LOGGER.warning("IRC server responded error " + code + " Message:\n" +
-    				event.getResponse());
+    				event.getParsedResponse());
     	}
+    }
+    
+    public void onNickChange(NickChangeEvent<PircBotX> event){
+        LOGGER.info("Nick '" + event.getOldNick() + "' was changed. Now it is used nick '" + event.getNewNick() + "'.");
+    }
+    
+    public void onNickAlreadyInUse(NickAlreadyInUseEvent<PircBotX> event){
+        LOGGER.warning("Nick '" + nick + "' is already in use ");
+//        String nickservPass = IrcPublisher.DESCRIPTOR.getNickServPassword();
+//        if(nickservPass!=null){
+//            LOGGER.info("Nick '" + nick + "' is already in use, trying to regain it.");
+//            String userservPass = IrcPublisher.DESCRIPTOR.getUserservPassword();
+//            String userName = IrcPublisher.DESCRIPTOR.getUserName();
+//            String nick = IrcPublisher.DESCRIPTOR.getNick();
+//            if(userservPass!=null && userName!=null)
+//                pircBot.sendIRC().message("USERSERV", "login " + userName + " " + userservPass);
+//            pircBot.sendIRC().message("NICKSERV", "regain " + nick + " " + nickservPass);
+//            pircBot.sendIRC().changeNick(nick);
+//        }
     }
     
     @Override
