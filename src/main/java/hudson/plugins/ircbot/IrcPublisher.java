@@ -209,6 +209,8 @@ public class IrcPublisher extends IMPublisher {
 
         private boolean useColors;
 
+        private Integer socketTimeout = 300; // Pircbotx default: 5 mins.
+
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
@@ -330,6 +332,13 @@ public class IrcPublisher extends IMPublisher {
                 this.charset = req.getParameter("irc_publisher.charset");
 
                 this.useColors = "on".equals(req.getParameter(PARAMETERNAME_USE_COLORS));
+
+                try {
+                    this.socketTimeout = Integer.valueOf(req.getParameter("irc_publisher.socketTimeout"));
+                } catch (NumberFormatException e) {
+                    throw new FormException("socket timeout field must be an Integer",
+                            "irc_publisher.socketTimeout");
+                }
 
                 // try to establish the connection
                 try {
@@ -565,6 +574,13 @@ public class IrcPublisher extends IMPublisher {
 		public String getCharset() {
 		    return this.charset;
 		}
+
+        /**
+         * Specifies the socket timeout for the underlying PircbotX client.
+         */
+        public Integer getSocketTimeout() {
+            return this.socketTimeout;
+        }
 		
 		
 		
