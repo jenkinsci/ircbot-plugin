@@ -223,7 +223,7 @@ public class IRCColorizer {
     private static void createThemes() {
     	themes = new HashMap<String, HashMap<ResultTrend,String>>();
     	themes.put("THEME1", createDefault());
-    	themes.put("THEME2", oneColorTheme("OLIVE"));
+    	themes.put("THEME2", oneColorTheme("CYAN"));
     	themes.put("THEME3", theme2());
     }
     
