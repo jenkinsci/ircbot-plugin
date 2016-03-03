@@ -91,6 +91,11 @@
         <f:entry title="Use colors" description="If checked, the bot will send colorized messages depending on the current and previous states of a job." help="/plugin/ircbot/help-globalConfigUseColors.html">
           <f:checkbox name="${descriptor.PARAMETERNAME_USE_COLORS}" checked="${descriptor.useColors}"/>
         </f:entry>
+        <f:entry title="Socket Timeout"
+          description="Time to wait for timeout before sending PINGs"
+          help="/plugin/ircbot/help-globalConfigSocketTimeout.html">
+          <f:textbox name="irc_publisher.socketTimeout" value="${descriptor.getSocketTimeout()}" />
+        </f:entry>
     </f:advanced>
    </f:optionalBlock>
   </f:section>
