@@ -3,6 +3,7 @@
 
   Since we don't really have anything dynamic here, let's just use static HTML. 
 -->
+<?jelly escape-by-default='true'?>
 <div>
   <p>This plugin is an IRC bot that can publish build results to IRC channels.</p>
   <p>Note that the <b>instant-messaging plugin ${version.instant-messaging.plugin}</b> is required for this plugin.

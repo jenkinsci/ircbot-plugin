@@ -256,6 +256,7 @@ public class IrcPublisher extends IMPublisher {
         /**
          * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest)
          */
+        @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             this.scrambledPasswords = true;

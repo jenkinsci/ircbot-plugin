@@ -33,11 +33,11 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * @author kutzi (original)
  * @author $Author: kutzi $ (last change)
  */
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings("DM_STRING_CTOR")
 public class PircListener extends ListenerAdapter<PircBotX> {
 
 	private static final Logger LOGGER = Logger.getLogger(PircListener.class.getName());
-	
-	@SuppressWarnings(value = "DM_STRING_CTOR", justification = "we want a new instance here to enable reference comparison")
+
 	public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
 	
 	private final List<IMConnectionListener> listeners = new CopyOnWriteArrayList<IMConnectionListener>();
@@ -55,11 +55,9 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 	
 	
 	@java.lang.SuppressWarnings("unused")
-	private final PircBotX pircBot;
     private final String nick;
 
-	public PircListener(PircBotX pircBot, String nick) {
-	    this.pircBot = pircBot;
+	public PircListener(String nick) {
 	    this.nick = nick;
     }
 
