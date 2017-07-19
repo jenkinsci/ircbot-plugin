@@ -55,6 +55,10 @@
           description="Password for the IRC server">
           <f:password name="irc_publisher.password" value="${descriptor.getPassword()}" />
         </f:entry>
+        <f:entry title="SASL"
+          description="Enable SASL for authentication">
+          <f:checkbox name="irc_publisher.sasl" checked="${descriptor.isSasl()}" />
+        </f:entry>
         <f:entry title="NickServ Password" description="On connection, try to identify with NickServ with this password" help="/plugin/ircbot/help-globalConfigNickServ.html">
             <f:password name="irc_publisher.nickServPassword" value="${descriptor.nickServPassword}"/>
         </f:entry>
