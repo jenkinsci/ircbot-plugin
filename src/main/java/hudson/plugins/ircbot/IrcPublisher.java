@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -172,6 +173,8 @@ public class IrcPublisher extends IMPublisher {
 
         String password = null;
 
+        private boolean sasl;
+
         String nick = "jenkins-bot";
         
         String nickServPassword = null;
@@ -267,6 +270,7 @@ public class IrcPublisher extends IMPublisher {
                 this.login = req.getParameter("irc_publisher.login");
                 this.password = Scrambler.scramble(
                         req.getParameter("irc_publisher.password"));
+                this.sasl = "on".equals(req.getParameter("irc_publisher.sasl"));
                 this.nick = req.getParameter("irc_publisher.nick");
                 this.nickServPassword = Scrambler.scramble(
                         req.getParameter(PARAMETERNAME_NICKSERV_PASSWORD));
@@ -469,6 +473,10 @@ public class IrcPublisher extends IMPublisher {
         //@Override
         public String getPassword() {
             return Scrambler.descramble(password);
+        }
+
+        public boolean isSasl() {
+            return this.sasl;
         }
 
         //@Override

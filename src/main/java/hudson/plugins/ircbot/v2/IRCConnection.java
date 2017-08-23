@@ -41,6 +41,7 @@ import org.pircbotx.Configuration.Builder;
 import org.pircbotx.PircBotX;
 import org.pircbotx.ProxySocketFactory;
 import org.pircbotx.UtilSSLSocketFactory;
+import org.pircbotx.cap.SASLCapHandler;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ConnectEvent;
 
@@ -91,8 +92,12 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		
 		config.setServerHostname(descriptor.getHost());
 		config.setServerPort(descriptor.getPort());
-		String password = Util.fixEmpty(this.descriptor.getPassword());
-		config.setServerPassword(password);
+		if (this.descriptor.isSasl()) {
+			config.addCapHandler(new SASLCapHandler(this.descriptor.getLogin(), this.descriptor.getPassword()));
+		} else {
+			String password = Util.fixEmpty(this.descriptor.getPassword());
+			config.setServerPassword(password);
+		}
 		final String nickServPassword = Util.fixEmpty(this.descriptor.getNickServPassword());
 		config.setNickservPassword(nickServPassword);
 		
