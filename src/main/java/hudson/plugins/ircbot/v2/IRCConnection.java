@@ -124,7 +124,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	    config.setMessageDelay(this.descriptor.getMessageRate());
 	    config.setEncoding(Charset.forName(this.descriptor.getCharset()));
         
-        this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
+        this.listener = new PircListener(this.descriptor.getNick());
 		this.listener.addJoinListener(this);
         this.listener.addInviteListener(this);
         this.listener.addPartListener(this);
@@ -142,7 +142,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         
         cfg = config;
 	}
-	
+
 	//@Override
 	public void close() {
 	    this.listener.explicitDisconnect = true;
