@@ -31,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Date;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -147,20 +148,6 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	public void close() {
 	    this.listener.explicitDisconnect = true;
 	    
-//		if (this.pircConnection != null) {
-//			if (this.pircConnection.isConnected()) {
-//	            this.listener.removeJoinListener(this);
-//	            this.listener.removePartListener(this);
-//	            this.listener.removeInviteListener(this);
-//	            
-//				this.pircConnection.disconnect();
-//			}
-//			
-//			// Perform a proper shutdown, also freeing all the resources (input-/output-thread)
-//			// Note that with PircBotx 2.x the threads are gone and we can maybe simplify this
-//			this.pircConnection.shutdown(true);
-//		}
-	    
 	    if (botThread != null) {
 	    	this.botThread.interrupt();
 	    }
@@ -225,26 +212,6 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 			
 			pircConnection.getConfiguration().getListenerManager().removeListener(connectListener);
 
-
-			
-//	        final String nickServPassword = this.descriptor.getNickServPassword();
-//            if(Util.fixEmpty(nickServPassword) != null) {
-//                this.pircConnection.identify(nickServPassword);
-//                
-//                if (!this.groupChats.isEmpty()) {
-//	                // Sleep some time so chances are good we're already identified
-//	                // when we try to join the channels.
-//	                // Unfortunately there seems to be no standard way in IRC to recognize
-//	                // if one has been identified already.
-//	                LOGGER.fine("Sleeping some time to wait for being authenticated");
-//	                try {
-//						Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-//					} catch (InterruptedException e) {
-//						// ignore
-//					}
-//                }
-//            }
-            
             joinGroupChats();
 			
 			return pircConnection.isConnected();
@@ -398,6 +365,14 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	    send(target.toString(), text);
 	}
 	
+    /**
+     * 
+     * send a message to PircBotx in the target channel
+     * 
+     * @param target target channel
+     * @param text sending message
+     * @throws IMException Represents any kind of protocol-level error that may occur
+     */
 	public void send(String target, String text) throws IMException {
 	    Channel channel = this.pircConnection.getUserChannelDao().getChannel(target);
 	    
@@ -412,10 +387,15 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
         // IRC doesn't support multiline messages (see http://stackoverflow.com/questions/7039478/linebreak-irc-protocol)
 	    // therefore we split the message on line breaks and send each line as its own message:
-        String[] lines = text.split("\\r?\\n|\\r");
+        String[] lines = text.split("\\r?\\n|\\r|\\n");
         for (String line : lines) {
+            // add wait here to prevent flood
+            long start = new Date().getTime();
+            while(new Date().getTime() - start < 1000L){}
+
             if (useColors){
-                line = IRCColorizer.colorize(line);
+                // target should be the name of the channel or the name of the user to which a private message is directed.
+                line = IRCColorizer.colorize(target, line);
             }
             if (this.descriptor.isUseNotice()) {
                 this.pircConnection.sendIRC().notice(target, line);
