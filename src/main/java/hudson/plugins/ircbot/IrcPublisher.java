@@ -34,6 +34,8 @@ import java.util.SortedMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -260,6 +262,8 @@ public class IrcPublisher extends IMPublisher {
          * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest)
          */
         @Override
+        @SuppressFBWarnings(value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
+            justification="There are, in fact, side effects")
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             this.scrambledPasswords = true;
             

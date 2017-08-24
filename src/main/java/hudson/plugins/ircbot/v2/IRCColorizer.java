@@ -30,7 +30,7 @@ public class IRCColorizer {
             return message;
         } else {
             String line = colorForBuildResult(message);
-            if (line == message) { // line didn't contain a build result
+            if (line.equals(message)) { // line didn't contain a build result
                 Matcher m = TEST_CLASS_PATTERN.matcher(message);
                 if (m.matches()){
                     return Colors.BOLD + Colors.MAGENTA + line;

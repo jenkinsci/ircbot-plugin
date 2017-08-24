@@ -25,7 +25,7 @@ import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * PircBot listener to react to certain IRC events.
@@ -33,11 +33,11 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
  * @author kutzi (original)
  * @author $Author: kutzi $ (last change)
  */
+@SuppressFBWarnings(value = "DM_STRING_CTOR", justification = "we want a new instance here to enable reference comparison")
 public class PircListener extends ListenerAdapter<PircBotX> {
 
 	private static final Logger LOGGER = Logger.getLogger(PircListener.class.getName());
 	
-	@SuppressWarnings(value = "DM_STRING_CTOR", justification = "we want a new instance here to enable reference comparison")
 	public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
 	
 	private final List<IMConnectionListener> listeners = new CopyOnWriteArrayList<IMConnectionListener>();

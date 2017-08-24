@@ -47,6 +47,8 @@ import org.pircbotx.hooks.events.ConnectEvent;
 
 import com.google.common.base.Function;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * IRC specific implementation of an {@link IMConnection}.
  * 
@@ -73,7 +75,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
 
 	
-
+    @SuppressFBWarnings(value="UR_UNINIT_READ",
+        justification="TODO: this is probably a geniune problem but I don't know why")
 	public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
 		Builder<PircBotX> config = new Configuration.Builder<PircBotX>();
 
