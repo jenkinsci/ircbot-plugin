@@ -1,10 +1,12 @@
 package hudson.plugins.ircbot.v2;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
 import org.jvnet.hudson.test.Bug;
+
 import org.pircbotx.Colors;
+
+import static org.junit.Assert.assertEquals;
 
 public class IRCColorizerTest {
 

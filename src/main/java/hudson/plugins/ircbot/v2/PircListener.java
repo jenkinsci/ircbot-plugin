@@ -3,6 +3,8 @@
  */
 package hudson.plugins.ircbot.v2;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import hudson.plugins.im.IMConnectionListener;
 import hudson.plugins.im.IMMessage;
 import hudson.plugins.im.IMMessageListener;
@@ -24,8 +26,6 @@ import org.pircbotx.hooks.events.NoticeEvent;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.ServerResponseEvent;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * PircBot listener to react to certain IRC events.

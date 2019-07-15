@@ -1,7 +1,9 @@
 package hudson.plugins.ircbot.v2;
 
-import static com.google.common.collect.Collections2.transform;
-import static java.util.logging.Level.WARNING;
+import com.google.common.base.Function;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import hudson.Util;
 import hudson.plugins.im.AuthenticationHolder;
 import hudson.plugins.im.GroupChatIMMessageTarget;
@@ -45,9 +47,9 @@ import org.pircbotx.cap.SASLCapHandler;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ConnectEvent;
 
-import com.google.common.base.Function;
+import static com.google.common.collect.Collections2.transform;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import static java.util.logging.Level.WARNING;
 
 /**
  * IRC specific implementation of an {@link IMConnection}.

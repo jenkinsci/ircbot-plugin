@@ -3,6 +3,8 @@
  */
 package hudson.plugins.ircbot;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.AbstractProject;
@@ -22,7 +24,7 @@ import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildStepMonitor;
+//import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.util.Scrambler;
 
@@ -31,10 +33,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
+//import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.Level;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
