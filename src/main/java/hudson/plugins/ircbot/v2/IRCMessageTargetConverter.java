@@ -6,6 +6,10 @@ import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.IMMessageTargetConversionException;
 import hudson.plugins.im.IMMessageTargetConverter;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 public class IRCMessageTargetConverter implements IMMessageTargetConverter {
 
     //@Override
@@ -22,6 +26,15 @@ public class IRCMessageTargetConverter implements IMMessageTargetConverter {
         } else {
             return new DefaultIMMessageTarget(targetAsString);
         }
+    }
+
+    public List<IMMessageTarget> allFromString(final Collection<String> targetsAsString)
+            throws IMMessageTargetConversionException {
+        List<IMMessageTarget> finalTargets = new LinkedList();
+        for(String target : targetsAsString) {
+            finalTargets.add(fromString(target));
+        }
+        return finalTargets;
     }
 
     //@Override
