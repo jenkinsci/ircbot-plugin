@@ -36,36 +36,36 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @SuppressFBWarnings(value = "DM_STRING_CTOR", justification = "we want a new instance here to enable reference comparison")
 public class PircListener extends ListenerAdapter<PircBotX> {
 
-	private static final Logger LOGGER = Logger.getLogger(PircListener.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PircListener.class.getName());
 
-	public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
+    public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
 
-	private final List<IMConnectionListener> listeners = new CopyOnWriteArrayList<IMConnectionListener>();
+    private final List<IMConnectionListener> listeners = new CopyOnWriteArrayList<IMConnectionListener>();
 
-	private final List<MessageListener> msgListeners = new CopyOnWriteArrayList<MessageListener>();
+    private final List<MessageListener> msgListeners = new CopyOnWriteArrayList<MessageListener>();
 
-	private final List<JoinListener> joinListeners = new CopyOnWriteArrayList<JoinListener>();
+    private final List<JoinListener> joinListeners = new CopyOnWriteArrayList<JoinListener>();
 
     private final List<InviteListener> inviteListeners = new CopyOnWriteArrayList<InviteListener>();
 
     private final List<PartListener> partListeners = new CopyOnWriteArrayList<PartListener>();
 
 
-	volatile boolean explicitDisconnect = false;
+    volatile boolean explicitDisconnect = false;
 
 
-	@java.lang.SuppressWarnings("unused")
-	private final PircBotX pircBot;
+    @java.lang.SuppressWarnings("unused")
+    private final PircBotX pircBot;
     private final String nick;
 
-	public PircListener(PircBotX pircBot, String nick) {
-	    this.pircBot = pircBot;
-	    this.nick = nick;
+    public PircListener(PircBotX pircBot, String nick) {
+        this.pircBot = pircBot;
+        this.nick = nick;
     }
 
-//	/**
-//	 * {@inheritDoc}
-//	 */
+//    /**
+//     * {@inheritDoc}
+//     */
 //    @Override
 //    protected void handleLine(String line) {
 //        LOGGER.fine(line);
@@ -77,12 +77,12 @@ public class PircListener extends ListenerAdapter<PircBotX> {
      */
     @Override
     public void onMessage(MessageEvent<PircBotX> event) {
-    	for (MessageListener l : this.msgListeners) {
-    		if(l.target.equals(event.getChannel().getName())) {
-    			l.listener.onMessage(new IMMessage(event.getUser().getNick(),
-    			        event.getChannel().getName(), event.getMessage()));
-    		}
-    	}
+        for (MessageListener l : this.msgListeners) {
+            if(l.target.equals(event.getChannel().getName())) {
+                l.listener.onMessage(new IMMessage(event.getUser().getNick(),
+                        event.getChannel().getName(), event.getMessage()));
+            }
+        }
     }
 
     /**
@@ -92,36 +92,36 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     public void onPrivateMessage(PrivateMessageEvent<PircBotX> event) {
         String sender = event.getUser().getNick();
         String message = event.getMessage();
-    	for (MessageListener l : this.msgListeners) {
-    		if (this.nick.equals(l.target)) {
-    		    if (l.sender == CHAT_ESTABLISHER || sender.equals(l.sender)) {
-    		        l.listener.onMessage(new IMMessage(sender, this.nick, message));
-    		    }
-    		}
-    	}
+        for (MessageListener l : this.msgListeners) {
+            if (this.nick.equals(l.target)) {
+                if (l.sender == CHAT_ESTABLISHER || sender.equals(l.sender)) {
+                    l.listener.onMessage(new IMMessage(sender, this.nick, message));
+                }
+            }
+        }
     }
 
     /**
      * Someone send me a notice. Possibly NickServ after identifying.
      */
     @Override
-	public void onNotice(NoticeEvent<PircBotX> event) {
+    public void onNotice(NoticeEvent<PircBotX> event) {
         String sourceNick = event.getUser().getNick();
         String notice = event.getMessage();
-		LOGGER.info("Notice from " + sourceNick + ": '" + normalize(notice) + "'");
-	}
+        LOGGER.info("Notice from " + sourceNick + ": '" + normalize(notice) + "'");
+    }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     @Override
     public void onJoin(JoinEvent<PircBotX> event) {
         String sender = event.getUser().getNick();
-    	for (JoinListener l : this.joinListeners) {
-    		if (this.nick.equals(sender)) {
-    			l.channelJoined(event.getChannel().getName());
-    		}
-    	}
+        for (JoinListener l : this.joinListeners) {
+            if (this.nick.equals(sender)) {
+                l.channelJoined(event.getChannel().getName());
+            }
+        }
     }
 
     @Override
@@ -148,14 +148,14 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     public void onServerResponse(ServerResponseEvent<PircBotX> event) {
         int code = event.getCode();
 
-		if (code == 433) {
-			return; // should be handled by onNickAlreadyInUse
-		}
+        if (code == 433) {
+            return; // should be handled by onNickAlreadyInUse
+        }
 
-    	if (code >= 400 && code <= 599) {
-    		LOGGER.warning("IRC server responded error " + code + " Message:\n" +
-    				event.getParsedResponse());
-    	}
+        if (code >= 400 && code <= 599) {
+            LOGGER.warning("IRC server responded error " + code + " Message:\n" +
+                    event.getParsedResponse());
+        }
     }
 
     public void onNickChange(NickChangeEvent<PircBotX> event){
@@ -178,15 +178,15 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     }
 
     @Override
-	public void onDisconnect(DisconnectEvent<PircBotX> event) {
+    public void onDisconnect(DisconnectEvent<PircBotX> event) {
 
-    	if (!explicitDisconnect) {
-	    	for (IMConnectionListener l : this.listeners) {
-	    		l.connectionBroken(null);
-	    	}
-    	}
-    	explicitDisconnect = false;
-	}
+        if (!explicitDisconnect) {
+            for (IMConnectionListener l : this.listeners) {
+                l.connectionBroken(null);
+            }
+        }
+        explicitDisconnect = false;
+    }
 
     @Override
     public void onInvite(InviteEvent<PircBotX> event) {
@@ -198,33 +198,33 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 
     // Note that the add/removeXyzListener methods needn't be synchronized because of the CopyOnWriteLists
 
-	public void addConnectionListener(IMConnectionListener listener) {
-    	this.listeners.add(listener);
+    public void addConnectionListener(IMConnectionListener listener) {
+        this.listeners.add(listener);
     }
 
     public void removeConnectionListener(IMConnectionListener listener) {
-    	this.listeners.remove(listener);
+        this.listeners.remove(listener);
     }
 
     public void addMessageListener(String target, IMMessageListener listener) {
         this.msgListeners.add(new MessageListener(target, listener));
     }
 
-	public void addMessageListener(String target, String sender, IMMessageListener listener) {
-		this.msgListeners.add(new MessageListener(target, sender, listener));
-	}
+    public void addMessageListener(String target, String sender, IMMessageListener listener) {
+        this.msgListeners.add(new MessageListener(target, sender, listener));
+    }
 
-	public void removeMessageListener(String target, IMMessageListener listener) {
-		this.msgListeners.remove(new MessageListener(target, listener));
-	}
+    public void removeMessageListener(String target, IMMessageListener listener) {
+        this.msgListeners.remove(new MessageListener(target, listener));
+    }
 
-	public void addJoinListener(JoinListener listener) {
-		this.joinListeners.add(listener);
-	}
+    public void addJoinListener(JoinListener listener) {
+        this.joinListeners.add(listener);
+    }
 
-	public void removeJoinListener(JoinListener listener) {
-		this.joinListeners.remove(listener);
-	}
+    public void removeJoinListener(JoinListener listener) {
+        this.joinListeners.remove(listener);
+    }
 
     public void addInviteListener(InviteListener listener) {
         this.inviteListeners.add(listener);
@@ -242,91 +242,91 @@ public class PircListener extends ListenerAdapter<PircBotX> {
         this.partListeners.remove(listener);
     }
 
-	private static final class MessageListener {
-		private final String target;
-		private final String sender;
-		private final IMMessageListener listener;
+    private static final class MessageListener {
+        private final String target;
+        private final String sender;
+        private final IMMessageListener listener;
 
-		public MessageListener(String expectedMessageTarget, IMMessageListener listener) {
-			this.target = expectedMessageTarget;
-			this.sender = null;
-			this.listener = listener;
-		}
+        public MessageListener(String expectedMessageTarget, IMMessageListener listener) {
+            this.target = expectedMessageTarget;
+            this.sender = null;
+            this.listener = listener;
+        }
 
-		public MessageListener(String expectedMessageTarget, String expectedMessageSender,
+        public MessageListener(String expectedMessageTarget, String expectedMessageSender,
                 IMMessageListener listener) {
-		    this.target = expectedMessageTarget;
-		    this.sender = expectedMessageSender;
+            this.target = expectedMessageTarget;
+            this.sender = expectedMessageSender;
             this.listener = listener;
         }
 
         @Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((listener == null) ? 0 : listener.hashCode());
-			result = prime * result
-					+ ((target == null) ? 0 : target.hashCode());
-			return result;
-		}
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result
+                    + ((listener == null) ? 0 : listener.hashCode());
+            result = prime * result
+                    + ((target == null) ? 0 : target.hashCode());
+            return result;
+        }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			MessageListener other = (MessageListener) obj;
-			if (listener == null) {
-				if (other.listener != null)
-					return false;
-			} else if (!listener.equals(other.listener))
-				return false;
-			if (target == null) {
-				if (other.target != null)
-					return false;
-			} else if (!target.equals(other.target))
-				return false;
-			return true;
-		}
-	}
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            MessageListener other = (MessageListener) obj;
+            if (listener == null) {
+                if (other.listener != null)
+                    return false;
+            } else if (!listener.equals(other.listener))
+                return false;
+            if (target == null) {
+                if (other.target != null)
+                    return false;
+            } else if (!target.equals(other.target))
+                return false;
+            return true;
+        }
+    }
 
-	/**
-	 * Removes any IRC special characters (I know of. Where is a authorative guide for them??)
-	 * for the message.
-	 *
-	 * http://oreilly.com/pub/h/1953
-	 */
-	private static String normalize(String ircMessage) {
-		String msg = ircMessage.replace("\u0001", "");
-		msg = msg.replace("\u0002", "");
-		msg = msg.replace("\u0016", "");
-		msg = msg.replace("\u000F", "");
+    /**
+     * Removes any IRC special characters (I know of. Where is a authorative guide for them??)
+     * for the message.
+     *
+     * http://oreilly.com/pub/h/1953
+     */
+    private static String normalize(String ircMessage) {
+        String msg = ircMessage.replace("\u0001", "");
+        msg = msg.replace("\u0002", "");
+        msg = msg.replace("\u0016", "");
+        msg = msg.replace("\u000F", "");
 
-		return msg;
-	}
+        return msg;
+    }
 
-	public interface JoinListener {
-		/**
-		 * Is called when the ircbot joins a channel.
-		 */
-		void channelJoined(String channelName);
-	}
+    public interface JoinListener {
+        /**
+         * Is called when the ircbot joins a channel.
+         */
+        void channelJoined(String channelName);
+    }
 
     public interface InviteListener {
-    	/**
-		 * Is called when the ircbot is invited to a channel.
-		 */
+        /**
+         * Is called when the ircbot is invited to a channel.
+         */
         void inviteReceived(String channelName, String inviter);
     }
 
     public interface PartListener {
-    	/**
-		 * Is called when the ircbot is disconnected (leaves or is kicked) from a channel.
-		 */
+        /**
+         * Is called when the ircbot is disconnected (leaves or is kicked) from a channel.
+         */
         void channelParted(String channelName);
     }
 

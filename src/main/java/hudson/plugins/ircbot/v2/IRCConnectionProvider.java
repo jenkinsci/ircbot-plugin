@@ -15,13 +15,13 @@ public class IRCConnectionProvider extends IMConnectionProvider {
     }
 
     public static final synchronized void setDesc(IMPublisherDescriptor desc) throws IMException {
-    	INSTANCE.setDescriptor(desc);
-    	INSTANCE.releaseConnection();
+        INSTANCE.setDescriptor(desc);
+        INSTANCE.releaseConnection();
     }
 
     private IRCConnectionProvider() {
-    	super();
-    	init();
+        super();
+        init();
     }
 
     @Override
@@ -29,15 +29,15 @@ public class IRCConnectionProvider extends IMConnectionProvider {
         releaseConnection();
 
         if (getDescriptor() == null) {
-        	throw new IMException("Descriptor not set");
+            throw new IMException("Descriptor not set");
         }
 
         IMConnection imConnection = new IRCConnection((IrcPublisher.DescriptorImpl)getDescriptor(),
-        		getAuthenticationHolder());
+                getAuthenticationHolder());
         if (imConnection.connect()) {
-        	return imConnection;
+            return imConnection;
         } else {
-        	imConnection.close();
+            imConnection.close();
         }
         throw new IMException("Connection failed");
     }
