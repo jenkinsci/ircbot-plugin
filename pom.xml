@@ -24,6 +24,7 @@
 
   <properties>
     <version.instant-messaging.plugin>1.35</version.instant-messaging.plugin>
+    <version.workflow-step-api.plugin>2.13</version.workflow-step-api.plugin>
     <java.level>8</java.level>
   </properties>
 
@@ -32,6 +33,12 @@
         <groupId>org.jvnet.hudson.plugins</groupId>
         <artifactId>instant-messaging</artifactId>
         <version>${version.instant-messaging.plugin}</version>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.jenkins-ci.plugins.workflow</groupId>
+        <artifactId>workflow-step-api</artifactId>
+        <version>${version.workflow-step-api.plugin}</version>
         <scope>compile</scope>
     </dependency>
     <dependency>
