@@ -24,6 +24,7 @@
 
   <properties>
     <version.instant-messaging.plugin>1.35</version.instant-messaging.plugin>
+    <java.level>8</java.level>
   </properties>
 
   <dependencies>
