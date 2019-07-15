@@ -51,19 +51,19 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * IRC specific implementation of an {@link IMConnection}.
- * 
+ *
  * @author kutzi
  */
 public class IRCConnection implements IMConnection, JoinListener, InviteListener, PartListener {
 
 	private static final Logger LOGGER = Logger.getLogger(IRCConnection.class.getName());
-	
+
 	private final DescriptorImpl descriptor;
 	private final AuthenticationHolder authentication;
-	
-	
+
+
 	private Thread botThread;
-	
+
 	private final Builder<PircBotX> cfg;
 	private volatile PircBotX pircConnection;
 	private final PircListener listener;
@@ -71,10 +71,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 	private List<IMMessageTarget> groupChats;
 
     private final Map<String, Bot> bots = new HashMap<String, Bot>();
-	
+
 	private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
 
-	
+
     @SuppressFBWarnings(value="UR_UNINIT_READ",
         justification="TODO: this is probably a geniune problem but I don't know why")
 	public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
@@ -86,13 +86,13 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 //	    }
 		this.descriptor = descriptor;
 		this.authentication = authentication;
-		
+
 		if (descriptor.getDefaultTargets() != null) {
 			this.groupChats = descriptor.getDefaultTargets();
 		} else {
 			this.groupChats = Collections.emptyList();
 		}
-		
+
 		config.setServerHostname(descriptor.getHost());
 		config.setServerPort(descriptor.getPort());
 		if (this.descriptor.isSasl()) {
@@ -105,10 +105,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		}
 		final String nickServPassword = Util.fixEmpty(this.descriptor.getNickServPassword());
 		config.setNickservPassword(nickServPassword);
-		
-		
+
+
 		String socksHost = Util.fixEmpty(this.descriptor.getSocksHost());
-		
+
 		final SocketFactory sf;
 		if (this.descriptor.isSsl()) {
 		    if (this.descriptor.isTrustAllCertificates()) {
@@ -122,50 +122,50 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 		    sf = SocketFactory.getDefault();
 		}
 		config.setSocketFactory(sf);
-		
-		
+
+
 	    config.setLogin(this.descriptor.getLogin());
 	    config.setName(this.descriptor.getNick());
 	    config.setMessageDelay(this.descriptor.getMessageRate());
 	    config.setEncoding(Charset.forName(this.descriptor.getCharset()));
-        
+
         this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
 		this.listener.addJoinListener(this);
         this.listener.addInviteListener(this);
         this.listener.addPartListener(this);
-        
-        
+
+
 		listener.addMessageListener(this.descriptor.getNick(),
 		        PircListener.CHAT_ESTABLISHER, new ChatEstablishedListener());
-        
+
         config.addListener(listener);
-        
+
         config.setAutoNickChange(false);
-        
+
         // we're still handling reconnection logic by ourself. Maybe not a good idea in the long run...
         config.setAutoReconnect(false);
-        
+
         cfg = config;
 	}
-	
+
 	//@Override
 	public void close() {
 	    this.listener.explicitDisconnect = true;
-	    
+
 //		if (this.pircConnection != null) {
 //			if (this.pircConnection.isConnected()) {
 //	            this.listener.removeJoinListener(this);
 //	            this.listener.removePartListener(this);
 //	            this.listener.removeInviteListener(this);
-//	            
+//
 //				this.pircConnection.disconnect();
 //			}
-//			
+//
 //			// Perform a proper shutdown, also freeing all the resources (input-/output-thread)
 //			// Note that with PircBotx 2.x the threads are gone and we can maybe simplify this
 //			this.pircConnection.shutdown(true);
 //		}
-	    
+
 	    if (botThread != null) {
 	    	this.botThread.interrupt();
 	    }
@@ -182,27 +182,27 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
 			LOGGER.info(String.format("Connecting to %s:%s as %s using charset %s",
 			        this.descriptor.getHost(), this.descriptor.getPort(), this.descriptor.getNick(), this.descriptor.getCharset()));
-			
-			
+
+
 			if (botThread != null) {
 				botThread.interrupt();
 			}
-			
+
 			final CountDownLatch connectLatch = new CountDownLatch(1);
-			
-			
+
+
 			ListenerAdapter<PircBotX> connectListener = new ListenerAdapter<PircBotX>() {
 
 				@Override
 				public void onConnect(ConnectEvent<PircBotX> event)
 						throws Exception {
 					connectLatch.countDown();
-				    
+
 					LOGGER.info("connected to IRC");
 				}
 			};
 			cfg.addListener(connectListener);
-			
+
 			botThread = new Thread("IRC Bot") {
 				public void run() {
 					pircConnection = new PircBotX(cfg.buildConfiguration());
@@ -214,10 +214,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 				}
 			};
 			botThread.start();
-				
+
 			try {
 				boolean connected = connectLatch.await(2, TimeUnit.MINUTES);
-				
+
 				if (!connected) {
 					LOGGER.warning("Time out waiting for connecting to irc");
 					close();
@@ -227,15 +227,15 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 				LOGGER.warning("Interrupted waiting for connecting to irc: " + e);
 				Thread.currentThread().interrupt();
 			}
-			
+
 			pircConnection.getConfiguration().getListenerManager().removeListener(connectListener);
 
 
-			
+
 //	        final String nickServPassword = this.descriptor.getNickServPassword();
 //            if(Util.fixEmpty(nickServPassword) != null) {
 //                this.pircConnection.identify(nickServPassword);
-//                
+//
 //                if (!this.groupChats.isEmpty()) {
 //	                // Sleep some time so chances are good we're already identified
 //	                // when we try to join the channels.
@@ -249,18 +249,18 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 //					}
 //                }
 //            }
-            
+
             joinGroupChats();
-			
+
 			return pircConnection.isConnected();
 		} catch (RuntimeException e) {
 		    LOGGER.log(WARNING, "Error connecting to irc", e);
 		    return false;
 		}
 	}
-	
+
 	private void joinGroupChats() {
-		
+
         long startTime = System.currentTimeMillis();
         long timeout = TimeUnit.MINUTES.toMillis(2);
 
@@ -268,7 +268,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         // This is because we might not be connected to nickserv, yet, even with the sleep of 5 seconds, we've done earlier
         Exception ex = null;
         while ((System.currentTimeMillis() - startTime) < timeout) {
-		
+
 			for (IMMessageTarget groupChat : this.groupChats) {
 				try {
 					joinGroupChat(groupChat);
@@ -280,20 +280,20 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 					break;
 				}
 			}
-			
+
 			try {
 				Thread.sleep(TimeUnit.SECONDS.toMillis(5));
 			} catch (InterruptedException e) {
 				// ignore
 			}
-			
+
 			if (areWeConnectedToAllChannels()) {
 				break;
 			}
-			
+
 			LOGGER.info("Still not connected to all channels. Retrying.");
         }
-        
+
         if (ex == null && !areWeConnectedToAllChannels()) {
         	LOGGER.warning("Still not connected to all channels after " + timeout + " minutes. Giving up.");
         }
@@ -307,14 +307,14 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 				return group.getName();
 			}
 		}));
-        
+
         Set<String> connectedToChannels = new HashSet<String>(transform(this.pircConnection.getUserChannelDao().getAllChannels(), new Function<Channel, String>() {
 			@Override
 			public String apply(Channel input) {
 				return input.getName();
 			}
 		}));
-        
+
         return groupChatNames.equals(connectedToChannels);
 	}
 
@@ -330,23 +330,23 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         }
         return null;
     }
-    
+
 	private void joinGroupChat(IMMessageTarget groupChat) {
 		if (! (groupChat instanceof GroupChatIMMessageTarget)) {
 			LOGGER.warning(groupChat + " is no channel. Cannot join.");
 			return;
 		}
-		
+
 		GroupChatIMMessageTarget channel = (GroupChatIMMessageTarget)groupChat;
 	    LOGGER.info("Trying to join channel " + channel.getName());
-	    
+
 	    if (channel.hasPassword()) {
 	    	this.pircConnection.sendIRC().joinChannel(channel.getName(), channel.getPassword());
 	    } else {
 	    	this.pircConnection.sendIRC().joinChannel(channel.getName());
 	    }
 	}
-	
+
     //@Override
     public void channelJoined(String channelName) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
@@ -402,10 +402,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     public void send(IMMessageTarget target, String text) throws IMException {
 	    send(target.toString(), text);
 	}
-	
+
 	public void send(String target, String text) throws IMException {
 	    Channel channel = this.pircConnection.getUserChannelDao().getChannel(target);
-	    
+
 	    boolean useColors = this.descriptor.isUseColors();
 	    if (useColors) {
 	        String mode = channel.getMode();
@@ -456,25 +456,25 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 				// ignore private chat, if disallow private chat commands.
 				return;
 			}
-                    
+
 			if(!message.getTo().equals(descriptor.getNick())) {
 				throw new IllegalStateException("Intercepted message to '" + message.getTo()
 						+ "'. That shouldn't happen!");
 			}
-			
+
 			synchronized (privateChats) {
 				if (privateChats.containsKey(message.getFrom())) {
 					// ignore. We're already in a chat with partner
 					return;
 				}
-				
+
 				IRCPrivateChat chat = new IRCPrivateChat(IRCConnection.this, listener, descriptor.getUserName(), message.getFrom());
 				Bot bot = new Bot(chat,
 						descriptor.getNick(), descriptor.getHost(),
 						descriptor.getCommandPrefix(), authentication);
-			
+
 				privateChats.put(message.getFrom(), bot);
-				
+
 				// we must replay this message as it could contain a command
 				bot.onMessage(message);
 			}

@@ -6,11 +6,11 @@ import hudson.plugins.im.IMMessageListener;
 
 /**
  * Representation of an IRC private (user-to-user) chat.
- * 
+ *
  * @author kutzi
  */
 public class IRCPrivateChat implements IMChat {
-	
+
 	private final PircListener listener;
 	private final String nick;
 	private final String chatPartner;
@@ -27,7 +27,7 @@ public class IRCPrivateChat implements IMChat {
 	public String getNickName(String senderId) {
 		return senderId;
 	}
-	
+
 	//@Override
 	public String getIMId(String senderId) {
 		return senderId;
@@ -37,17 +37,17 @@ public class IRCPrivateChat implements IMChat {
 	public boolean isMultiUserChat() {
 		return false;
 	}
-	
+
 	//@Overrid
 	public boolean isCommandsAccepted() {
 	    return true;
 	}
-	
+
 	//@Override
 	public void addMessageListener(IMMessageListener listener) {
 		this.listener.addMessageListener(this.nick, this.chatPartner, listener);
 	}
-	
+
 	//@Override
 	public void removeMessageListener(IMMessageListener listener) {
 		this.listener.removeMessageListener(this.nick, listener);

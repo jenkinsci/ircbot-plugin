@@ -9,11 +9,11 @@ import hudson.plugins.ircbot.IrcPublisher;
 public class IRCConnectionProvider extends IMConnectionProvider {
 
     private static final IMConnectionProvider INSTANCE = new IRCConnectionProvider();
-    
+
     public static final synchronized IMConnectionProvider getInstance() {
         return INSTANCE;
     }
-    
+
     public static final synchronized void setDesc(IMPublisherDescriptor desc) throws IMException {
     	INSTANCE.setDescriptor(desc);
     	INSTANCE.releaseConnection();
@@ -31,7 +31,7 @@ public class IRCConnectionProvider extends IMConnectionProvider {
         if (getDescriptor() == null) {
         	throw new IMException("Descriptor not set");
         }
-        
+
         IMConnection imConnection = new IRCConnection((IrcPublisher.DescriptorImpl)getDescriptor(),
         		getAuthenticationHolder());
         if (imConnection.connect()) {

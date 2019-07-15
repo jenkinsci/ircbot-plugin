@@ -6,7 +6,7 @@ import hudson.plugins.im.IMMessageListener;
 
 /**
  * Representation of an IRC channel.
- * 
+ *
  * @author kutzi
  */
 public class IRCChannel implements IMChat {
@@ -22,12 +22,12 @@ public class IRCChannel implements IMChat {
 		this.listener = listener;
 		this.commandsAccepted = commandsAccepted;
 	}
-	
+
 	//@Override
 	public String getNickName(String senderId) {
 		return senderId;
 	}
-	
+
 	//@Override
 	public String getIMId(String senderId) {
 		return senderId;
@@ -37,7 +37,7 @@ public class IRCChannel implements IMChat {
 	public boolean isMultiUserChat() {
 		return true;
 	}
-	
+
 	//@Overrid
 	public boolean isCommandsAccepted() {
 	    return this.commandsAccepted;
@@ -47,7 +47,7 @@ public class IRCChannel implements IMChat {
 	public void addMessageListener(IMMessageListener listener) {
 		this.listener.addMessageListener(this.channelName, listener);
 	}
-	
+
 	//@Override
 	public void removeMessageListener(IMMessageListener listener) {
 		this.listener.removeMessageListener(this.channelName, listener);

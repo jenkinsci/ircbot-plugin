@@ -43,7 +43,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Publishes build results to IRC channels.
- * 
+ *
  * @author bruyeron (original author)
  * @author $Author: kutzi $ (last change)
  * @version $Id: IrcPublisher.java 39408 2011-05-01 10:52:54Z kutzi $
@@ -109,7 +109,7 @@ public class IrcPublisher extends IMPublisher {
 	protected String getPluginName() {
 		return "IRC notifier plugin";
 	}
-    
+
     // deserialize/migrate old instances
     @SuppressWarnings("deprecation")
     protected Object readResolve() {
@@ -126,7 +126,7 @@ public class IrcPublisher extends IMPublisher {
     		}
     	}
     	this.channels = null;
-    	
+
     	if (getNotificationStrategy() == null) {
     		// set to the only available strategy in ircbot <= 1.7
     		setNotificationStrategy(NotificationStrategy.STATECHANGE_ONLY);
@@ -138,14 +138,14 @@ public class IrcPublisher extends IMPublisher {
      * Descriptor for {@link IrcPublisher}
      */
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> implements IMPublisherDescriptor {
-        
+
         private static final String PREFIX = "irc_publisher.";
 	    public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
 	    public static final String PARAMETERNAME_USE_COLORS = PREFIX + "useColors";
 	    public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
-	    
+
 	    public static final String[] CHARSETS;
-	    
+
 	    static {
 	        SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
 	        String[] cs = new String[availableCharsets.size()];
@@ -164,13 +164,13 @@ public class IrcPublisher extends IMPublisher {
         String hostname = null;
 
         Integer port = 194;
-        
+
         private boolean ssl;
-        
+
         private boolean disallowPrivateChat;
-        
+
         private String login = "PircBotx";
-        
+
         private boolean sslTrustAllCertificates;
 
         String password = null;
@@ -178,15 +178,15 @@ public class IrcPublisher extends IMPublisher {
         private boolean sasl;
 
         String nick = "jenkins-bot";
-        
+
         String nickServPassword = null;
-        
+
         private String socksHost = null;
-        
+
         private Integer socksPort = 1080;
 
         private Integer messageRate = getMessageRateFromSystemProperty();
-        
+
         /**
          * Marks if passwords are already scrambled.
          * Needed to migrate old, unscrambled passwords.
@@ -196,20 +196,20 @@ public class IrcPublisher extends IMPublisher {
 
         /**
          * channels to join
-         * 
+         *
          * @deprecated Only to deserialize old descriptors
          */
         @Deprecated
 		List<String> channels;
-        
+
         private List<IMMessageTarget> defaultTargets;
 
         String commandPrefix = "!jenkins";
-        
+
         private String hudsonLogin;
-        
+
         private boolean useNotice;
-        
+
         private String charset;
 
         private boolean useColors;
@@ -217,7 +217,7 @@ public class IrcPublisher extends IMPublisher {
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
-            
+
             if (isEnabled()) {
                 try {
                 	IRCConnectionProvider.setDesc(this);
@@ -266,7 +266,7 @@ public class IrcPublisher extends IMPublisher {
             justification="There are, in fact, side effects")
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             this.scrambledPasswords = true;
-            
+
             this.enabled = "on".equals(req.getParameter("irc_publisher.enabled"))
                     || "true".equals(req.getParameter("irc_publisher.enabled"));
             if (this.enabled) {
@@ -295,18 +295,18 @@ public class IrcPublisher extends IMPublisher {
                 this.sslTrustAllCertificates = "on".equals(req.getParameter("irc_publisher.ssl_trust_all_certificates"));
                 this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
                 this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
-                
+
                 this.disallowPrivateChat = "on".equals(req.getParameter("irc_publisher.disallowPrivateChat"));
 
                 this.messageRate = getMessageRateFromSystemProperty();
-                
+
             	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
             	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
             	// only checked state can be queried, unchecked state are ignored and the size of
             	// notifyOnlys may be lower than the size of channelNames
             	// so getting the values via stapler is unreliable.
             	// String[] notifyOnlys = req.getParameterValues("irc_publisher.chat.notificationOnly");
-            	
+
             	List<IMMessageTarget> targets = Collections.emptyList();
             	if (channelsNames != null) {
             	    // JENKINS-13697: Get the data from the JSON representation which always returns
@@ -318,21 +318,21 @@ public class IrcPublisher extends IMPublisher {
             	    }
             		targets = new ArrayList<IMMessageTarget>(channelsNames.length);
             		for (int i=0; i < channelsNames.length; i++) {
-            			
+
             			if (Util.fixEmptyAndTrim(channelsNames[i]) == null) {
             				throw new FormException("Channel name must not be empty", "channel.name");
             			}
-            			
+
             			String password = Util.fixEmpty(channelsPasswords[i]);
                 		boolean notifyOnly = jchans != null ? jchans.get(i).getBoolean("notificationOnly") : false;
-            			
+
         				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
             		}
             	}
             	this.defaultTargets = targets;
-            	
+
                 this.hudsonLogin = req.getParameter(getParamNames().getJenkinsLogin());
-                
+
                 this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
 
                 this.charset = req.getParameter("irc_publisher.charset");
@@ -354,7 +354,7 @@ public class IrcPublisher extends IMPublisher {
     				// ignore
     			}
             }
-            
+
             save();
             return super.configure(req, formData);
         }
@@ -382,23 +382,23 @@ public class IrcPublisher extends IMPublisher {
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
         	String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
         	String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
-        	
+
         	List<IMMessageTarget> targets = Collections.emptyList();
         	if (channelsNames != null) {
                 List<JSONObject> jchans = fillChannelsFromJSON(formData);
         		targets = new ArrayList<IMMessageTarget>(channelsNames.length);
         		for (int i=0; i < channelsNames.length; i++) {
-        			
+
         			if (Util.fixEmptyAndTrim(channelsNames[i]) == null) {
         				throw new FormException("Channel name must not be empty", "channel.name");
         			}
-        			
+
         			String password = Util.fixEmpty(channelsPasswords[i]);
             		boolean notifyOnly = jchans != null ? jchans.get(i).getBoolean("notificationOnly") : false;
     				targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
         		}
         	}
-        	
+
             String n = req.getParameter(getParamNames().getStrategy());
             if (n == null) {
             	n = PARAMETERVALUE_STRATEGY_DEFAULT;
@@ -419,7 +419,7 @@ public class IrcPublisher extends IMPublisher {
             boolean notifyCulprits = "on".equals(req.getParameter(getParamNames().getNotifyCulprits()));
             boolean notifyFixers = "on".equals(req.getParameter(getParamNames().getNotifyFixers()));
             boolean notifyUpstream = "on".equals(req.getParameter(getParamNames().getNotifyUpstreamCommitters()));
-            
+
             MatrixJobMultiplier matrixJobMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
             if (formData.has("matrixNotifier")) {
                 String o = formData.getString("matrixNotifier");
@@ -461,7 +461,7 @@ public class IrcPublisher extends IMPublisher {
         public String getNick() {
             return nick;
         }
-        
+
         /**
          * Returns the password that should be used to try and identify
          * with NickServ.
@@ -473,7 +473,7 @@ public class IrcPublisher extends IMPublisher {
         public String getLogin() {
             return this.login;
         }
-        
+
         //@Override
         public String getPassword() {
             return Scrambler.descramble(password);
@@ -487,23 +487,23 @@ public class IrcPublisher extends IMPublisher {
         public int getPort() {
             return port;
         }
-        
+
         public String getSocksHost() {
             return socksHost;
         }
-        
+
         public int getSocksPort() {
             return socksPort;
         }
-        
+
         public boolean isSsl() {
             return this.ssl;
         }
-        
+
         public boolean isTrustAllCertificates() {
             return this.sslTrustAllCertificates;
         }
-        
+
         public boolean isDisallowPrivateChat() {
             return this.disallowPrivateChat;
         }
@@ -529,7 +529,7 @@ public class IrcPublisher extends IMPublisher {
 		public String getHudsonUserName() {
 			return this.hudsonLogin;
 		}
-		
+
 		//@Override
 		public String getPluginDescription() {
 			return "IRC notifier plugin";
@@ -544,21 +544,21 @@ public class IrcPublisher extends IMPublisher {
 		public boolean isExposePresence() {
 			return true;
 		}
-		
+
 		//@Override
 		public List<IMMessageTarget> getDefaultTargets() {
 			if (this.defaultTargets == null) {
 				return Collections.emptyList();
 			}
-			
+
 			return this.defaultTargets;
 		}
-		
+
 	    //@Override
 	    public IMMessageTargetConverter getIMMessageTargetConverter() {
 	        return CONVERTER;
 	    }
-		
+
 		/**
 		 * Specifies if the bot should use the /notice command
 		 * instead of the /msg command to notify.
@@ -573,13 +573,13 @@ public class IrcPublisher extends IMPublisher {
 		public boolean isUseColors() {
 		    return this.useColors;
 		}
-		
+
 		public String getCharset() {
 		    return this.charset;
 		}
-		
-		
-		
+
+
+
 		public ParameterNames getParamNames() {
             return new ParameterNames() {
                 @Override
@@ -612,11 +612,11 @@ public class IrcPublisher extends IMPublisher {
 					for (String channel : this.channels) {
 						this.defaultTargets.add(new GroupChatIMMessageTarget(channel));
 					}
-					
+
 					this.channels = null;
 				}
 			}
-			
+
 			if (this.charset == null) {
 			    this.charset = "UTF-8";
 			}
@@ -624,7 +624,7 @@ public class IrcPublisher extends IMPublisher {
             if (this.messageRate == null) {
                 this.messageRate = getMessageRateFromSystemProperty();
             }
-			
+
 			if (!this.scrambledPasswords) {
 			    this.password = Scrambler.scramble(this.password);
 			    this.nickServPassword = Scrambler.scramble(this.nickServPassword);
@@ -634,9 +634,9 @@ public class IrcPublisher extends IMPublisher {
 			    // save() will fail on Windows
 			    //save();
 			}
-			
+
 			return this;
 		}
-		
+
     }
 }

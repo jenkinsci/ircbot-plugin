@@ -82,7 +82,7 @@
             <f:checkbox name="irc_publisher.disallowPrivateChat" checked="${descriptor.disallowPrivateChat}"/>
         </f:entry>
         <super:global-jenkinsLogin />
-      
+
         <f:entry title="Notification charset" description="The character set to use for notifications">
             <select name="irc_publisher.charset">
                <j:forEach var="cs" items="${descriptor.CHARSETS}">

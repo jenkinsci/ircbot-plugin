@@ -23,11 +23,11 @@
         </table>
 	  	</f:repeatable>
 	  </f:entry>
-     
+
      <super:notification-strategy/>
-     
+
      <super:config-buildToChatNotifier/>
-      
+
      <super:further-config/>
 
   </f:advanced>

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package hudson.plugins.ircbot.v2;
 
@@ -37,23 +37,23 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class PircListener extends ListenerAdapter<PircBotX> {
 
 	private static final Logger LOGGER = Logger.getLogger(PircListener.class.getName());
-	
+
 	public static final String CHAT_ESTABLISHER = new String("<<<ChatEstablisher>>>");
-	
+
 	private final List<IMConnectionListener> listeners = new CopyOnWriteArrayList<IMConnectionListener>();
-	
+
 	private final List<MessageListener> msgListeners = new CopyOnWriteArrayList<MessageListener>();
-	
+
 	private final List<JoinListener> joinListeners = new CopyOnWriteArrayList<JoinListener>();
 
     private final List<InviteListener> inviteListeners = new CopyOnWriteArrayList<InviteListener>();
 
     private final List<PartListener> partListeners = new CopyOnWriteArrayList<PartListener>();
-    
-	
+
+
 	volatile boolean explicitDisconnect = false;
-	
-	
+
+
 	@java.lang.SuppressWarnings("unused")
 	private final PircBotX pircBot;
     private final String nick;
@@ -73,7 +73,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 //    }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     @Override
     public void onMessage(MessageEvent<PircBotX> event) {
@@ -86,7 +86,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     @Override
     public void onPrivateMessage(PrivateMessageEvent<PircBotX> event) {
@@ -100,7 +100,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     		}
     	}
     }
-    
+
     /**
      * Someone send me a notice. Possibly NickServ after identifying.
      */
@@ -143,25 +143,25 @@ public class PircListener extends ListenerAdapter<PircBotX> {
             }
         }
     }
-    
+
     @Override
     public void onServerResponse(ServerResponseEvent<PircBotX> event) {
         int code = event.getCode();
-        
+
 		if (code == 433) {
 			return; // should be handled by onNickAlreadyInUse
 		}
-        
+
     	if (code >= 400 && code <= 599) {
     		LOGGER.warning("IRC server responded error " + code + " Message:\n" +
     				event.getParsedResponse());
     	}
     }
-    
+
     public void onNickChange(NickChangeEvent<PircBotX> event){
         LOGGER.info("Nick '" + event.getOldNick() + "' was changed. Now it is used nick '" + event.getNewNick() + "'.");
     }
-    
+
     public void onNickAlreadyInUse(NickAlreadyInUseEvent<PircBotX> event){
         LOGGER.warning("Nick '" + nick + "' is already in use ");
 //        String nickservPass = IrcPublisher.DESCRIPTOR.getNickServPassword();
@@ -176,10 +176,10 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 //            pircBot.sendIRC().changeNick(nick);
 //        }
     }
-    
+
     @Override
 	public void onDisconnect(DisconnectEvent<PircBotX> event) {
-        
+
     	if (!explicitDisconnect) {
 	    	for (IMConnectionListener l : this.listeners) {
 	    		l.connectionBroken(null);
@@ -197,15 +197,15 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 
 
     // Note that the add/removeXyzListener methods needn't be synchronized because of the CopyOnWriteLists
-    
+
 	public void addConnectionListener(IMConnectionListener listener) {
     	this.listeners.add(listener);
     }
-    
+
     public void removeConnectionListener(IMConnectionListener listener) {
     	this.listeners.remove(listener);
     }
-    
+
     public void addMessageListener(String target, IMMessageListener listener) {
         this.msgListeners.add(new MessageListener(target, listener));
     }
@@ -217,7 +217,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 	public void removeMessageListener(String target, IMMessageListener listener) {
 		this.msgListeners.remove(new MessageListener(target, listener));
 	}
-	
+
 	public void addJoinListener(JoinListener listener) {
 		this.joinListeners.add(listener);
 	}
@@ -241,7 +241,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     public void removePartListener(PartListener listener) {
         this.partListeners.remove(listener);
     }
-	
+
 	private static final class MessageListener {
 		private final String target;
 		private final String sender;
@@ -293,11 +293,11 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Removes any IRC special characters (I know of. Where is a authorative guide for them??)
 	 * for the message.
-	 * 
+	 *
 	 * http://oreilly.com/pub/h/1953
 	 */
 	private static String normalize(String ircMessage) {
@@ -305,10 +305,10 @@ public class PircListener extends ListenerAdapter<PircBotX> {
 		msg = msg.replace("\u0002", "");
 		msg = msg.replace("\u0016", "");
 		msg = msg.replace("\u000F", "");
-		
+
 		return msg;
 	}
-	
+
 	public interface JoinListener {
 		/**
 		 * Is called when the ircbot joins a channel.

@@ -16,7 +16,7 @@ public class IRCMessageTargetConverter implements IMMessageTargetConverter {
 		}
 
 		targetAsString = targetAsString.trim();
-		
+
 		if (targetAsString.startsWith("#")) {
 			return new GroupChatIMMessageTarget(targetAsString);
 		} else {
