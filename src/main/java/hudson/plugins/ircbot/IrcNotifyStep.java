@@ -67,6 +67,10 @@ public class IrcNotifyStep extends Step {
         this.targets = targets;
     }
 
+    public IrcNotifyStep() {
+        this.targets = ""; // Notify all channels subscribed via global config
+    }
+
     public String getTargets() {
         return targets;
     }
