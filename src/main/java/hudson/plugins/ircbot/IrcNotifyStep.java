@@ -14,10 +14,13 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.im.IMMessageTarget;
+import hudson.plugins.im.IMConnection;
 import hudson.plugins.im.MatrixJobMultiplier;
 import hudson.plugins.im.NotificationStrategy;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
+import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.plugins.ircbot.IrcPublisher;
 import hudson.util.ListBoxModel;
@@ -56,6 +59,10 @@ public class IrcNotifyStep extends Step {
     private BuildToChatNotifier buildToChatNotifier = new DefaultBuildToChatNotifier();
     private MatrixJobMultiplier matrixNotifier = MatrixJobMultiplier.ONLY_PARENT;
 
+    // Instead of build status messages, send an arbitrary message to specified
+    // or default (global config) targets with the pipeline step (and ignoring
+    // the strategy and filtering rules options above)
+    private String customMessage;
 
     @Override
     public StepExecution start(StepContext context) throws Exception {
@@ -138,6 +145,15 @@ public class IrcNotifyStep extends Step {
         this.notificationStrategy = notificationStrategy;
     }
 
+    public String getCustomMessage() {
+        return customMessage;
+    }
+
+    @DataBoundSetter
+    public void setCustomMessage(String customMessage) {
+        this.customMessage = customMessage;
+    }
+
     private static class IrcNotifyStepExecution extends SynchronousNonBlockingStepExecution<Void> {
         private transient final IrcNotifyStep step;
 
@@ -166,11 +182,19 @@ public class IrcNotifyStep extends Step {
                     step.buildToChatNotifier,
                     step.matrixNotifier
             );
-            publisher.perform(
+            if (step.customMessage == null || step.customMessage.isEmpty()) {
+                publisher.perform(
                     getContext().get(Run.class),
                     getContext().get(FilePath.class),
                     getContext().get(Launcher.class),
                     getContext().get(TaskListener.class));
+            } else {
+                IMConnection imConnection = //publisher.getIMConnection();
+                    IRCConnectionProvider.getInstance().currentConnection();
+                for (IMMessageTarget target : CONVERTER.allFromString(targets)) {
+                    imConnection.send(target, step.customMessage);
+                }
+            }
 
             return null;
         }
