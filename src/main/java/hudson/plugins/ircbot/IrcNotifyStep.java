@@ -50,7 +50,7 @@ public class IrcNotifyStep extends Step {
     private final static char TARGET_SEPARATOR_CHAR = ' ';
     private final static IRCMessageTargetConverter CONVERTER = new IRCMessageTargetConverter();
 
-    private final String targets;
+    private String targets;
     private boolean notifySuspects;
     private boolean notifyCulprits;
     private boolean notifyFixers;
@@ -70,12 +70,13 @@ public class IrcNotifyStep extends Step {
     }
 
     @DataBoundConstructor
-    public IrcNotifyStep(String targets) {
-        this.targets = targets;
-    }
-
     public IrcNotifyStep() {
         this.targets = ""; // Notify all channels subscribed via global config
+    }
+
+    @DataBoundSetter
+    public void setTargets(String targets) {
+        this.targets = targets;
     }
 
     public String getTargets() {
