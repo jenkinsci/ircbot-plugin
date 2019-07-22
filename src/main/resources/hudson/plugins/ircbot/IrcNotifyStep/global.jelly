@@ -1,0 +1,102 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+   xmlns:super="/hudson/plugins/im/IMPublisher">
+  <f:section title="IRC Notification">
+   <f:optionalBlock name="irc_publisher.enabled" title="Enable IRC Notification" checked="${descriptor.enabled}"
+          help="/plugin/ircbot/help-globalConfigEnable.html">
+    <f:entry title="Hostname"
+      description="Hostname of the IRC server">
+      <!--
+        we'll have on input field. In HTML, single "namespace" is shared between
+        all form components in one <form>, so we need to choose a name that doesn't
+        collide with other plugins. The 'descriptor' variable represents our descriptor
+        object, so we use that to determine the initial value for this form.
+      -->
+      <f:textbox name="irc_publisher.hostname" value="${descriptor.getHostname()}" />
+    </f:entry>
+    <f:entry title="Port"
+      description="Port of the IRC server"
+      help="/plugin/ircbot/help-globalConfigPort.html">
+      <f:textbox name="irc_publisher.port" value="${descriptor.getPort()}" />
+    </f:entry>
+    <f:entry title="SSL">
+      <f:checkbox name="irc_publisher.ssl" checked="${descriptor.ssl}"/>
+    </f:entry>
+    <f:entry title="Channels"
+        description="Channels to join. Name and optional password. Check 'Notification only' if you want to disallow bot commands."
+        help="/plugin/ircbot/help-globalConfigChannels.html">
+      <!-- Note that this strange separation of the table headers into a separate table is done one purpose. I didn't find another way
+                  without breaking the rendering of the whole config page! -->
+     <table width="100%">
+       <tr style="text-align:left"><th width="30%">Name</th><th width="30%">Password</th><th width="10%">Notification only</th><th width="30%"/></tr>
+     </table>
+     <f:repeatable name="irc_publisher.channels" var="ch" items="${descriptor.defaultTargets}">
+        <table width="100%">
+            <tr>
+                    <td width="30%"><input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" /></td>
+                    <td width="30%"><input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" /></td>
+                    <td width="10%"><f:checkbox name="irc_publisher.chat.notificationOnly" checked="${ch.notificationOnly}"/></td>
+                    <td width="30%">
+                        <div align="right"><f:repeatableDeleteButton /></div>
+                    </td>
+            </tr>
+        </table>
+     </f:repeatable>
+    </f:entry>
+    <f:advanced>
+        <f:entry title="Nickname"
+          description="Nickname of the bot">
+          <f:textbox name="irc_publisher.nick" value="${descriptor.getNick()}" />
+        </f:entry>
+        <f:entry title="Login"
+          description="Login for the IRC server">
+          <f:textbox name="irc_publisher.login" value="${descriptor.getLogin()}" />
+        </f:entry>
+        <f:entry title="Password"
+          description="Password for the IRC server">
+          <f:password name="irc_publisher.password" value="${descriptor.getPassword()}" />
+        </f:entry>
+        <f:entry title="SASL"
+          description="Enable SASL for authentication">
+          <f:checkbox name="irc_publisher.sasl" checked="${descriptor.isSasl()}" />
+        </f:entry>
+        <f:entry title="NickServ Password" description="On connection, try to identify with NickServ with this password" help="/plugin/ircbot/help-globalConfigNickServ.html">
+            <f:password name="irc_publisher.nickServPassword" value="${descriptor.nickServPassword}"/>
+        </f:entry>
+        <f:entry title="Command prefix"
+          description="The prefix for the commands"
+          help="/plugin/ircbot/help-globalConfigCommandPrefix.html">
+          <f:textbox name="irc_publisher.commandPrefix" value="${descriptor.getCommandPrefix()}" />
+        </f:entry>
+        <f:entry title="Trust all SSL certificates" description="Ignore untrusted (e.g. self-signed) SSL certificates. Attention: this is insecure!"
+          help="/plugin/ircbot/help-globalTrustAllCertificates.html">
+          <f:checkbox name="irc_publisher.ssl_trust_all_certificates" checked="${descriptor.trustAllCertificates}"/>
+        </f:entry>
+        <f:entry title="SOCKS proxy host" description="Proxy server hostname or IP (if applicable). Only supported without SSL.">
+          <f:textbox name="irc_publisher.socksHost" value="${descriptor.getSocksHost()}"/>
+        </f:entry>
+        <f:entry title="SOCKS proxy port" description="Proxy server port">
+          <f:textbox name="irc_publisher.socksPort" value="${descriptor.getSocksPort()}"/>
+        </f:entry>
+        <f:entry title="Disallow Private Chat" description="Disallow bot commands from private chat.">
+            <f:checkbox name="irc_publisher.disallowPrivateChat" checked="${descriptor.disallowPrivateChat}"/>
+        </f:entry>
+        <super:global-jenkinsLogin />
+
+        <f:entry title="Notification charset" description="The character set to use for notifications">
+            <select name="irc_publisher.charset">
+               <j:forEach var="cs" items="${descriptor.CHARSETS}">
+                  <f:option selected="${instance.charset.toString()==cs}">${cs}</f:option>
+               </j:forEach>
+            </select>
+        </f:entry>
+        <f:entry title="Use /notice command" description="Use /notice command instead of /msg (default in ircbot &lt;= 2.0)">
+          <f:checkbox name="${descriptor.PARAMETERNAME_USE_NOTICE}" checked="${descriptor.useNotice}"/>
+        </f:entry>
+        <f:entry title="Use colors" description="If checked, the bot will send colorized messages depending on the current and previous states of a job." help="/plugin/ircbot/help-globalConfigUseColors.html">
+          <f:checkbox name="${descriptor.PARAMETERNAME_USE_COLORS}" checked="${descriptor.useColors}"/>
+        </f:entry>
+    </f:advanced>
+   </f:optionalBlock>
+  </f:section>
+</j:jelly>
