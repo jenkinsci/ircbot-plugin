@@ -63,6 +63,9 @@ public class IrcNotifyStep extends Step {
     private BuildToChatNotifier buildToChatNotifier = new DefaultBuildToChatNotifier();
     private MatrixJobMultiplier matrixNotifier = MatrixJobMultiplier.ONLY_PARENT;
 
+    // Append an additional message to usual notifications about build start/completion
+    private String extraMessage;
+
     // Instead of build status messages, send an arbitrary message to specified
     // or default (global config) targets with the pipeline step (and ignoring
     // the strategy and filtering rules options above)
@@ -150,6 +153,15 @@ public class IrcNotifyStep extends Step {
         this.notificationStrategy = notificationStrategy;
     }
 
+    public String getExtraMessage() {
+        return extraMessage;
+    }
+
+    @DataBoundSetter
+    public void setExtraMessage(String extraMessage) {
+        this.extraMessage = extraMessage;
+    }
+
     public String getCustomMessage() {
         return customMessage;
     }
@@ -191,19 +203,14 @@ public class IrcNotifyStep extends Step {
                     step.buildToChatNotifier,
                     step.matrixNotifier
             );
-            if (step.customMessage == null || step.customMessage.isEmpty()) {
-                publisher.perform(
+            publisher.setExtraMessage(step.extraMessage);
+            publisher.setCustomMessage(step.customMessage);
+
+            publisher.perform(
                     getContext().get(Run.class),
                     getContext().get(FilePath.class),
                     getContext().get(Launcher.class),
                     getContext().get(TaskListener.class));
-            } else {
-                IMConnection imConnection = //publisher.getIMConnection();
-                    IRCConnectionProvider.getInstance().currentConnection();
-                for (IMMessageTarget target : CONVERTER.allFromString(targets)) {
-                    imConnection.send(target, step.customMessage);
-                }
-            }
 
             return null;
         }
