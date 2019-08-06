@@ -463,7 +463,7 @@ public class IrcPublisher extends IMPublisher {
         }
 
         /**
-         * Returns the password that should be used to try and identify
+         * @return The password that should be used to try and identify
          * with NickServ.
          */
         public String getNickServPassword() {
@@ -560,15 +560,16 @@ public class IrcPublisher extends IMPublisher {
         }
 
         /**
-         * Specifies if the bot should use the /notice command
-         * instead of the /msg command to notify.
+         * @return Boolean flag which specifies if the bot should use
+         * the /notice command instead of the /msg command to notify.
          */
         public boolean isUseNotice() {
             return this.useNotice;
         }
 
         /**
-         * Specifies if the bot should send message with colors.
+         * @return Boolean flag which specifies if the bot should
+         * send message with colors.
          */
         public boolean isUseColors() {
             return this.useColors;

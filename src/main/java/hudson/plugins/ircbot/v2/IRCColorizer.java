@@ -23,6 +23,12 @@ public class IRCColorizer {
 
     /**
      * Colorize the message line if certain keywords are found in it.
+     *
+     * @param message
+     *   String content that we want to send
+     *
+     * @return
+     *   String markup (maybe with colors) that we would send
      */
     public static String colorize(String message){
 
