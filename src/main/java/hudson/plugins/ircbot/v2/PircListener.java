@@ -312,6 +312,9 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     public interface JoinListener {
         /**
          * Is called when the ircbot joins a channel.
+         *
+         * @param channelName
+         *   Name of the IRC channel to act in
          */
         void channelJoined(String channelName);
     }
@@ -319,6 +322,11 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     public interface InviteListener {
         /**
          * Is called when the ircbot is invited to a channel.
+         *
+         * @param channelName
+         *   Name of the IRC channel to act in
+         * @param inviter
+         *   Name of the IRC user who sent us an invitation
          */
         void inviteReceived(String channelName, String inviter);
     }
@@ -326,6 +334,9 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     public interface PartListener {
         /**
          * Is called when the ircbot is disconnected (leaves or is kicked) from a channel.
+         *
+         * @param channelName
+         *   Name of the IRC channel to act in
          */
         void channelParted(String channelName);
     }
