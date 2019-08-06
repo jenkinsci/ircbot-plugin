@@ -160,6 +160,10 @@ public class IrcNotifyStep extends Step {
     }
 
     private static class IrcNotifyStepExecution extends SynchronousNonBlockingStepExecution<Void> {
+        // NOTE: Bump this number if the class evolves as a breaking change
+        // (e.g. serializable fields change)
+        private static final long serialVersionUID = 1;
+
         private transient final IrcNotifyStep step;
 
         public IrcNotifyStepExecution(@Nonnull IrcNotifyStep step, @Nonnull StepContext context) {
