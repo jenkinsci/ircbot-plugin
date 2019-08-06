@@ -47,6 +47,10 @@ import org.kohsuke.stapler.DataBoundSetter;
  */
 public class IrcNotifyStep extends Step {
 
+    // NOTE: Bump this number if the class evolves as a breaking change
+    // (e.g. serializable fields change)
+    private static final long serialVersionUID = 1;
+
     private final static char TARGET_SEPARATOR_CHAR = ' ';
     private final static IRCMessageTargetConverter CONVERTER = new IRCMessageTargetConverter();
 
