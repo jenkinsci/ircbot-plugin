@@ -1,4 +1,4 @@
-package hudson.plugins.jabber.im.steps;
+package hudson.plugins.ircbot.steps;
 
 /* Snatched one-for-one from Jabber plugin implem by akomakom :
  *   https://github.com/jenkinsci/jabber-plugin/pull/18/files#diff-c197962302397baf3a4cc36463dce5ea
