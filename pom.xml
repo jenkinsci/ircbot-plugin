@@ -23,7 +23,7 @@
   </licenses>
 
   <properties>
-    <version.instant-messaging.plugin>1.36-SNAPSHOT-PIPELINES</version.instant-messaging.plugin>
+    <version.instant-messaging.plugin>1.37</version.instant-messaging.plugin>
     <version.workflow-step-api.plugin>2.13</version.workflow-step-api.plugin>
     <java.level>8</java.level>
   </properties>
