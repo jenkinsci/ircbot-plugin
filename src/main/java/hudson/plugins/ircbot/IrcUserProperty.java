@@ -1,6 +1,6 @@
 /**
  * Created on Dec 21, 2006 2:40:45 PM
- * 
+ *
  * Copyright FullSIX
  */
 package hudson.plugins.ircbot;
@@ -15,7 +15,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * User property to assign an IRC nickname to a Jenkins user.
- * 
+ *
  * @author bruyeron (original author)
  * @author $Author$ (last change)
  * @version $Id: IrcUserProperty.java 23738 2009-11-15 18:36:59Z kutzi $

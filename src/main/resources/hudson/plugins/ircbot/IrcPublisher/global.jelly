@@ -23,25 +23,25 @@
       <f:checkbox name="irc_publisher.ssl" checked="${descriptor.ssl}"/>
     </f:entry>
     <f:entry title="Channels"
-      description="Channels to join. Name and optional password. Check 'Notification only' if you want to disallow bot commands."
-      help="/plugin/ircbot/help-globalConfigChannels.html">
+        description="Channels to join. Name and optional password. Check 'Notification only' if you want to disallow bot commands."
+        help="/plugin/ircbot/help-globalConfigChannels.html">
       <!-- Note that this strange separation of the table headers into a separate table is done one purpose. I didn't find another way
                   without breaking the rendering of the whole config page! -->
      <table width="100%">
-     <tr style="text-align:left"><th width="30%">Name</th><th width="30%">Password</th><th width="10%">Notification only</th><th width="30%"/></tr>
+       <tr style="text-align:left"><th width="30%">Name</th><th width="30%">Password</th><th width="10%">Notification only</th><th width="30%"/></tr>
      </table>
- 	  <f:repeatable name="irc_publisher.channels" var="ch" items="${descriptor.defaultTargets}">
-	  	  <table width="100%">
-			<tr>
-		  	  	<td width="30%"><input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" /></td>
-		  	  	<td width="30%"><input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" /></td>
-		  	  	<td width="10%"><f:checkbox name="irc_publisher.chat.notificationOnly" checked="${ch.notificationOnly}"/></td>
-		  	  	<td width="30%">
-    		        <div align="right"><f:repeatableDeleteButton /></div>
-                </td>
-	  	  	</tr>
+     <f:repeatable name="irc_publisher.channels" var="ch" items="${descriptor.defaultTargets}">
+        <table width="100%">
+            <tr>
+                    <td width="30%"><input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" /></td>
+                    <td width="30%"><input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" /></td>
+                    <td width="10%"><f:checkbox name="irc_publisher.chat.notificationOnly" checked="${ch.notificationOnly}"/></td>
+                    <td width="30%">
+                        <div align="right"><f:repeatableDeleteButton /></div>
+                    </td>
+            </tr>
         </table>
-	  	</f:repeatable>
+     </f:repeatable>
     </f:entry>
     <f:advanced>
         <f:entry title="Nickname"
@@ -82,7 +82,7 @@
             <f:checkbox name="irc_publisher.disallowPrivateChat" checked="${descriptor.disallowPrivateChat}"/>
         </f:entry>
         <super:global-jenkinsLogin />
-      
+
         <f:entry title="Notification charset" description="The character set to use for notifications">
             <select name="irc_publisher.charset">
                <j:forEach var="cs" items="${descriptor.CHARSETS}">
