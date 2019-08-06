@@ -14,15 +14,15 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.IMConnection;
+import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.MatrixJobMultiplier;
 import hudson.plugins.im.NotificationStrategy;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
+import hudson.plugins.ircbot.IrcPublisher;
 import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
-import hudson.plugins.ircbot.IrcPublisher;
 import hudson.util.ListBoxModel;
 
 import java.util.Arrays;
