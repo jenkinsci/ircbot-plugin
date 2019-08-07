@@ -49,12 +49,13 @@ public class IrcNotifyStep extends Step {
 
     // NOTE: Bump this number if the class evolves as a breaking change
     // (e.g. serializable fields change)
-    private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 2;
 
     private final static char TARGET_SEPARATOR_CHAR = ' ';
     private final static IRCMessageTargetConverter CONVERTER = new IRCMessageTargetConverter();
 
     private String targets;
+    private boolean notifyOnStart; // Set to true explicitly in an ircNotify step reporting start of build
     private boolean notifySuspects;
     private boolean notifyCulprits;
     private boolean notifyFixers;
@@ -79,6 +80,7 @@ public class IrcNotifyStep extends Step {
     @DataBoundConstructor
     public IrcNotifyStep() {
         this.targets = ""; // Notify all channels subscribed via global config
+        this.notifyOnStart = false;
     }
 
     @DataBoundSetter
@@ -88,6 +90,15 @@ public class IrcNotifyStep extends Step {
 
     public String getTargets() {
         return targets;
+    }
+
+    public boolean isNotifyOnStart() {
+        return notifyOnStart;
+    }
+
+    @DataBoundSetter
+    public void setNotifyOnStart(boolean notifyOnStart) {
+        this.notifyOnStart = notifyOnStart;
     }
 
     public boolean isNotifySuspects() {
@@ -174,7 +185,7 @@ public class IrcNotifyStep extends Step {
     private static class IrcNotifyStepExecution extends SynchronousNonBlockingStepExecution<Void> {
         // NOTE: Bump this number if the class evolves as a breaking change
         // (e.g. serializable fields change)
-        private static final long serialVersionUID = 1;
+        private static final long serialVersionUID = 2;
 
         private transient final IrcNotifyStep step;
 
@@ -195,7 +206,7 @@ public class IrcNotifyStep extends Step {
             IrcPublisher publisher = new IrcPublisher(
                     CONVERTER.allFromString(targets),
                     step.notificationStrategy,
-                    false,
+                    step.notifyOnStart,
                     step.notifySuspects,
                     step.notifyCulprits,
                     step.notifyFixers,
