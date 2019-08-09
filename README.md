@@ -1,7 +1,10 @@
-Jenkins IRC plugin [![Build Status](https://buildhive.cloudbees.com/job/jenkinsci/job/ircbot-plugin/badge/icon)](https://buildhive.cloudbees.com/job/jenkinsci/job/ircbot-plugin/)
+Jenkins IRC plugin [![Build Status](https://ci.jenkins.io/job/Plugins/job/ircbot-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/ircbot-plugin/job/master/)
 ==================
 
-This plugin enables Jenkins to send build notífications via IRC and lets you interact with Jenkins via an IRC bot.
+This plugin enables Jenkins to send build notífications via IRC and
+lets you interact with Jenkins via an IRC bot. Like some other IM protocol
+plugins, for most of the common IM capabilities it relies on the
+[`instant-messaging-plugin`](https://github.com/jenkinsci/instant-messaging-plugin).
 
 Among many other abilities, it can be used for hands-off notifications
 about build status changes with a globally configured IRC channel
@@ -24,4 +27,3 @@ post the specified string
 
 For more information, visit the wiki page:
 <http://wiki.jenkins-ci.org/display/JENKINS/IRC+Plugin>
-
