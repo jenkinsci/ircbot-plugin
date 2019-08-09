@@ -25,5 +25,11 @@ built into the job configuration rather than default subscribed channels
 * `ircNotify customMessage: "Some text", targets: "adminname"` to always
 post the specified string
 
+* Note: due to constraints of the current implementation, please use a
+special form of notification for reporting a start of pipeline build:
+`ircNotify notifyOnStart:true` otherwise the step is treated as a build
+completion notification with a `NOT BUILT` status (before some verdict
+becomes available).
+
 For more information, visit the wiki page:
 <http://wiki.jenkins-ci.org/display/JENKINS/IRC+Plugin>
