@@ -14,14 +14,11 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.im.IMConnection;
-import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.MatrixJobMultiplier;
 import hudson.plugins.im.NotificationStrategy;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.plugins.ircbot.IrcPublisher;
-import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.util.ListBoxModel;
 
@@ -49,12 +46,13 @@ public class IrcNotifyStep extends Step {
 
     // NOTE: Bump this number if the class evolves as a breaking change
     // (e.g. serializable fields change)
-    private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 2;
 
     private final static char TARGET_SEPARATOR_CHAR = ' ';
     private final static IRCMessageTargetConverter CONVERTER = new IRCMessageTargetConverter();
 
     private String targets;
+    private boolean notifyOnStart; // Set to true explicitly in an ircNotify step reporting start of build
     private boolean notifySuspects;
     private boolean notifyCulprits;
     private boolean notifyFixers;
@@ -62,6 +60,9 @@ public class IrcNotifyStep extends Step {
     private String notificationStrategy = NotificationStrategy.ALL.getDisplayName();
     private BuildToChatNotifier buildToChatNotifier = new DefaultBuildToChatNotifier();
     private MatrixJobMultiplier matrixNotifier = MatrixJobMultiplier.ONLY_PARENT;
+
+    // Append an additional message to usual notifications about build start/completion
+    private String extraMessage;
 
     // Instead of build status messages, send an arbitrary message to specified
     // or default (global config) targets with the pipeline step (and ignoring
@@ -76,6 +77,7 @@ public class IrcNotifyStep extends Step {
     @DataBoundConstructor
     public IrcNotifyStep() {
         this.targets = ""; // Notify all channels subscribed via global config
+        this.notifyOnStart = false;
     }
 
     @DataBoundSetter
@@ -85,6 +87,15 @@ public class IrcNotifyStep extends Step {
 
     public String getTargets() {
         return targets;
+    }
+
+    public boolean isNotifyOnStart() {
+        return notifyOnStart;
+    }
+
+    @DataBoundSetter
+    public void setNotifyOnStart(boolean notifyOnStart) {
+        this.notifyOnStart = notifyOnStart;
     }
 
     public boolean isNotifySuspects() {
@@ -150,6 +161,15 @@ public class IrcNotifyStep extends Step {
         this.notificationStrategy = notificationStrategy;
     }
 
+    public String getExtraMessage() {
+        return extraMessage;
+    }
+
+    @DataBoundSetter
+    public void setExtraMessage(String extraMessage) {
+        this.extraMessage = extraMessage;
+    }
+
     public String getCustomMessage() {
         return customMessage;
     }
@@ -162,7 +182,7 @@ public class IrcNotifyStep extends Step {
     private static class IrcNotifyStepExecution extends SynchronousNonBlockingStepExecution<Void> {
         // NOTE: Bump this number if the class evolves as a breaking change
         // (e.g. serializable fields change)
-        private static final long serialVersionUID = 1;
+        private static final long serialVersionUID = 2;
 
         private transient final IrcNotifyStep step;
 
@@ -183,7 +203,7 @@ public class IrcNotifyStep extends Step {
             IrcPublisher publisher = new IrcPublisher(
                     CONVERTER.allFromString(targets),
                     step.notificationStrategy,
-                    false,
+                    step.notifyOnStart,
                     step.notifySuspects,
                     step.notifyCulprits,
                     step.notifyFixers,
@@ -191,19 +211,14 @@ public class IrcNotifyStep extends Step {
                     step.buildToChatNotifier,
                     step.matrixNotifier
             );
-            if (step.customMessage == null || step.customMessage.isEmpty()) {
-                publisher.perform(
+            publisher.setExtraMessage(step.extraMessage);
+            publisher.setCustomMessage(step.customMessage);
+
+            publisher.perform(
                     getContext().get(Run.class),
                     getContext().get(FilePath.class),
                     getContext().get(Launcher.class),
                     getContext().get(TaskListener.class));
-            } else {
-                IMConnection imConnection = //publisher.getIMConnection();
-                    IRCConnectionProvider.getInstance().currentConnection();
-                for (IMMessageTarget target : CONVERTER.allFromString(targets)) {
-                    imConnection.send(target, step.customMessage);
-                }
-            }
 
             return null;
         }
