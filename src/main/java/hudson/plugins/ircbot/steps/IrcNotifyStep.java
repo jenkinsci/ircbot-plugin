@@ -193,15 +193,12 @@ public class IrcNotifyStep extends Step {
 
         @Override
         protected Void run() throws Exception {
-
-            List<String> targets = Arrays.asList(StringUtils.split(step.targets, TARGET_SEPARATOR_CHAR));
-
 //            getContext().get(TaskListener.class).getLogger().println("IrcNotifyStep: sending message with strategy " + step.notificationStrategy);
 
-
-
             IrcPublisher publisher = new IrcPublisher(
-                    CONVERTER.allFromString(targets),
+                    step.targets.equals("")
+                        ? IrcPublisher.DESCRIPTOR.getDefaultTargets()
+                        : CONVERTER.allFromString((List<String>)Arrays.asList(StringUtils.split(step.targets, TARGET_SEPARATOR_CHAR))),
                     step.notificationStrategy,
                     step.notifyOnStart,
                     step.notifySuspects,
