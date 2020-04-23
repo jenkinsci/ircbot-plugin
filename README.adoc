@@ -206,6 +206,7 @@ reproduce the problem and attach the collected logs to the JIRA issue.
 https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.31...jenkinsci:ircbot-2.32
 
 * Fixed use of default targets from global config
+* Ported documentation from old Wiki to in-codebase README
 
 [[IRCPlugin-Version-2.31]]
 === Version 2.31 (2019-08-09)
