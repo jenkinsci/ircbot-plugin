@@ -200,8 +200,9 @@ reproduce the problem and attach the collected logs to the JIRA issue.
 [[IRCPlugin-Changelog]]
 == Changelog
 
+[[IRCPlugin-Version-2.33]]
 [[IRCPlugin-Version-2.32]]
-=== Version 2.32 (2020-04-23)
+=== Version 2.32 and 2.33 (2020-04-23)
 
 https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.31...jenkinsci:ircbot-2.32
 
