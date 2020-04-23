@@ -1,42 +1,56 @@
-[.conf-macro .output-inline]##
-
-[cols="",options="header",]
 |===
 |Plugin Information
-|View IRC https://plugins.jenkins.io/ircbot[on the plugin site] for more
-information.
+|View `ircbot-plugin` https://plugins.jenkins.io/ircbot[on the plugin site]
+for more information.
 |===
 
-[.aui-icon .aui-icon-small .aui-iconfont-error .confluence-information-macro-icon]##
-
-The current version of this plugin may not be safe to use. Please review
+|===
+|WARNING
+|The current version of this plugin may not be safe to use. Please review
 the following warnings before use:
 
 * https://jenkins.io/security/advisory/2019-04-03/#SECURITY-829[Credentials
 stored in plain text]
+|===
 
-[.conf-macro .output-inline]#This plugin enables Jenkins to send build
-notífications via IRC and lets you interact with Jenkins via an IRC bot.
-Note that you also need to install the
-http://wiki.jenkins-ci.org/display/HUDSON/Instant+Messaging+Plugin[instant-messaging
-plugin] .#
+This plugin enables Jenkins to send build notífications via IRC and
+lets you interact with Jenkins via an IRC bot. Like some other IM protocol
+plugins, for most of the common IM capabilities it relies on the
+https://github.com/jenkinsci/instant-messaging-plugin[`instant-messaging-plugin`]
 
-Installation Requirements
+Among many other abilities, it can be used for hands-off notifications
+about build status changes with a globally configured IRC channel
+subscription, in both legacy freestyle jobs and newly with pipelines
+as an `ircNotify` step.
 
-[.aui-icon .aui-icon-small .aui-iconfont-warning .confluence-information-macro-icon]#
-#
+Interesting usage examples for the pipeline step include:
 
-This plugin needs the
-http://wiki.jenkins-ci.org/display/HUDSON/Instant+Messaging+Plugin[instant-messaging
-plugin]. Please ensure that the latest version of this plug-in is also
-installed.
+* `ircNotify()` to alert default subscribed channels per global config,
+using common notification strategies to filter messages about newly
+introduced failures and fixes (the empty parenthesis mean to use the
+default settings, very simply to code)
+
+* `ircNotify targets: "username #channelname"` to alert certain recipients
+(in particular, certain users via private chats) - note that the list gets
+built into the job configuration rather than default subscribed channels
+
+* `ircNotify customMessage: "Some text", targets: "adminname"` to always
+post the specified string
+
+* Note: due to constraints of the current implementation, please use a
+special form of notification for reporting a start of pipeline build:
+`ircNotify notifyOnStart:true` otherwise the step is treated as a build
+completion notification with a `NOT BUILT` status (before some verdict
+becomes available).
+
+== Installation Requirements
 
 [[IRCPlugin-Features]]
 == Features
 
-See the 
-http://wiki.jenkins-ci.org/display/HUDSON/Instant+Messaging+Plugin[instant-messaging
-plugin] for a description of protocol-independent features.
+See the required
+https://plugins.jenkins.io/instant-messaging/[instant-messaging-plugin]
+for a description of protocol-independent features.
 
 [[IRCPlugin-IRC-specificfeatures]]
 === IRC-specific features
@@ -59,7 +73,7 @@ that they are executed at once.
 [[IRCPlugin-Examplepipelinesteps]]
 ==== Example pipeline steps
 
-Example `+ircNotify+` pipeline step syntax variants (not exhaustive): 
+Example `ircNotify` pipeline step syntax variants (not exhaustive): 
 
 [source,syntaxhighlighter-pre]
 ----
@@ -87,7 +101,9 @@ pipeline {
     post {
         always {
 // Notify the verdict only known at end of build; send to default targets by default notification strategy
-            ircNotify()
+//          ircNotify()
+// ...or with a particular strategy:
+            ircNotify notificationStrategy:"FAILURE_AND_FIXED"
         }
     }
 }
@@ -105,48 +121,47 @@ with an output in the IRC room like the following:
 [[IRCPlugin-Pipelinesteparguments]]
 ==== Pipeline step arguments
 
-The `+ircNotify+`  step optionally accepts any of the following
-parameters, and effectively passes them to the
-http://wiki.jenkins-ci.org/display/HUDSON/Instant+Messaging+Plugin[instant-messaging
-plugin] for practical application.
+The `ircNotify` step optionally accepts any of the following parameters,
+and effectively passes them to the
+https://plugins.jenkins.io/instant-messaging/[instant-messaging-plugin]
+for practical application.
 
 [width="100%",cols="12%,13%,75%",options="header",]
 |===
 |argument name |syntax |description
-|targets |space-separated string |Send the notification (or a
+|`targets` |space-separated string |Send the notification (or a
 "customMessage") to specified user name(s) and channel name(s), the
 latter start with a hash sign.
-
-|notifyOnStart |boolean |[.pl-c]# Set to *true* explicitly in an
-ircNotify step reporting a start of build, instead of a build
-completion +
-#
-
-|notifySuspects |boolean |Select if the (build completion) notification
-should alarm the c[.pl-c]##ommitters to (newly) failed builds##
-
-|notifyCulprits |boolean |[.pl-c]#Specifies if culprits - i.e.
-committers to previous already failing builds - should be informed about
-subsequent build failures. +
-#
-
-|notifyFixers |boolean |[.pl-c]#Specifies if 'fixers' should be informed
-about fixed builds. +
-#
-
-|notifyUpstreamCommitters |boolean |[.pl-c]#Specifies if upstream
-committers should be informed about build failures. +
-#
-
-|extraMessage |string |[.pl-c]#Append an additional message to usual
-notifications about build start/completion# (note: you may want to start
-it with a separator like a semicolon)
-
-|customMessage |string |[.pl-c]#*Instead* of build status messages, send
+|`notifyOnStart` |boolean |Set to *true* explicitly in an `ircNotify`
+step reporting a start of build, instead of a build completion
+|`notifySuspects` |boolean |Select if the (build completion) notification
+should alarm the committers to (newly) failed builds
+|`notifyCulprits` |boolean |Specifies if culprits - i.e. committers to
+previous already failing builds - should be informed about subsequent
+build failures.
+|`notifyFixers` |boolean |Specifies if 'fixers' should be informed
+about builds they fixed.
+|`notifyUpstreamCommitters` |boolean |Specifies if upstream
+committers should be informed about build failures.
+|`extraMessage` |string |Append an additional message to usual
+notifications about build start/completion (note: you may want
+to start this string with a separator such as a semicolon)
+|`customMessage` |string |*Instead* of build status messages, send
 an arbitrary message to specified or default (global config) targets
 with the pipeline step (and ignoring the strategy and filtering rules
-options above) +
-#
+options above)
+|notificationStrategy |string a|
+https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/NotificationStrategy.java
+
+* `"ALL"` - No matter what, notifications should always be sent.
+* `"ANY_FAILURE"` - Whenever there is a failure, a notification should be sent.
+* `"FAILURE_AND_FIXED"` - Whenever there is a failure or a failure was fixed,
+   a notification should be sent.
+* `"NEW_FAILURE_AND_FIXED"` - Whenever there is a new failure or a failure was
+   fixed, a notification should be sent. Similar to `FAILURE_AND_FIXED`, but
+   repeated failures do not trigger a notification.
+* `"STATECHANGE_ONLY"` - Notifications should be sent only if there was a
+   change in the build state, or this was the first build.
 |===
 
 The following options can be specified, but not sure to what effect and
@@ -158,34 +173,13 @@ how (TODO: try in practice and document here):
 |buildToChatNotifier |class name?
 |https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/IMPublisher.java#L88
 
-|notificationStrategy |string or java/groovy token? a|
-https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/NotificationStrategy.java
-
-* ALL - [.pl-c]#No matter what, notifications should always be sent.#
-* [.pl-c]#[.pl-c1]#ANY_FAILURE# - Whenever there is a failure, a
-notification should be sent. +
-#
-* [.pl-c]#[.pl-c1]#FAILURE_AND_FIXED# - Whenever there is a failure or a
-failure was fixed, a notification should be sent. +
-#
-* [.pl-c]#[.pl-c1]#NEW_FAILURE_AND_FIXED# - Whenever there is a new
-failure or a failure was fixed, a notification should be sent. Similar
-to #FAILURE_AND_FIXED, but repeated failures do not trigger a
-notification. +
-#
-* [.pl-c]#[.pl-c1]#STATECHANGE_ONLY - Notifications should be send only
-if there was a change in the build state, or this was the first build. +
-##
-
 |matrixMultiplier |string or java/groovy token? a|
-https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/IMPublisher.java#L89
+* https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/IMPublisher.java#L89
+* https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/MatrixJobMultiplier.java
 
-https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/MatrixJobMultiplier.java
-
-e.g.
-[.pl-smi]##MatrixJobMultiplier##[.pl-c1]##[.pl-k]##.##ONLY_CONFIGURATIONS
-ONLY_PARENT ALL##
-
+e.g. MatrixJobMultiplier
+* ONLY_CONFIGURATIONS
+* ONLY_PARENT ALL
 |===
 
 [[IRCPlugin-KnownIssues]]
@@ -199,14 +193,21 @@ tracker] for any open issues for this plugin.
 === Debugging Problems
 
 If you experience any problems using the plugin please increase the log
-level of the logger _hudson.plugins.ircbot_ to FINEST (see
+level of the logger `hudson.plugins.ircbot` to FINEST (see
 https://wiki.jenkins.io/display/JENKINS/Logging[Logging]), try to
 reproduce the problem and attach the collected logs to the JIRA issue.
 
 [[IRCPlugin-Changelog]]
 == Changelog
 
-[[IRCPlugin-Version2.31(2019-08-09)]]
+[[IRCPlugin-Version-2.32]]
+=== Version 2.32 (2020-04-23)
+
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.31...jenkinsci:ircbot-2.32
+
+* Fixed use of default targets from global config
+
+[[IRCPlugin-Version-2.31]]
 === Version 2.31 (2019-08-09)
 
 https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.30...jenkinsci:ircbot-2.31
@@ -219,33 +220,33 @@ https://github.com/jenkinsci/ircbot-plugin/pull/20
 * Added pipeline support to match capabilities of
 instant-messaging-plugin release 1.36 (not fully published) and 1.37:
 https://github.com/jenkinsci/ircbot-plugin/pull/21 and then 1.38:
-https://github.com/jenkinsci/ircbot-plugin/pull/23 +
-** So now there is an `+ircNotify()+` step with numerous supported
-options (or default activity if none are passed) for `+Jenkinsfile+`
+https://github.com/jenkinsci/ircbot-plugin/pull/23
+** So now there is an `ircNotify()` step with numerous supported
+options (or default activity if none are passed) for `Jenkinsfile`
 scripts!
-* Added a `+customMessage+` option to instantly post the specified
+* Added a `customMessage` option to instantly post the specified
 message to specified IM target(s) as the payload of a step (not tied
 into notification strategies for build start/completion): part of
 https://github.com/jenkinsci/ircbot-plugin/pull/21
 * Note that currently there is special syntax for build-start
-notifications from a pipeline step (e.g.
-`+ircNotify notifyOnStart:true+`) which is intended as a *temporary*
-solution to the problem of not having support for an IM-specific
-`+options{...}+` setting in pipelines yet, and so reporting "NOT BUILT"
-(completion-notification mode) if there was no verdict yet
+notifications from a pipeline step (e.g. `ircNotify notifyOnStart:true`)
+which is intended as a *temporary* solution to the problem of not having
+support for an IM-specific `options{...}` setting in pipelines yet, and
+so reporting "NOT BUILT" (via completion-notification mode) if there was
+no verdict yet
 
-[[IRCPlugin-Version2.30(2017-08-25)]]
+[[IRCPlugin-Version-2.30]]
 === Version 2.30 (2017-08-25)
 
 * A rapid series of releases (2.28, 2.29, 2.30) led up to addition of
 SASL in PircBotX, and some warnings fixes
 
-[[IRCPlugin-Version2.27(2016-03-03)]]
+[[IRCPlugin-Version-2.27]]
 === Version 2.27 (2016-03-03)
 
 * Bump of PircBotX and other dependencies versions
 
-[[IRCPlugin-Version2.26(2015-02-19)]]
+[[IRCPlugin-Version-2.26]]
 === Version 2.26 (2015-02-19)
 
 * don't make concurrent builds wait for the previous build (with
@@ -256,13 +257,13 @@ https://issues.jenkins-ci.org/browse/JENKINS-26892[JENKINS-26892]
 * try to connect to NickServ protected up to 2 minutes in case NickServ
 is reacting very slowly
 
-[[IRCPlugin-Version2.25(Apr2,2014)]]
+[[IRCPlugin-Version-2.25]]
 === Version 2.25 (Apr 2, 2014)
 
 * Fixed a NullPointerException introduced in 2.24
 https://issues.jenkins-ci.org/browse/JENKINS-22478[JENKINS-22478]
 
-[[IRCPlugin-Version2.24(Mar29,2014)]]
+[[IRCPlugin-Version-2.24]]
 === Version 2.24 (Mar 29, 2014)
 
 * Added basic support for SOCKS proxies (thanks Andrew Bonney)
@@ -271,22 +272,22 @@ https://issues.jenkins-ci.org/browse/JENKINS-22360[JENKINS-22360]
 (thanks Marius Gedminas)
 * Updated to PircBotX 1.9
 
-[[IRCPlugin-Version2.23(May22,2013)]]
+[[IRCPlugin-Version-2.23]]
 === Version 2.23 (May 22, 2013)
 
 * new option to disallow bot commands from private chats
 * new option to trust self-signed SSL certificates
 
-[[IRCPlugin-Version2.22(Mar.1,2013)]]
-=== Version 2.22 (Mar. 1, 2013)
+[[IRCPlugin-Version-2.22]]
+=== Version 2.22 (Mar 1, 2013)
 
 * fixed a problem with reconnects
 (https://issues.jenkins-ci.org/browse/JENKINS-17017[JENKINS-17017])
 * Update to PircBotX 1.8
 (https://code.google.com/p/pircbotx/wiki/ChangeLog#1.8_-_January_11th,_2013)
 
-[[IRCPlugin-Version2.21(Dec.15,2012)]]
-=== Version 2.21 (Dec. 15, 2012)
+[[IRCPlugin-Version-2.21]]
+=== Version 2.21 (Dec 15, 2012)
 
 * new option to colorize build notifications based on the build
 outcome. +
@@ -296,46 +297,46 @@ Note that this feature may change in the future - especially regarding
 #13967] (ArrayIndexOutOfBounds Exception when I try to setup a second
 IRC channel in Jenkins configuration)
 
-[[IRCPlugin-Version2.20(Oct.13,2012)]]
-=== Version 2.20 (Oct. 13, 2012)
+[[IRCPlugin-Version-2.20]]
+=== Version 2.20 (Oct 13, 2012)
 
 * fixed a bug when updating from previous versions on Windows
 
-[[IRCPlugin-Version2.19]]
+[[IRCPlugin-Version-2.19]]
 === Version 2.19
 
-* See http://wiki.jenkins-ci.org/display/HUDSON/Instant+Messaging+Plugin[instant-messaging
+* See https://plugins.jenkins.io/instant-messaging/[instant-messaging
 plugin] 1.22 for new features. Also:
 * Make IRC login name configurable
 https://issues.jenkins-ci.org/browse/JENKINS-14467[JENKINS-14467]
 * Update to PircBotX 1.7
 
-[[IRCPlugin-Version2.18]]
+[[IRCPlugin-Version-2.18]]
 === Version 2.18
 
 * fixed: unable to connect to ircu servers
 https://issues.jenkins-ci.org/browse/JENKINS-11623[JENKINS-11623]
-* See http://wiki.jenkins-ci.org/display/HUDSON/Instant+Messaging+Plugin[instant-messaging
+* See https://plugins.jenkins.io/instant-messaging/[instant-messaging
 plugin] 1.21 for more new features
 
-[[IRCPlugin-Version2.17]]
+[[IRCPlugin-Version-2.17]]
 === Version 2.17
 
 skipped
 
-[[IRCPlugin-Version2.16:]]
-=== Version 2.16:
+[[IRCPlugin-Version-2.16]]
+=== Version 2.16
 
 * fixed: password authentication not working since 2.14
 (https://issues.jenkins-ci.org/browse/JENKINS-10862[JENKINS-10862])
 
-[[IRCPlugin-Version2.15]]
+[[IRCPlugin-Version-2.15]]
 === Version 2.15
 
 * fixed: NickServ password wasn't saved
 (https://issues.jenkins-ci.org/browse/JENKINS-10145[JENKINS-10145])
 
-[[IRCPlugin-Version2.14]]
+[[IRCPlugin-Version-2.14]]
 === Version 2.14
 
 * Support SSL connections
@@ -346,26 +347,26 @@ some regressions. Please open a new issue in that case.
 * New option to specify IRC server encoding
 (https://issues.jenkins-ci.org/browse/JENKINS-10090[JENKINS-10090])
 
-[[IRCPlugin-Version2.13]]
+[[IRCPlugin-Version-2.13]]
 === Version 2.13
 
 * See
 https://wiki.jenkins.io/display/JENKINS/Instant+Messaging+Plugin#InstantMessagingPlugin-Version1.16[Instant-Messaging
 plugin 1.16] for new features
 
-[[IRCPlugin-Version2.12]]
+[[IRCPlugin-Version-2.12]]
 === Version 2.12
 
 * See
 https://wiki.jenkins.io/display/JENKINS/Instant+Messaging+Plugin#InstantMessagingPlugin-Version1.15[Instant-Messaging
 plugin 1.15] for new features
 
-[[IRCPlugin-Version2.11]]
+[[IRCPlugin-Version-2.11]]
 === Version 2.11
 
 * see instant-messaging plugin 1.14 for changes!
 
-[[IRCPlugin-Version2.9]]
+[[IRCPlugin-Version-2.9]]
 === Version 2.9
 
 * wait 5 seconds after identifying with NickServ before trying to join
@@ -375,7 +376,7 @@ the channels. Refs.
 http://issues.jenkins-ci.org/browse/JENKINS-6600[JENKINS-6600] ,
 http://issues.jenkins-ci.org/browse/JENKINS-8451[JENKINS-8451]
 
-[[IRCPlugin-Version2.8]]
+[[IRCPlugin-Version-2.8]]
 === Version 2.8
 
 * fixed: NullPointerException because of incorrect migration of old
@@ -384,7 +385,7 @@ http://issues.jenkins-ci.org/browse/JENKINS-8001[JENKINS-8001]
 * new feature: new chat notifier which prints the failing tests, too
 http://issues.jenkins-ci.org/browse/JENKINS-7035[JENKINS-7035]
 
-[[IRCPlugin-Version2.7]]
+[[IRCPlugin-Version-2.7]]
 === Version 2.7
 
 * improvement: bot commands are now extensible and open for other
@@ -394,7 +395,7 @@ sends to chats for notification (see class BuildToChatNotifier).
 * improvement: bot may be invited to channels
 (http://issues.jenkins-ci.org/browse/JENKINS-6600[issue 6600] )
 
-[[IRCPlugin-Version2.6]]
+[[IRCPlugin-Version-2.6]]
 === Version 2.6
 
 * fixed: disconnects (and no reconnects) when changing the global config
@@ -407,7 +408,7 @@ http://issues.jenkins-ci.org/browse/JENKINS-5233[JENKINS-5233]
 * use UTF-8 as encoding for sending/receiving messages (previously used
 default encoding of the Hudson server)
 
-[[IRCPlugin-Version2.5]]
+[[IRCPlugin-Version-2.5]]
 === Version 2.5
 
 * fixed: _notify upstream commiter_ would have notified committers of
@@ -422,13 +423,13 @@ default encoding of the Hudson server)
 * fixed: don't count offline computer for the executors count
 (http://issues.jenkins-ci.org/browse/JENKINS-6387[JENKINS-6387])
 
-[[IRCPlugin-Version2.4]]
+[[IRCPlugin-Version-2.4]]
 === Version 2.4
 
 * fixed: bot output sometimes send to wrong user
 (http://issues.jenkins-ci.org/browse/JENKINS-6484[JENKINS-6484])
 
-[[IRCPlugin-Version2.3]]
+[[IRCPlugin-Version-2.3]]
 === Version 2.3
 
 * allow to pass build parameters with the _build_ command
@@ -436,12 +437,12 @@ default encoding of the Hudson server)
 sure that instant-messaging 1.7 or later is installed.*
 * allow to set NickServ passwords
 
-[[IRCPlugin-Version2.2]]
+[[IRCPlugin-Version-2.2]]
 === Version 2.2
 
 * support password-protected chatrooms
 
-[[IRCPlugin-Version2.1]]
+[[IRCPlugin-Version-2.1]]
 === Version 2.1
 
 * new option to inform upstream committers
@@ -450,7 +451,7 @@ sure that instant-messaging 1.7 or later is installed.*
 before. You can restore the old behaviour in the global configuration.
 (http://issues.jenkins-ci.org/browse/JENKINS-5087[JENKINS-5087] )
 
-[[IRCPlugin-Version2.0]]
+[[IRCPlugin-Version-2.0]]
 === Version 2.0
 
 * This is the first version which is build upon the _instant-messaging_
