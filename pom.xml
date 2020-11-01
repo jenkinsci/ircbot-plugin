@@ -2,19 +2,18 @@
 <!-- $Id: pom.xml 39481 2011-05-12 20:14:54Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.jvnet.hudson.plugins</groupId>
-    <artifactId>instant-messaging-parent</artifactId>
-    <version>1.29</version>
-    <relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
-  </parent>
 
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>4.12</version>
+  </parent>
   <artifactId>ircbot</artifactId>
   <packaging>hpi</packaging>
-  <version>2.34-SNAPSHOT</version>
+  <version>${revision}${changelist}</version>
   <name>Jenkins IRC Plugin</name>
   <description>A build status publisher that notifies channels on a IRC server</description>
-  <url>http://wiki.jenkins-ci.org/display/JENKINS/IRC+Plugin</url>
+  <url>https://github.com/jenkinsci/ircbot-plugin</url>
   <licenses>
     <license>
         <name>MIT license</name>
@@ -23,23 +22,35 @@
   </licenses>
 
   <properties>
+    <revision>2.34</revision>
+    <changelist>-SNAPSHOT</changelist>
+    <gitHubRepo>jenkinsci/ircbot-plugin</gitHubRepo>
     <version.instant-messaging.plugin>1.38</version.instant-messaging.plugin>
-    <version.workflow-step-api.plugin>2.13</version.workflow-step-api.plugin>
     <java.level>8</java.level>
+    <jenkins.version>2.204.6</jenkins.version>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-2.204.x</artifactId>
+        <version>17</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <dependencies>
     <dependency>
         <groupId>org.jvnet.hudson.plugins</groupId>
         <artifactId>instant-messaging</artifactId>
         <version>${version.instant-messaging.plugin}</version>
-        <scope>compile</scope>
     </dependency>
     <dependency>
         <groupId>org.jenkins-ci.plugins.workflow</groupId>
         <artifactId>workflow-step-api</artifactId>
-        <version>${version.workflow-step-api.plugin}</version>
-        <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.pircbotx</groupId>
@@ -79,10 +90,10 @@
   </developers>
 
   <scm>
-    <connection>scm:git:github.com:jenkinsci/ircbot-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/ircbot-plugin.git</developerConnection>
-    <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/hudson/plugins/ircbot</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:github.com:${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+    <url>https://github.com/${gitHubRepo}</url>
+    <tag>${scmTag}</tag>
   </scm>
 
   <pluginRepositories>
