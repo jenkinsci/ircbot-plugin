@@ -380,6 +380,10 @@ public class IrcPublisher extends IMPublisher {
          */
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            if (req == null) {
+                throw new IllegalArgumentException("req must be non null");
+            }
+
             String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
             String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
 
@@ -394,7 +398,7 @@ public class IrcPublisher extends IMPublisher {
                     }
 
                     String password = Util.fixEmpty(channelsPasswords[i]);
-                    boolean notifyOnly = jchans != null ? jchans.get(i).getBoolean("notificationOnly") : false;
+                    boolean notifyOnly = jchans != null && jchans.get(i).getBoolean("notificationOnly");
                     targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
                 }
             }

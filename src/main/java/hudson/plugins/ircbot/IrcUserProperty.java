@@ -64,6 +64,9 @@ public class IrcUserProperty extends hudson.model.UserProperty {
         @Override
         public IrcUserProperty newInstance(StaplerRequest req, JSONObject formData)
                 throws FormException {
+            if (req == null) {
+                throw new IllegalArgumentException("req must be non null");
+            }
             return new IrcUserProperty(req.getParameter("irc.nick"));
         }
     }
