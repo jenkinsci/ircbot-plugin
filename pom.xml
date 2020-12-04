@@ -25,7 +25,7 @@
         <revision>2.34</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/ircbot-plugin</gitHubRepo>
-        <version.instant-messaging.plugin>1.38</version.instant-messaging.plugin>
+        <version.instant-messaging.plugin>1.39</version.instant-messaging.plugin>
         <java.level>8</java.level>
         <jenkins.version>2.204.6</jenkins.version>
     </properties>
