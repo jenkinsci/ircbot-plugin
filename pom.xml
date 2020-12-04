@@ -1,87 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: pom.xml 39481 2011-05-12 20:14:54Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.jvnet.hudson.plugins</groupId>
-    <artifactId>instant-messaging-parent</artifactId>
-    <version>1.29</version>
-    <relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>ircbot</artifactId>
-  <packaging>hpi</packaging>
-  <version>2.31-SNAPSHOT</version>
-  <name>Jenkins IRC Plugin</name>
-  <description>A build status publisher that notifies channels on a IRC server</description>
-  <url>http://wiki.jenkins-ci.org/display/JENKINS/IRC+Plugin</url>
-  <licenses>
-  	<license>
-        <name>MIT license</name>
-        <comments>All source code is under the MIT license.</comments>
-    </license>
-  </licenses>
-  
-  <properties>
-  	<version.instant-messaging.plugin>1.35</version.instant-messaging.plugin>
-  </properties>
-  
-  <dependencies>
-     <dependency>
-     	<groupId>org.jvnet.hudson.plugins</groupId>
-     	<artifactId>instant-messaging</artifactId>
-     	<version>${version.instant-messaging.plugin}</version>
-	    <scope>compile</scope>
-     </dependency>
-    <dependency>
-      <groupId>org.pircbotx</groupId>
-      <artifactId>pircbotx</artifactId>
-      <version>2.0.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
-      <version>3.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-  
-  <repositories>
-    <repository>
-        <id>repo.jenkins-ci.org</id>
-        <url>http://repo.jenkins-ci.org/public/</url>
-    </repository>
-    <repository>
-        <id>jenkins-snapshots</id>
-        <url>http://repo.jenkins-ci.org/content/repositories/snapshots</url>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>
-    </repository>    
-  </repositories>
-  
-  <developers>
-    <developer>
-        <id>kutzi</id>
-        <name>Christoph Kutzinski</name>
-        <email>kutzi@gmx.de</email>
-        <timezone>1</timezone>
-    </developer>
-  </developers>
-  
-  <scm>
-    <connection>scm:git:github.com:jenkinsci/ircbot-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/ircbot-plugin.git</developerConnection>
-    <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/hudson/plugins/ircbot</url>
-    <tag>ircbot-2.28</tag>
-  </scm>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>4.12</version>
+    </parent>
+    <artifactId>ircbot</artifactId>
+    <packaging>hpi</packaging>
+    <version>${revision}${changelist}</version>
+    <name>Jenkins IRC Plugin</name>
+    <description>A build status publisher that notifies channels on a IRC server</description>
+    <url>https://github.com/jenkinsci/ircbot-plugin</url>
+    <licenses>
+        <license>
+            <name>MIT license</name>
+            <comments>All source code is under the MIT license.</comments>
+        </license>
+    </licenses>
+
+    <properties>
+        <revision>2.34</revision>
+        <changelist>-SNAPSHOT</changelist>
+        <gitHubRepo>jenkinsci/ircbot-plugin</gitHubRepo>
+        <version.instant-messaging.plugin>1.39</version.instant-messaging.plugin>
+        <java.level>8</java.level>
+        <jenkins.version>2.269</jenkins.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-2.204.x</artifactId>
+                <version>17</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jvnet.hudson.plugins</groupId>
+            <artifactId>instant-messaging</artifactId>
+            <version>${version.instant-messaging.plugin}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-step-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.pircbotx</groupId>
+            <artifactId>pircbotx</artifactId>
+            <version>2.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </repository>
+        <repository>
+            <id>jenkins-snapshots</id>
+            <url>https://repo.jenkins-ci.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <developers>
+        <developer>
+            <id>jimklimov</id>
+            <name>Jim Klimov</name>
+            <email>jimklimov+jenkinsci@gmail.com</email>
+            <timezone>1</timezone>
+        </developer>
+        <developer>
+            <id>kutzi</id>
+            <name>Christoph Kutzinski</name>
+            <email>kutzi@gmx.de</email>
+            <timezone>1</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:github.com:${gitHubRepo}.git</connection>
+        <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+        <url>https://github.com/${gitHubRepo}</url>
+        <tag>${scmTag}</tag>
+    </scm>
 
     <pluginRepositories>
         <pluginRepository>
             <id>repo.jenkins-ci.org</id>
-            <url>http://repo.jenkins-ci.org/public/</url>
+            <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-</project>  
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <configLocation>${basedir}/checkstyle.xml</configLocation>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                    </sourceDirectories>
+                    <testSourceDirectories>
+                        <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+                    </testSourceDirectories>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

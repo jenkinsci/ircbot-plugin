@@ -6,18 +6,18 @@ import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 
 /**
  * Entry point of the plugin.
- * 
+ *
  * @author Renaud Bruyeron
  * @version $Id: PluginImpl.java 23738 2009-11-15 18:36:59Z kutzi $
  */
 public class PluginImpl extends Plugin {
-    
-	private transient final IMPlugin imPlugin;
 
-	public PluginImpl() {
-		this.imPlugin = new IMPlugin(IRCConnectionProvider.getInstance());
-	}
-	
+    private transient final IMPlugin imPlugin;
+
+    public PluginImpl() {
+        this.imPlugin = new IMPlugin(IRCConnectionProvider.getInstance());
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -32,7 +32,7 @@ public class PluginImpl extends Plugin {
      */
     @Override
     public void stop() throws Exception {
-    	this.imPlugin.stop();
+        this.imPlugin.stop();
         super.stop();
     }
 
