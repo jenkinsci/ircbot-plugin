@@ -8,6 +8,7 @@
         <artifactId>plugin</artifactId>
         <version>4.12</version>
     </parent>
+    <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>ircbot</artifactId>
     <packaging>hpi</packaging>
     <version>${revision}${changelist}</version>
