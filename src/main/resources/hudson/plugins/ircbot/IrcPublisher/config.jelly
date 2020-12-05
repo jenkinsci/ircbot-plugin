@@ -19,6 +19,8 @@
             <f:entry title="Notification only">
               <f:checkbox field="notificationOnly"/>
             </f:entry>
+
+            <f:invisibleEntry><input type="hidden" name="class" value="hudson.plugins.im.GroupChatIMMessageTarget"/></f:invisibleEntry>
             <f:entry>
               <div align="right">
                 <f:repeatableDeleteButton/>

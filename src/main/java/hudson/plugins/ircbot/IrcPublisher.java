@@ -142,9 +142,6 @@ public class IrcPublisher extends IMPublisher {
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> implements IMPublisherDescriptor {
 
         private static final String PREFIX = "irc_publisher.";
-        public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
-        public static final String PARAMETERNAME_USE_COLORS = PREFIX + "useColors";
-        public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
 
         public static final String[] CHARSETS;
 
@@ -175,6 +172,7 @@ public class IrcPublisher extends IMPublisher {
 
         private boolean sslTrustAllCertificates;
 
+        @Deprecated
         String password = null;
         Secret secretPassword;
 
@@ -182,6 +180,7 @@ public class IrcPublisher extends IMPublisher {
 
         String nick = "jenkins-bot";
 
+        @Deprecated
         String nickServPassword = null;
         Secret secretNickServPassword;
 
@@ -210,7 +209,7 @@ public class IrcPublisher extends IMPublisher {
         private String charset;
 
         private boolean useColors;
-
+        
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
@@ -250,58 +249,15 @@ public class IrcPublisher extends IMPublisher {
                     || "true".equals(req.getParameter("irc_publisher.enabled"));
             if (this.enabled) {
                 JSONObject enabled = formData.getJSONObject("enabled");
-                this.hostname = enabled.getString("hostname");
-                this.login = enabled.getString("login");
-                this.secretPassword = Secret.fromString(enabled.getString("secretPassword"));
-                this.sasl = enabled.getBoolean("sasl");
-                this.nick = enabled.getString("nick");
-                this.secretNickServPassword = Secret.fromString(enabled.getString("secretNickServPassword"));
-                this.port = enabled.getInt("port");
-
-                this.socksHost = enabled.getString("socksHost");
-                this.socksPort = enabled.getInt("socksPort");
-                this.ssl = enabled.getBoolean("ssl");
-                this.sslTrustAllCertificates = enabled.getBoolean("sslTrustAllCertificates");
-                this.commandPrefix = Util.fixEmptyAndTrim(enabled.getString("commandPrefix"));
-
-                this.disallowPrivateChat = enabled.getBoolean("disallowPrivateChat");
-
-                this.messageRate = getMessageRateFromSystemProperty();
-
-                List<IMMessageTarget> targets = new ArrayList<>();
-                // JENKINS-13697: Get the data from the JSON representation which always returns
-                // a value. The downside is that we are dependent on the data structure.
-                JSONArray jchans;
-                jchans = enabled.getJSONArray("defaultTargets");
-
-                for (int i = 0; i < jchans.size(); i++) {
-                    JSONObject channel = jchans.getJSONObject(i);
-                    String name = channel.getString("name");
-                    if (Util.fixEmptyAndTrim(name) == null) {
-                        throw new FormException("Channel name must not be empty", "channel.name");
-                    }
-                    Secret password = Secret.fromString(channel.getString("secretPassword"));
-                    boolean notificationOnly = channel.getBoolean("notificationOnly");
-
-                    targets.add(new GroupChatIMMessageTarget(name, password, notificationOnly));
-                }
-                this.defaultTargets = targets;
-
-                this.hudsonLogin = req.getParameter(getParamNames().getJenkinsLogin());
-
-                this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
-
-                this.charset = req.getParameter("irc_publisher.charset");
-
-                this.useColors = "on".equals(req.getParameter(PARAMETERNAME_USE_COLORS));
+                req.bindJSON(this, enabled);
 
                 // try to establish the connection
-//                try {
-//                    IRCConnectionProvider.setDesc(this);
-//                    IRCConnectionProvider.getInstance().currentConnection();
-//                } catch (final Exception e) {
-//                    LOGGER.warning(ExceptionHelper.dump(e));
-//                }
+                try {
+                    IRCConnectionProvider.setDesc(this);
+                    IRCConnectionProvider.getInstance().currentConnection();
+                } catch (final Exception e) {
+                    LOGGER.warning(ExceptionHelper.dump(e));
+                }
             } else {
                 IRCConnectionProvider.getInstance().releaseConnection();
                 try {
@@ -346,7 +302,7 @@ public class IrcPublisher extends IMPublisher {
                 if (Util.fixEmptyAndTrim(name) == null) {
                     throw new FormException("Channel name must not be empty", "channel.name");
                 }
-                String password = Secret.fromString(channel.getString("secretPassword")).getPlainText();
+                Secret password = Secret.fromString(channel.getString("secretPassword"));
                 boolean notificationOnly = channel.getBoolean("notificationOnly");
 
                 targets.add(new GroupChatIMMessageTarget(name, password, notificationOnly));
@@ -514,6 +470,95 @@ public class IrcPublisher extends IMPublisher {
             return this.defaultTargets;
         }
 
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public void setHostname(String hostname) {
+            this.hostname = hostname;
+        }
+
+        public void setPort(Integer port) {
+            this.port = port;
+        }
+
+        public void setSsl(boolean ssl) {
+            this.ssl = ssl;
+        }
+
+        public void setDisallowPrivateChat(boolean disallowPrivateChat) {
+            this.disallowPrivateChat = disallowPrivateChat;
+        }
+
+        public void setLogin(String login) {
+            this.login = login;
+        }
+
+        public boolean isSslTrustAllCertificates() {
+            return sslTrustAllCertificates;
+        }
+
+        public void setSslTrustAllCertificates(boolean sslTrustAllCertificates) {
+            this.sslTrustAllCertificates = sslTrustAllCertificates;
+        }
+
+        public void setSecretPassword(Secret secretPassword) {
+            this.secretPassword = secretPassword;
+        }
+
+        public void setSasl(boolean sasl) {
+            this.sasl = sasl;
+        }
+
+        public void setNick(String nick) {
+            this.nick = nick;
+        }
+
+        public void setSecretNickServPassword(Secret secretNickServPassword) {
+            this.secretNickServPassword = secretNickServPassword;
+        }
+
+        public void setSocksHost(String socksHost) {
+            this.socksHost = socksHost;
+        }
+
+        public void setSocksPort(Integer socksPort) {
+            this.socksPort = socksPort;
+        }
+
+        public void setMessageRate(Integer messageRate) {
+            this.messageRate = messageRate;
+        }
+
+        public void setDefaultTargets(List<IMMessageTarget> defaultTargets) {
+            this.defaultTargets = defaultTargets;
+        }
+
+        public void setCommandPrefix(String commandPrefix) {
+            this.commandPrefix = commandPrefix;
+        }
+
+        public String getHudsonLogin() {
+            return hudsonLogin;
+        }
+
+        public void setHudsonLogin(String hudsonLogin) {
+            this.hudsonLogin = hudsonLogin;
+        }
+
+        public void setUseNotice(boolean useNotice) {
+            this.useNotice = useNotice;
+        }
+
+        public void setCharset(String charset) {
+            this.charset = charset;
+        }
+
+        public void setUseColors(boolean useColors) {
+            this.useColors = useColors;
+        }
+        
         //@Override
         public IMMessageTargetConverter getIMMessageTargetConverter() {
             return CONVERTER;
