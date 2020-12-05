@@ -24,7 +24,6 @@ import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.tasks.BuildStepDescriptor;
-//import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 
 import hudson.util.Scrambler;
@@ -209,7 +208,7 @@ public class IrcPublisher extends IMPublisher {
         private String charset;
 
         private boolean useColors;
-        
+
         DescriptorImpl() {
             super(IrcPublisher.class);
             load();
@@ -374,7 +373,7 @@ public class IrcPublisher extends IMPublisher {
         /**
          * @return The password that should be used to try and identify
          * with NickServ.
-         * 
+         *
          * @deprecated use {@link #getSecretNickServPassword()}
          */
         @Deprecated
@@ -558,7 +557,7 @@ public class IrcPublisher extends IMPublisher {
         public void setUseColors(boolean useColors) {
             this.useColors = useColors;
         }
-        
+
         //@Override
         public IMMessageTargetConverter getIMMessageTargetConverter() {
             return CONVERTER;

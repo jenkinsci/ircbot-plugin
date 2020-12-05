@@ -26,7 +26,7 @@
     <revision>2.34</revision>
     <changelist>-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/ircbot-plugin</gitHubRepo>
-    <version.instant-messaging.plugin>1.40-SNAPSHOT</version.instant-messaging.plugin>
+    <version.instant-messaging.plugin>1.40-rc459.252399e42dd7</version.instant-messaging.plugin>
     <java.level>8</java.level>
     <jenkins.version>2.269</jenkins.version>
   </properties>
@@ -58,12 +58,28 @@
       <artifactId>pircbotx</artifactId>
       <version>2.0.1</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
-      <version>3.0.0</version>
-      <scope>provided</scope>
+      <exclusions>
+        <!-- provides an ancient version, junit plugin is pulling in a more recent one -->
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+        <!-- provided by jenkins core -->
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <!-- provided by jenkins core -->
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+        <!-- provided by jenkins core -->
+        <exclusion>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
