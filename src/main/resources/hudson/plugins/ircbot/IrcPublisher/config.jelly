@@ -8,22 +8,24 @@
       <f:entry title="Channels"
               description="Channels to notify. Name and optional password. Check 'Notification only' if you want to disallow bot commands."
               help="/plugin/ircbot/help-instanceConfigChannels.html">
-          <f:repeatable name="irc_publisher.channels" var="ch" items="${instance.notificationTargets}">
-            <div width="100%">
-              <f:entry title="Name">
-                  <input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" />
-              </f:entry>
-              <f:entry title="Password">
-                  <input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" />
-              </f:entry>
-              <f:entry title="Notification only">
-                  <f:checkbox name="irc_publisher.chat.notificationOnly" checked="${ch.notificationOnly}"/>
-              </f:entry>
-              <f:entry>
-                  <div align="right"><f:repeatableDeleteButton /></div>
-              </f:entry>
-            </div>
-          </f:repeatable>
+        <f:repeatable var="ch" field="notificationTargets">
+          <div>
+            <f:entry title="Name">
+              <f:textbox field="name"/>
+            </f:entry>
+            <f:entry title="Password">
+              <f:password field="secretPassword"/>
+            </f:entry>
+            <f:entry title="Notification only">
+              <f:checkbox field="notificationOnly"/>
+            </f:entry>
+            <f:entry>
+              <div align="right">
+                <f:repeatableDeleteButton/>
+              </div>
+            </f:entry>
+          </div>
+        </f:repeatable>
       </f:entry>
 
      <super:notification-strategy/>

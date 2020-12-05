@@ -100,12 +100,12 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         if (this.descriptor.isSasl()) {
             LOGGER.info("Enabling SASL");
             config.setCapEnabled(true);
-            config.addCapHandler(new SASLCapHandler(this.descriptor.getLogin(), this.descriptor.getPassword()));
+            config.addCapHandler(new SASLCapHandler(this.descriptor.getLogin(), this.descriptor.getSecretPassword().getPlainText()));
         } else {
-            String password = Util.fixEmpty(this.descriptor.getPassword());
+            String password = Util.fixEmpty(this.descriptor.getSecretPassword().getPlainText());
             config.setServerPassword(password);
         }
-        final String nickServPassword = Util.fixEmpty(this.descriptor.getNickServPassword());
+        final String nickServPassword = Util.fixEmpty(this.descriptor.getSecretNickServPassword().getPlainText());
         config.setNickservPassword(nickServPassword);
 
 
