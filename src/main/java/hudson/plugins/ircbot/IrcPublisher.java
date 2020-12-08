@@ -172,7 +172,7 @@ public class IrcPublisher extends IMPublisher {
         private boolean sslTrustAllCertificates;
 
         @Deprecated
-        String password = null;
+        transient String password = null;
         Secret secretPassword;
 
         private boolean sasl;
@@ -180,7 +180,7 @@ public class IrcPublisher extends IMPublisher {
         String nick = "jenkins-bot";
 
         @Deprecated
-        String nickServPassword = null;
+        transient String nickServPassword = null;
         Secret secretNickServPassword;
 
         private String socksHost = null;
