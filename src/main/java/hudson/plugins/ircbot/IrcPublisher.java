@@ -287,24 +287,40 @@ public class IrcPublisher extends IMPublisher {
         }
 
         @Override
+        // TODO refactor to use stapler databinding, rather than hand binding
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             if (req == null) {
                 throw new IllegalArgumentException("req must be non null");
             }
 
             List<IMMessageTarget> targets = new ArrayList<>();
-            JSONArray jchans = formData.getJSONArray("notificationTargets");
+            if (formData.has("notificationTargets")) {
+                JSONArray jchans = formData.optJSONArray("notificationTargets");
+                if (jchans != null) {
+                    for (int i = 0; i < jchans.size(); i++) {
+                        JSONObject channel = jchans.getJSONObject(i);
+                        String name = channel.getString("name");
+                        if (Util.fixEmptyAndTrim(name) == null) {
+                            throw new FormException("Channel name must not be empty", "channel.name");
+                        }
+                        Secret channelPasssword = Secret.fromString(channel.getString("secretPassword"));
+                        boolean notificationOnly = channel.getBoolean("notificationOnly");
 
-            for (int i = 0; i < jchans.size(); i++) {
-                JSONObject channel = jchans.getJSONObject(i);
-                String name = channel.getString("name");
-                if (Util.fixEmptyAndTrim(name) == null) {
-                    throw new FormException("Channel name must not be empty", "channel.name");
+                        targets.add(new GroupChatIMMessageTarget(name, channelPasssword, notificationOnly));
+                    }
+                } else {
+                    // if only one channel then it comes as an object
+                    JSONObject notificationTarget = formData.getJSONObject("notificationTargets");
+                  
+                    String name = notificationTarget.getString("name");
+                    if (Util.fixEmptyAndTrim(name) == null) {
+                        throw new FormException("Channel name must not be empty", "channel.name");
+                    }
+                    Secret channelPasssword = Secret.fromString(notificationTarget.getString("secretPassword"));
+                    boolean notificationOnly = notificationTarget.getBoolean("notificationOnly");
+
+                    targets.add(new GroupChatIMMessageTarget(name, channelPasssword, notificationOnly));
                 }
-                Secret password = Secret.fromString(channel.getString("secretPassword"));
-                boolean notificationOnly = channel.getBoolean("notificationOnly");
-
-                targets.add(new GroupChatIMMessageTarget(name, password, notificationOnly));
             }
 
             String n = req.getParameter(getParamNames().getStrategy());
