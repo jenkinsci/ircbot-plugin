@@ -102,11 +102,16 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
             config.setCapEnabled(true);
             config.addCapHandler(new SASLCapHandler(this.descriptor.getLogin(), this.descriptor.getSecretPassword().getPlainText()));
         } else {
-            String password = Util.fixEmpty(this.descriptor.getSecretPassword().getPlainText());
-            config.setServerPassword(password);
+            if (this.descriptor.getSecretPassword() != null) {
+                String password = Util.fixEmpty(this.descriptor.getSecretPassword().getPlainText());
+                config.setServerPassword(password);
+            }
         }
-        final String nickServPassword = Util.fixEmpty(this.descriptor.getSecretNickServPassword().getPlainText());
-        config.setNickservPassword(nickServPassword);
+
+        if (this.descriptor.getSecretNickServPassword() != null) {
+            final String nickServPassword = Util.fixEmpty(this.descriptor.getSecretNickServPassword().getPlainText());
+            config.setNickservPassword(nickServPassword);
+        }
 
 
         String socksHost = Util.fixEmpty(this.descriptor.getSocksHost());
