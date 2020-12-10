@@ -311,7 +311,7 @@ public class IrcPublisher extends IMPublisher {
                 } else {
                     // if only one channel then it comes as an object
                     JSONObject notificationTarget = formData.getJSONObject("notificationTargets");
-                  
+
                     String name = notificationTarget.getString("name");
                     if (Util.fixEmptyAndTrim(name) == null) {
                         throw new FormException("Channel name must not be empty", "channel.name");
