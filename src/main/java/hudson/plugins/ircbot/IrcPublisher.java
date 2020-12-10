@@ -24,10 +24,10 @@ import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.tasks.BuildStepDescriptor;
-//import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
-import hudson.util.Scrambler;
 
+import hudson.util.Scrambler;
+import hudson.util.Secret;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -140,9 +141,6 @@ public class IrcPublisher extends IMPublisher {
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> implements IMPublisherDescriptor {
 
         private static final String PREFIX = "irc_publisher.";
-        public static final String PARAMETERNAME_USE_NOTICE = PREFIX + "useNotice";
-        public static final String PARAMETERNAME_USE_COLORS = PREFIX + "useColors";
-        public static final String PARAMETERNAME_NICKSERV_PASSWORD = PREFIX + "nickServPassword";
 
         public static final String[] CHARSETS;
 
@@ -173,26 +171,23 @@ public class IrcPublisher extends IMPublisher {
 
         private boolean sslTrustAllCertificates;
 
-        String password = null;
+        @Deprecated
+        transient String password = null;
+        Secret secretPassword;
 
         private boolean sasl;
 
         String nick = "jenkins-bot";
 
-        String nickServPassword = null;
+        @Deprecated
+        transient String nickServPassword = null;
+        Secret secretNickServPassword;
 
         private String socksHost = null;
 
         private Integer socksPort = 1080;
 
         private Integer messageRate = getMessageRateFromSystemProperty();
-
-        /**
-         * Marks if passwords are already scrambled.
-         * Needed to migrate old, unscrambled passwords.
-         * @since 2.19
-         */
-        private boolean scrambledPasswords = false;
 
         /**
          * channels to join
@@ -239,23 +234,7 @@ public class IrcPublisher extends IMPublisher {
          * The workaround consists in acceding these values via the JSON representation.
          */
         private static List<JSONObject> fillChannelsFromJSON(JSONObject root){
-            List<JSONObject> result = null;
-            JSONObject chan = root.optJSONObject("channels");
-            if (chan != null){
-                result = new ArrayList<JSONObject>();
-                result.add(chan);
-            }
-            else{
-                JSONArray chans = root.optJSONArray("channels");
-                if (chans != null){
-                    result = new ArrayList<JSONObject>();
-                    for(int i=0; i<chans.size(); ++i){
-                        chan = chans.getJSONObject(i);
-                        result.add(chan);
-                    }
-                }
-            }
-            return result;
+            throw new UnsupportedOperationException();
         }
 
         /**
@@ -265,79 +244,11 @@ public class IrcPublisher extends IMPublisher {
         @SuppressFBWarnings(value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
             justification="There are, in fact, side effects")
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-            this.scrambledPasswords = true;
-
             this.enabled = "on".equals(req.getParameter("irc_publisher.enabled"))
                     || "true".equals(req.getParameter("irc_publisher.enabled"));
             if (this.enabled) {
-                this.hostname = req.getParameter("irc_publisher.hostname");
-                this.login = req.getParameter("irc_publisher.login");
-                this.password = Scrambler.scramble(
-                        req.getParameter("irc_publisher.password"));
-                this.sasl = "on".equals(req.getParameter("irc_publisher.sasl"));
-                this.nick = req.getParameter("irc_publisher.nick");
-                this.nickServPassword = Scrambler.scramble(
-                        req.getParameter(PARAMETERNAME_NICKSERV_PASSWORD));
-                try {
-                    this.port = Integer.valueOf(req.getParameter("irc_publisher.port"));
-                } catch (NumberFormatException e) {
-                    throw new FormException("port field must be an Integer",
-                            "irc_publisher.port");
-                }
-                this.socksHost = req.getParameter("irc_publisher.socksHost");
-                try {
-                    this.socksPort = Integer.valueOf(req.getParameter("irc_publisher.socksPort"));
-                } catch (NumberFormatException e) {
-                    throw new FormException("SOCKS proxy port field must be an Integer",
-                            "irc_publisher.socksPort");
-                }
-                this.ssl = "on".equals(req.getParameter("irc_publisher.ssl"));
-                this.sslTrustAllCertificates = "on".equals(req.getParameter("irc_publisher.ssl_trust_all_certificates"));
-                this.commandPrefix = req.getParameter("irc_publisher.commandPrefix");
-                this.commandPrefix = Util.fixEmptyAndTrim(commandPrefix);
-
-                this.disallowPrivateChat = "on".equals(req.getParameter("irc_publisher.disallowPrivateChat"));
-
-                this.messageRate = getMessageRateFromSystemProperty();
-
-                String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
-                String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
-                // only checked state can be queried, unchecked state are ignored and the size of
-                // notifyOnlys may be lower than the size of channelNames
-                // so getting the values via stapler is unreliable.
-                // String[] notifyOnlys = req.getParameterValues("irc_publisher.chat.notificationOnly");
-
-                List<IMMessageTarget> targets = Collections.emptyList();
-                if (channelsNames != null) {
-                    // JENKINS-13697: Get the data from the JSON representation which always returns
-                    // a value. The downside is that we are dependent on the data structure.
-                    List<JSONObject> jchans = null;
-                    JSONObject enabled = formData.optJSONObject("enabled");
-                    if (enabled != null){
-                        jchans = fillChannelsFromJSON(enabled);
-                    }
-                    targets = new ArrayList<IMMessageTarget>(channelsNames.length);
-                    for (int i=0; i < channelsNames.length; i++) {
-
-                        if (Util.fixEmptyAndTrim(channelsNames[i]) == null) {
-                            throw new FormException("Channel name must not be empty", "channel.name");
-                        }
-
-                        String password = Util.fixEmpty(channelsPasswords[i]);
-                        boolean notifyOnly = jchans != null ? jchans.get(i).getBoolean("notificationOnly") : false;
-
-                        targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
-                    }
-                }
-                this.defaultTargets = targets;
-
-                this.hudsonLogin = req.getParameter(getParamNames().getJenkinsLogin());
-
-                this.useNotice = "on".equals(req.getParameter(PARAMETERNAME_USE_NOTICE));
-
-                this.charset = req.getParameter("irc_publisher.charset");
-
-                this.useColors = "on".equals(req.getParameter(PARAMETERNAME_USE_COLORS));
+                JSONObject enabled = formData.getJSONObject("enabled");
+                req.bindJSON(this, enabled);
 
                 // try to establish the connection
                 try {
@@ -375,31 +286,40 @@ public class IrcPublisher extends IMPublisher {
             return "/plugin/ircbot/help.html";
         }
 
-        /**
-         * @see hudson.model.Descriptor#newInstance(org.kohsuke.stapler.StaplerRequest)
-         */
         @Override
+        // TODO refactor to use stapler databinding, rather than hand binding
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             if (req == null) {
                 throw new IllegalArgumentException("req must be non null");
             }
 
-            String[] channelsNames = req.getParameterValues("irc_publisher.channel.name");
-            String[] channelsPasswords = req.getParameterValues("irc_publisher.channel.password");
+            List<IMMessageTarget> targets = new ArrayList<>();
+            if (formData.has("notificationTargets")) {
+                JSONArray jchans = formData.optJSONArray("notificationTargets");
+                if (jchans != null) {
+                    for (int i = 0; i < jchans.size(); i++) {
+                        JSONObject channel = jchans.getJSONObject(i);
+                        String name = channel.getString("name");
+                        if (Util.fixEmptyAndTrim(name) == null) {
+                            throw new FormException("Channel name must not be empty", "channel.name");
+                        }
+                        Secret channelPasssword = Secret.fromString(channel.getString("secretPassword"));
+                        boolean notificationOnly = channel.getBoolean("notificationOnly");
 
-            List<IMMessageTarget> targets = Collections.emptyList();
-            if (channelsNames != null) {
-                List<JSONObject> jchans = fillChannelsFromJSON(formData);
-                targets = new ArrayList<IMMessageTarget>(channelsNames.length);
-                for (int i=0; i < channelsNames.length; i++) {
+                        targets.add(new GroupChatIMMessageTarget(name, channelPasssword, notificationOnly));
+                    }
+                } else {
+                    // if only one channel then it comes as an object
+                    JSONObject notificationTarget = formData.getJSONObject("notificationTargets");
 
-                    if (Util.fixEmptyAndTrim(channelsNames[i]) == null) {
+                    String name = notificationTarget.getString("name");
+                    if (Util.fixEmptyAndTrim(name) == null) {
                         throw new FormException("Channel name must not be empty", "channel.name");
                     }
+                    Secret channelPasssword = Secret.fromString(notificationTarget.getString("secretPassword"));
+                    boolean notificationOnly = notificationTarget.getBoolean("notificationOnly");
 
-                    String password = Util.fixEmpty(channelsPasswords[i]);
-                    boolean notifyOnly = jchans != null && jchans.get(i).getBoolean("notificationOnly");
-                    targets.add(new GroupChatIMMessageTarget(channelsNames[i], password, notifyOnly));
+                    targets.add(new GroupChatIMMessageTarget(name, channelPasssword, notificationOnly));
                 }
             }
 
@@ -469,9 +389,16 @@ public class IrcPublisher extends IMPublisher {
         /**
          * @return The password that should be used to try and identify
          * with NickServ.
+         *
+         * @deprecated use {@link #getSecretNickServPassword()}
          */
+        @Deprecated
         public String getNickServPassword() {
-            return Scrambler.descramble(nickServPassword);
+            return getSecretNickServPassword().getPlainText();
+        }
+
+        public Secret getSecretNickServPassword() {
+            return secretNickServPassword;
         }
 
         public String getLogin() {
@@ -479,8 +406,8 @@ public class IrcPublisher extends IMPublisher {
         }
 
         //@Override
-        public String getPassword() {
-            return Scrambler.descramble(password);
+        public Secret getSecretPassword() {
+            return secretPassword;
         }
 
         public boolean isSasl() {
@@ -558,6 +485,95 @@ public class IrcPublisher extends IMPublisher {
             return this.defaultTargets;
         }
 
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public void setHostname(String hostname) {
+            this.hostname = hostname;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+
+        public void setSsl(boolean ssl) {
+            this.ssl = ssl;
+        }
+
+        public void setDisallowPrivateChat(boolean disallowPrivateChat) {
+            this.disallowPrivateChat = disallowPrivateChat;
+        }
+
+        public void setLogin(String login) {
+            this.login = login;
+        }
+
+        public boolean isSslTrustAllCertificates() {
+            return sslTrustAllCertificates;
+        }
+
+        public void setSslTrustAllCertificates(boolean sslTrustAllCertificates) {
+            this.sslTrustAllCertificates = sslTrustAllCertificates;
+        }
+
+        public void setSecretPassword(Secret secretPassword) {
+            this.secretPassword = secretPassword;
+        }
+
+        public void setSasl(boolean sasl) {
+            this.sasl = sasl;
+        }
+
+        public void setNick(String nick) {
+            this.nick = nick;
+        }
+
+        public void setSecretNickServPassword(Secret secretNickServPassword) {
+            this.secretNickServPassword = secretNickServPassword;
+        }
+
+        public void setSocksHost(String socksHost) {
+            this.socksHost = socksHost;
+        }
+
+        public void setSocksPort(Integer socksPort) {
+            this.socksPort = socksPort;
+        }
+
+        public void setMessageRate(Integer messageRate) {
+            this.messageRate = messageRate;
+        }
+
+        public void setDefaultTargets(List<IMMessageTarget> defaultTargets) {
+            this.defaultTargets = defaultTargets;
+        }
+
+        public void setCommandPrefix(String commandPrefix) {
+            this.commandPrefix = commandPrefix;
+        }
+
+        public String getHudsonLogin() {
+            return hudsonLogin;
+        }
+
+        public void setHudsonLogin(String hudsonLogin) {
+            this.hudsonLogin = hudsonLogin;
+        }
+
+        public void setUseNotice(boolean useNotice) {
+            this.useNotice = useNotice;
+        }
+
+        public void setCharset(String charset) {
+            this.charset = charset;
+        }
+
+        public void setUseColors(boolean useColors) {
+            this.useColors = useColors;
+        }
+
         //@Override
         public IMMessageTargetConverter getIMMessageTargetConverter() {
             return CONVERTER;
@@ -610,10 +626,10 @@ public class IrcPublisher extends IMPublisher {
          * Deserialize old descriptors.
          */
         @SuppressWarnings("deprecation")
-        private Object readResolve() {
+        protected Object readResolve() {
             if (this.defaultTargets == null) {
                 if (this.channels != null) {
-                    this.defaultTargets = new ArrayList<IMMessageTarget>(this.channels.size());
+                    this.defaultTargets = new ArrayList<>(this.channels.size());
                     for (String channel : this.channels) {
                         this.defaultTargets.add(new GroupChatIMMessageTarget(channel));
                     }
@@ -630,14 +646,13 @@ public class IrcPublisher extends IMPublisher {
                 this.messageRate = getMessageRateFromSystemProperty();
             }
 
-            if (!this.scrambledPasswords) {
-                this.password = Scrambler.scramble(this.password);
-                this.nickServPassword = Scrambler.scramble(this.nickServPassword);
-                this.scrambledPasswords = true;
-                // JENKINS-15469: seems to be a bad idea to save in readResolve
-                // as the file to be saved/replaced is currently open for reading and thus
-                // save() will fail on Windows
-                //save();
+            if (StringUtils.isNotBlank(this.password)) {
+                this.secretPassword = Secret.fromString(Scrambler.descramble(this.password));
+                this.password = null;
+            }
+            if (StringUtils.isNotBlank(this.nickServPassword)) {
+                this.secretNickServPassword = Secret.fromString(Scrambler.descramble(this.nickServPassword));
+                this.nickServPassword = null;
             }
 
             return this;

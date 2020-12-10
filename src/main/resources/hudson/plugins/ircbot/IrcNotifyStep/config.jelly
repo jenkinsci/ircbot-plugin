@@ -14,7 +14,7 @@
                   <input type="text" width="100%" style="text-align:left" name="irc_publisher.channel.name" value="${ch.name}" />
               </f:entry>
               <f:entry title="Password">
-                  <input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.password" value="${ch.password}" />
+                  <input type="password" width="100%" style="text-align:left" name="irc_publisher.channel.secretPassword" value="${ch.password}" />
               </f:entry>
               <f:entry title="Notification only">
                   <f:checkbox name="irc_publisher.chat.notificationOnly" checked="${ch.notificationOnly}"/>
