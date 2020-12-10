@@ -104,13 +104,17 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         } else {
             if (this.descriptor.getSecretPassword() != null) {
                 String password = Util.fixEmpty(this.descriptor.getSecretPassword().getPlainText());
-                config.setServerPassword(password);
+                if (password != null) {
+                    config.setServerPassword(password);
+                }
             }
         }
 
         if (this.descriptor.getSecretNickServPassword() != null) {
             final String nickServPassword = Util.fixEmpty(this.descriptor.getSecretNickServPassword().getPlainText());
-            config.setNickservPassword(nickServPassword);
+            if (nickServPassword != null) {
+                config.setNickservPassword(nickServPassword);
+            }
         }
 
 
