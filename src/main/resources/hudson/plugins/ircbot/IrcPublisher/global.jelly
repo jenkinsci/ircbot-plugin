@@ -45,7 +45,7 @@
     </f:entry>
     <f:advanced>
         <f:entry title="Nickname"
-          description="Nickname of the bot">
+          description="Nickname of the bot (note that RFC 2812 limits by default to 9 chars; some servers enable more)">
           <f:textbox field="nick" />
         </f:entry>
         <f:entry title="Login"

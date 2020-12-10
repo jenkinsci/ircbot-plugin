@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:entry title="IRC Nick"
-    description="Your IRC Nick">
+    description="Your IRC Nick (note that RFC 2812 limits by default to 9 chars; some servers enable more)">
     <input class="setting-input" name="irc.nick"
       type="text" value="${instance.nick}"/>
   </f:entry>
