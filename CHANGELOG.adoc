@@ -1,10 +1,41 @@
 = Changelog
 
+[[IRCPlugin-Version-2.36]]
+== Version 2.36 (2020-12-xx) - pending
+
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.35...jenkinsci:ircbot-2.36
+
+* Revised solution for job configuration UI broken after Jenkins core
+  2.264 (dropped HTML tables)
+* Modernized saving and processing of job and global configurations
+** https://jenkins.io/security/advisory/2019-04-03/#SECURITY-829 should
+   now be fixed
+** Plain-text passwords were optionally "scrambled" for some years now,
+   but in this release the changes done by @timja make use of standard
+   `secretPassword` fields. To update the on-disk representation of
+   your IRC user and channel passwords, it should suffice to open and
+   save your Jenkins global configuration after upgrading the plugin.
+** CAVEAT: The "Jenkins Username" ("hudsonLogin" in XML configuration)
+   currently is not editable from the global configuration page. If you
+   need to change its value with the new plugin version running, please
+   edit `$JENKINS_HOME/hudson.plugins.ircbot.IrcPublisher.xml` directly
+   and restart Jenkins or gracefully reload its configuration.
+
+[[IRCPlugin-Version-2.35]]
+[[IRCPlugin-Version-2.34]]
+== Version 2.34 and 2.35 (2020-12-05)
+
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.33...jenkinsci:ircbot-2.35
+
+* First-shot solution for job configuration UI broken after Jenkins core 2.264 (dropped HTML tables)
+* Refresh plugin recipe
+* Further docs migration into Git
+
 [[IRCPlugin-Version-2.33]]
 [[IRCPlugin-Version-2.32]]
 == Version 2.32 and 2.33 (2020-04-23)
 
-https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.31...jenkinsci:ircbot-2.32
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.31...jenkinsci:ircbot-2.33
 
 * Fixed use of default targets from global config
 * Ported documentation from old Wiki to in-codebase README
