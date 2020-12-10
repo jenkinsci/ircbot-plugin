@@ -201,7 +201,10 @@ public class IrcPublisher extends IMPublisher {
 
         String commandPrefix = "!jenkins";
 
-        private String hudsonLogin;
+        @Deprecated
+        private transient String hudsonLogin;
+
+        private String jenkinsLogin;
 
         private boolean useNotice;
 
@@ -377,6 +380,14 @@ public class IrcPublisher extends IMPublisher {
             return hostname;
         }
 
+        public String getJenkinsLogin() {
+            return jenkinsLogin;
+        }
+
+        public void setJenkinsLogin(String jenkinsLogin) {
+            this.jenkinsLogin = jenkinsLogin;
+        }
+
         /**
          * Returns the nickname that should be used to identify against the IRC server.
          *
@@ -456,9 +467,10 @@ public class IrcPublisher extends IMPublisher {
         public String getHost() {
             return this.hostname;
         }
-        //@Override
+
+        @Override
         public String getHudsonUserName() {
-            return this.hudsonLogin;
+            return this.jenkinsLogin;
         }
 
         //@Override
@@ -554,14 +566,6 @@ public class IrcPublisher extends IMPublisher {
             this.commandPrefix = commandPrefix;
         }
 
-        public String getHudsonLogin() {
-            return hudsonLogin;
-        }
-
-        public void setHudsonLogin(String hudsonLogin) {
-            this.hudsonLogin = hudsonLogin;
-        }
-
         public void setUseNotice(boolean useNotice) {
             this.useNotice = useNotice;
         }
@@ -653,6 +657,11 @@ public class IrcPublisher extends IMPublisher {
             if (StringUtils.isNotBlank(this.nickServPassword)) {
                 this.secretNickServPassword = Secret.fromString(Scrambler.descramble(this.nickServPassword));
                 this.nickServPassword = null;
+            }
+
+            if (StringUtils.isNotBlank(this.hudsonLogin)) {
+                this.jenkinsLogin = this.hudsonLogin;
+                this.hudsonLogin = null;
             }
 
             return this;
