@@ -494,7 +494,7 @@ public class IrcPublisher extends IMPublisher {
             this.hostname = hostname;
         }
 
-        public void setPort(Integer port) {
+        public void setPort(int port) {
             this.port = port;
         }
 

@@ -343,7 +343,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         LOGGER.info("Trying to join channel " + channel.getName());
 
         if (channel.hasPassword()) {
-            this.pircConnection.sendIRC().joinChannel(channel.getName(), channel.getPassword());
+            this.pircConnection.sendIRC().joinChannel(channel.getName(), channel.getSecretPassword().getPlainText());
         } else {
             this.pircConnection.sendIRC().joinChannel(channel.getName());
         }
