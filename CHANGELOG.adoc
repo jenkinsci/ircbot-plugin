@@ -20,6 +20,11 @@ https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.35...jenkinsci:ircbo
    need to change its value with the new plugin version running, please
    edit `$JENKINS_HOME/hudson.plugins.ircbot.IrcPublisher.xml` directly
    and restart Jenkins or gracefully reload its configuration.
+* Changed default IRC nickname for new deployments of the bot to `jenkins`
+  (from `jenkins-bot`) be in limits set by RFC 2812 (9 chars), and added
+  notes to the nickname editing fields in the UI (global config of the
+  server as a client to IRC; individual users' configs to link their IRC
+  accounts to Jenkins account)
 
 [[IRCPlugin-Version-2.35]]
 [[IRCPlugin-Version-2.34]]
