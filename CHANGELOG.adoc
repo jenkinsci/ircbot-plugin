@@ -1,7 +1,7 @@
 = Changelog
 
 [[IRCPlugin-Version-2.36]]
-== Version 2.36 (2020-12-xx) - pending
+== Version 2.36 (2020-12-12) - pending
 
 https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.35...jenkinsci:ircbot-2.36
 
@@ -15,11 +15,9 @@ https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.35...jenkinsci:ircbo
    `secretPassword` fields. To update the on-disk representation of
    your IRC user and channel passwords, it should suffice to open and
    save your Jenkins global configuration after upgrading the plugin.
-** CAVEAT: The "Jenkins Username" ("hudsonLogin" in XML configuration)
-   currently is not editable from the global configuration page. If you
-   need to change its value with the new plugin version running, please
-   edit `$JENKINS_HOME/hudson.plugins.ircbot.IrcPublisher.xml` directly
-   and restart Jenkins or gracefully reload its configuration.
+** Note that some field names would be updated in the configuration file 
+   `$JENKINS_HOME/hudson.plugins.ircbot.IrcPublisher.xml` after this
+   upgrade.
 
 [[IRCPlugin-Version-2.35]]
 [[IRCPlugin-Version-2.34]]
