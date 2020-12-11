@@ -177,7 +177,8 @@ public class IrcPublisher extends IMPublisher {
 
         private boolean sasl;
 
-        String nick = "jenkins-bot";
+        /* Note that RFC 2812 limits by default to 9 chars; some servers enable more */
+        String nick = "jenkins";
 
         @Deprecated
         transient String nickServPassword = null;
