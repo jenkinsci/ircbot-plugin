@@ -1,7 +1,7 @@
 = Changelog
 
 [[IRCPlugin-Version-2.36]]
-== Version 2.36 (2020-12-12) - pending
+== Version 2.36 (2020-12-12)
 
 https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.35...jenkinsci:ircbot-2.36
 
