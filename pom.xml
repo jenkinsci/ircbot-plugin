@@ -11,7 +11,7 @@
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>ircbot</artifactId>
     <packaging>hpi</packaging>
-    <version>2.36</version>
+    <version>${revision}${changelist}</version>
     <name>Jenkins IRC Plugin</name>
     <description>A build status publisher that notifies channels on a IRC server</description>
     <url>https://github.com/jenkinsci/ircbot-plugin</url>
@@ -23,7 +23,7 @@
     </licenses>
 
     <properties>
-        <revision>2.36</revision>
+        <revision>2.37</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/ircbot-plugin</gitHubRepo>
         <version.instant-messaging.plugin>1.40</version.instant-messaging.plugin>
@@ -116,7 +116,7 @@
         <connection>scm:git:github.com:${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
         <url>https://github.com/${gitHubRepo}</url>
-        <tag>ircbot-2.36</tag>
+        <tag>${scmTag}</tag>
     </scm>
 
     <pluginRepositories>
