@@ -1,7 +1,5 @@
 package hudson.plugins.ircbot.v2;
 
-import com.google.common.base.Function;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import hudson.Util;
@@ -25,7 +23,6 @@ import java.net.Proxy;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +30,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -46,8 +44,6 @@ import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.cap.SASLCapHandler;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ConnectEvent;
-
-import static com.google.common.collect.Collections2.transform;
 
 import static java.util.logging.Level.WARNING;
 
@@ -311,20 +307,11 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     }
 
     private boolean areWeConnectedToAllChannels() {
-        Set<String> groupChatNames = new HashSet<String>(transform(this.groupChats, new Function<IMMessageTarget, String>() {
-            @Override
-            public String apply(IMMessageTarget input) {
-                GroupChatIMMessageTarget group = (GroupChatIMMessageTarget) input;
-                return group.getName();
-            }
-        }));
+        Set<String> groupChatNames =
+                this.groupChats.stream().map(input -> ((GroupChatIMMessageTarget)input).getName()).collect(Collectors.toSet());
 
-        Set<String> connectedToChannels = new HashSet<String>(transform(this.pircConnection.getUserChannelDao().getAllChannels(), new Function<Channel, String>() {
-            @Override
-            public String apply(Channel input) {
-                return input.getName();
-            }
-        }));
+        Set<String> connectedToChannels =
+                this.pircConnection.getUserChannelDao().getAllChannels().stream().map(Channel::getName).collect(Collectors.toSet());
 
         return groupChatNames.equals(connectedToChannels);
     }
