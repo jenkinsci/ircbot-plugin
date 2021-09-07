@@ -1,8 +1,8 @@
 package hudson.plugins.ircbot.v2;
 
-import org.junit.Test;
-
 import org.jvnet.hudson.test.Bug;
+
+import org.junit.Test;
 
 import org.pircbotx.Colors;
 
