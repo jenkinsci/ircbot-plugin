@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml 39481 2011-05-12 20:14:54Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.13</version>
+        <version>4.19</version>
+    <relativePath />
     </parent>
+
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>ircbot</artifactId>
     <packaging>hpi</packaging>
     <version>${revision}${changelist}</version>
+
     <name>Jenkins IRC Plugin</name>
-    <description>A build status publisher that notifies channels on a IRC server</description>
-    <url>https://github.com/jenkinsci/ircbot-plugin</url>
+    <description>
+A build status publisher that notifies channels on a IRC server
+(Note: the "bot" part is mostly in instant-messaging-plugin)
+</description>
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <inceptionYear>2006</inceptionYear>
+
     <licenses>
         <license>
             <name>MIT license</name>
+            <url>https://opensource.org/licenses/MIT</url>
             <comments>All source code is under the MIT license.</comments>
         </license>
     </licenses>
@@ -25,7 +33,7 @@
     <properties>
         <revision>2.38</revision>
         <changelist>-SNAPSHOT</changelist>
-        <gitHubRepo>jenkinsci/ircbot-plugin</gitHubRepo>
+        <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <version.instant-messaging.plugin>1.40</version.instant-messaging.plugin>
         <java.level>8</java.level>
         <jenkins.version>2.269</jenkins.version>
@@ -81,6 +89,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
     </dependencies>
 
     <repositories>
@@ -113,7 +122,7 @@
     </developers>
 
     <scm>
-        <connection>scm:git:github.com:${gitHubRepo}.git</connection>
+        <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
         <url>https://github.com/${gitHubRepo}</url>
         <tag>${scmTag}</tag>
