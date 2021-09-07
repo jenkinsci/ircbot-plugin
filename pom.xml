@@ -16,7 +16,7 @@
 
     <name>Jenkins IRC Plugin</name>
     <description>A build status publisher that notifies channels on a IRC server</description>
-    <url>https://github.com/jenkinsci/ircbot-plugin</url>
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <inceptionYear>2006</inceptionYear>
 
     <licenses>
@@ -30,7 +30,7 @@
     <properties>
         <revision>2.38</revision>
         <changelist>-SNAPSHOT</changelist>
-        <gitHubRepo>jenkinsci/ircbot-plugin</gitHubRepo>
+        <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <version.instant-messaging.plugin>1.40</version.instant-messaging.plugin>
         <java.level>8</java.level>
         <jenkins.version>2.269</jenkins.version>
