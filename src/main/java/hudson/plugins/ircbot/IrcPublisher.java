@@ -25,21 +25,21 @@ import hudson.plugins.ircbot.v2.IRCConnectionProvider;
 import hudson.plugins.ircbot.v2.IRCMessageTargetConverter;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
-
 import hudson.util.Scrambler;
 import hudson.util.Secret;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
-//import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
