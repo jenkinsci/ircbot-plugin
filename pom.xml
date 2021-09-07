@@ -13,9 +13,11 @@
     <artifactId>ircbot</artifactId>
     <packaging>hpi</packaging>
     <version>${revision}${changelist}</version>
+
     <name>Jenkins IRC Plugin</name>
     <description>A build status publisher that notifies channels on a IRC server</description>
     <url>https://github.com/jenkinsci/ircbot-plugin</url>
+    <inceptionYear>2006</inceptionYear>
 
     <licenses>
         <license>
