@@ -6,7 +6,7 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>4.24</version>
-    <relativePath />
+        <relativePath />
     </parent>
 
     <groupId>org.jvnet.hudson.plugins</groupId>
