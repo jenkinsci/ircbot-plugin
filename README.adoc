@@ -1,4 +1,4 @@
-= IRCBot Plugin
+= IRCBot Plugin https://ci.jenkins.io/job/Plugins/job/ircbot-plugin/job/master/[image:https://ci.jenkins.io/job/Plugins/job/ircbot-plugin/job/master/badge/icon["Build Status"]]
 
 This plugin enables Jenkins to send build notífications via IRC and
 lets you interact with Jenkins via an IRC bot. Like some other IM protocol
