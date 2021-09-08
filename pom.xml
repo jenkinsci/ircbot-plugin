@@ -31,7 +31,7 @@ A build status publisher that notifies channels on a IRC server
     </licenses>
 
     <properties>
-        <revision>2.38</revision>
+        <revision>2.39</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <version.instant-messaging.plugin>1.43</version.instant-messaging.plugin>
