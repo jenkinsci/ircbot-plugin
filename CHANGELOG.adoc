@@ -1,5 +1,22 @@
 = Changelog
 
+[[IRCPlugin-Version-2.38]]
+== Version 2.37 (2021-09-08)
+
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.37...jenkinsci:ircbot-2.38
+
+* Updated build recipes to include dependabot and to keep the `pom.xml`
+  style common with some other plugins to simplify cross-pollination
+* Bumped several dependency versions
+* Rectified parts of codebase to match the new quality constraints
+
+[[IRCPlugin-Version-2.37]]
+== Version 2.37 (2021-08-27)
+
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.36...jenkinsci:ircbot-2.37
+
+* Remove usages of Guava
+
 [[IRCPlugin-Version-2.36]]
 == Version 2.36 (2020-12-12)
 
