@@ -10,10 +10,10 @@
     <module name="TreeWalker">
         <module name="ImportOrder">
             <property name="groups" value="*,com,edu,hudson,io,java,javax,jenkins,net,okhttp3,org.apache,org.jenkinsci,org.jvnet.hudson,org.junit,org.kohsuke,org.pircbotx,org" />
-	    <property name="ordered" value="true"/>
-	    <property name="separated" value="true"/>
-	    <property name="option" value="bottom"/>
-	    <property name="sortStaticImportsAlphabetically" value="true"/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="true"/>
+            <property name="option" value="bottom"/>
+            <property name="sortStaticImportsAlphabetically" value="true"/>
             <!-- See also https://github.com/checkstyle/checkstyle/issues/5476
                  and https://github.com/checkstyle/checkstyle/issues/7425
               -->
