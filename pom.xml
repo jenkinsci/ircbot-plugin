@@ -44,7 +44,7 @@ A build status publisher that notifies channels on a IRC server
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.263.x</artifactId>
-                <version>937.v51fde92016ed</version>
+                <version>950.v396cb834de1e</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
