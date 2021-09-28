@@ -1,5 +1,12 @@
 = Changelog
 
+[[IRCPlugin-Version-2.40]]
+== Version 2.40 (2021-09-28)
+
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.39...jenkinsci:ircbot-2.40
+
+* Some more recipe updates, dependency versions and cosmetic fixes
+
 [[IRCPlugin-Version-2.39]]
 == Version 2.39 (2021-09-08)
 
