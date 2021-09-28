@@ -36,7 +36,7 @@ A build status publisher that notifies channels on a IRC server
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <version.instant-messaging.plugin>1.44</version.instant-messaging.plugin>
         <java.level>8</java.level>
-        <jenkins.version>2.270</jenkins.version>
+        <jenkins.version>2.289.1</jenkins.version>
     </properties>
 
     <dependencyManagement>
@@ -89,7 +89,7 @@ A build status publisher that notifies channels on a IRC server
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
-            <version>3.12</version>
+            <version>3.13</version>
             <exclusions>
                 <!-- TODO conflict with jenkins-test-harness that wants a newer
                      version currently, see comments in
