@@ -75,11 +75,6 @@ A build status publisher that notifies channels on a IRC server
                 </exclusion>
                 <!-- provided by jenkins core -->
                 <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <!-- provided by jenkins core -->
-                <exclusion>
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
                 </exclusion>
@@ -189,6 +184,7 @@ A build status publisher that notifies channels on a IRC server
                     <loggers>
                         <hudson.plugins.im>FINE</hudson.plugins.im>
                     </loggers>
+                    <maskClasses>com.google.common.</maskClasses>
                     <compatibleSinceVersion>2.0</compatibleSinceVersion>
                 </configuration>
             </plugin>
