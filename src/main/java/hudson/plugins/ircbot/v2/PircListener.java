@@ -34,7 +34,7 @@ import org.pircbotx.hooks.events.ServerResponseEvent;
  * @author $Author: kutzi $ (last change)
  */
 @SuppressFBWarnings(value = "DM_STRING_CTOR", justification = "we want a new instance here to enable reference comparison")
-public class PircListener extends ListenerAdapter<PircBotX> {
+public class PircListener extends ListenerAdapter {
 
     private static final Logger LOGGER = Logger.getLogger(PircListener.class.getName());
 
@@ -76,7 +76,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
      * {@inheritDoc}
      */
     @Override
-    public void onMessage(MessageEvent<PircBotX> event) {
+    public void onMessage(MessageEvent event) {
         for (MessageListener l : this.msgListeners) {
             if(l.target.equals(event.getChannel().getName())) {
                 l.listener.onMessage(new IMMessage(event.getUser().getNick(),
@@ -89,7 +89,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
      * {@inheritDoc}
      */
     @Override
-    public void onPrivateMessage(PrivateMessageEvent<PircBotX> event) {
+    public void onPrivateMessage(PrivateMessageEvent event) {
         String sender = event.getUser().getNick();
         String message = event.getMessage();
         for (MessageListener l : this.msgListeners) {
@@ -105,7 +105,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
      * Someone send me a notice. Possibly NickServ after identifying.
      */
     @Override
-    public void onNotice(NoticeEvent<PircBotX> event) {
+    public void onNotice(NoticeEvent event) {
         String sourceNick = event.getUser().getNick();
         String notice = event.getMessage();
         LOGGER.info("Notice from " + sourceNick + ": '" + normalize(notice) + "'");
@@ -115,7 +115,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
      * {@inheritDoc}
      */
     @Override
-    public void onJoin(JoinEvent<PircBotX> event) {
+    public void onJoin(JoinEvent event) {
         String sender = event.getUser().getNick();
         for (JoinListener l : this.joinListeners) {
             if (this.nick.equals(sender)) {
@@ -125,7 +125,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     }
 
     @Override
-    public void onPart(PartEvent<PircBotX> event) {
+    public void onPart(PartEvent event) {
         String sender = event.getUser().getNick();
         for (PartListener l : this.partListeners) {
             if (this.nick.equals(sender)) {
@@ -135,7 +135,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     }
 
     @Override
-    public void onKick(KickEvent<PircBotX> event) {
+    public void onKick(KickEvent event) {
         String recipientNick = event.getRecipient().getNick();
         for(PartListener l : this.partListeners) {
             if (this.nick.equals(recipientNick)) {
@@ -145,7 +145,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     }
 
     @Override
-    public void onServerResponse(ServerResponseEvent<PircBotX> event) {
+    public void onServerResponse(ServerResponseEvent event) {
         int code = event.getCode();
 
         if (code == 433) {
@@ -158,11 +158,11 @@ public class PircListener extends ListenerAdapter<PircBotX> {
         }
     }
 
-    public void onNickChange(NickChangeEvent<PircBotX> event){
+    public void onNickChange(NickChangeEvent event){
         LOGGER.info("Nick '" + event.getOldNick() + "' was changed. Now it is used nick '" + event.getNewNick() + "'.");
     }
 
-    public void onNickAlreadyInUse(NickAlreadyInUseEvent<PircBotX> event){
+    public void onNickAlreadyInUse(NickAlreadyInUseEvent event){
         LOGGER.warning("Nick '" + nick + "' is already in use ");
 //        String nickservPass = IrcPublisher.DESCRIPTOR.getNickServPassword();
 //        if(nickservPass!=null){
@@ -178,7 +178,7 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     }
 
     @Override
-    public void onDisconnect(DisconnectEvent<PircBotX> event) {
+    public void onDisconnect(DisconnectEvent event) {
 
         if (!explicitDisconnect) {
             for (IMConnectionListener l : this.listeners) {
@@ -189,9 +189,9 @@ public class PircListener extends ListenerAdapter<PircBotX> {
     }
 
     @Override
-    public void onInvite(InviteEvent<PircBotX> event) {
+    public void onInvite(InviteEvent event) {
         for (InviteListener listener : inviteListeners) {
-            listener.inviteReceived(event.getChannel(), event.getUser());
+            listener.inviteReceived(event.getChannel());
         }
     }
 
@@ -325,10 +325,8 @@ public class PircListener extends ListenerAdapter<PircBotX> {
          *
          * @param channelName
          *   Name of the IRC channel to act in
-         * @param inviter
-         *   Name of the IRC user who sent us an invitation
          */
-        void inviteReceived(String channelName, String inviter);
+        void inviteReceived(String channelName);
     }
 
     public interface PartListener {

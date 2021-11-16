@@ -42,6 +42,8 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.ProxySocketFactory;
 import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.cap.SASLCapHandler;
+import org.pircbotx.delay.StaticReadonlyDelay;
+import org.pircbotx.exception.NotReadyException;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ConnectEvent;
 
@@ -62,7 +64,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
     private Thread botThread;
 
-    private final Builder<PircBotX> cfg;
+    private final Builder cfg;
     private volatile PircBotX pircConnection;
     private final PircListener listener;
 
@@ -76,7 +78,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     @SuppressFBWarnings(value="UR_UNINIT_READ",
         justification="TODO: this is probably a geniune problem but I don't know why")
     public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
-        Builder<PircBotX> config = new Configuration.Builder<PircBotX>();
+        Builder config = new Configuration.Builder();
 
         // TODO: setVerbose is gone in 2.x - or is it default now?
 //        if (LOGGER.isLoggable(Level.FINEST)) {
@@ -133,7 +135,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
         config.setLogin(this.descriptor.getLogin());
         config.setName(this.descriptor.getNick());
-        config.setMessageDelay(this.descriptor.getMessageRate());
+        config.setMessageDelay(new StaticReadonlyDelay(this.descriptor.getMessageRate()));
         config.setEncoding(Charset.forName(this.descriptor.getCharset()));
 
         this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
@@ -198,10 +200,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
             final CountDownLatch connectLatch = new CountDownLatch(1);
 
 
-            ListenerAdapter<PircBotX> connectListener = new ListenerAdapter<PircBotX>() {
+            ListenerAdapter connectListener = new ListenerAdapter() {
 
                 @Override
-                public void onConnect(ConnectEvent<PircBotX> event)
+                public void onConnect(ConnectEvent event)
                         throws Exception {
                     connectLatch.countDown();
 
@@ -365,7 +367,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     }
 
     //@Override
-    public void inviteReceived(String channelName, String inviter) {
+    public void inviteReceived(String channelName) {
         GroupChatIMMessageTarget groupChat = getGroupChatForChannelName(channelName);
         if (groupChat == null) {
             LOGGER.log(Level.INFO, "Invited to channel {0} but I don't seem to belong here", channelName);
@@ -411,7 +413,12 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
         boolean useColors = this.descriptor.isUseColors();
         if (useColors) {
-            String mode = channel.getMode();
+            String mode;
+            try {
+                mode = channel.getMode();
+            } catch (NotReadyException e) {
+                throw new IMException(e);
+            }
             if (mode.contains("c")) {
                 LOGGER.warning("Bot is configured to use colors, but channel " + target + " disallows colors!");
                 useColors = false;
