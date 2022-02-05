@@ -81,22 +81,6 @@ A build status publisher that notifies channels on a IRC server
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.jenkins-ci.main</groupId>
-            <artifactId>maven-plugin</artifactId>
-            <version>3.16</version>
-            <exclusions>
-                <!-- TODO conflict with jenkins-test-harness that wants a newer
-                     version currently, see comments in
-                     https://github.com/jenkinsci/instant-messaging-plugin/pull/50
-                -->
-                <exclusion>
-                    <groupId>commons-net</groupId>
-                    <artifactId>commons-net</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Jenkins pipeline support below -->
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
