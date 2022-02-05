@@ -15,10 +15,7 @@
     <version>${revision}${changelist}</version>
 
     <name>Jenkins IRC Plugin</name>
-    <description>
-A build status publisher that notifies channels on a IRC server
-(Note: the "bot" part is mostly in instant-messaging-plugin)
-</description>
+    <description>A build status publisher that notifies channels on an IRC server</description>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <inceptionYear>2006</inceptionYear>
 
