@@ -7,6 +7,8 @@ package hudson.plugins.ircbot.steps;
  *   https://github.com/jenkinsci/instant-messaging-plugin/pull/16
  */
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -25,8 +27,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -186,7 +186,7 @@ public class IrcNotifyStep extends Step {
 
         private transient final IrcNotifyStep step;
 
-        public IrcNotifyStepExecution(@Nonnull IrcNotifyStep step, @Nonnull StepContext context) {
+        public IrcNotifyStepExecution(@NonNull IrcNotifyStep step, @NonNull StepContext context) {
             super(context);
             this.step = step;
         }

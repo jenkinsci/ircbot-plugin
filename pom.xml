@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.29</version>
+        <version>4.33</version>
         <relativePath />
     </parent>
 
@@ -15,10 +15,7 @@
     <version>${revision}${changelist}</version>
 
     <name>Jenkins IRC Plugin</name>
-    <description>
-A build status publisher that notifies channels on a IRC server
-(Note: the "bot" part is mostly in instant-messaging-plugin)
-</description>
+    <description>A build status publisher that notifies channels on an IRC server</description>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <inceptionYear>2006</inceptionYear>
 
@@ -31,10 +28,10 @@ A build status publisher that notifies channels on a IRC server
     </licenses>
 
     <properties>
-        <revision>2.42</revision>
+        <revision>2.43</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <version.instant-messaging.plugin>1.47</version.instant-messaging.plugin>
+        <version.instant-messaging.plugin>1.48</version.instant-messaging.plugin>
         <java.level>8</java.level>
         <jenkins.version>2.320</jenkins.version>
     </properties>
@@ -43,8 +40,8 @@ A build status publisher that notifies channels on a IRC server
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.263.x</artifactId>
-                <version>961.vf0c9f6f59827</version>
+                <artifactId>bom-2.289.x</artifactId>
+                <version>1148.v7261f385f859</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -56,6 +53,13 @@ A build status publisher that notifies channels on a IRC server
             <groupId>org.jvnet.hudson.plugins</groupId>
             <artifactId>instant-messaging</artifactId>
             <version>${version.instant-messaging.plugin}</version>
+            <exclusions>
+                <!-- Provided by Jenkins core -->
+                <exclusion>
+                    <groupId>org.jenkins-ci</groupId>
+                    <artifactId>symbol-annotation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.pircbotx</groupId>
@@ -82,22 +86,6 @@ A build status publisher that notifies channels on a IRC server
                 <exclusion>
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jenkins-ci.main</groupId>
-            <artifactId>maven-plugin</artifactId>
-            <version>3.15</version>
-            <exclusions>
-                <!-- TODO conflict with jenkins-test-harness that wants a newer
-                     version currently, see comments in
-                     https://github.com/jenkinsci/instant-messaging-plugin/pull/50
-                -->
-                <exclusion>
-                    <groupId>commons-net</groupId>
-                    <artifactId>commons-net</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
