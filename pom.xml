@@ -33,17 +33,22 @@
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <version.instant-messaging.plugin>1.48</version.instant-messaging.plugin>
         <java.level>8</java.level>
-        <jenkins.version>2.289.1</jenkins.version>
+        <jenkins.version>2.332.1</jenkins.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.289.x</artifactId>
+                <artifactId>bom-2.332.x</artifactId>
                 <version>1210.vcd41f6657f03</version>
                 <scope>import</scope>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.9</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -62,9 +67,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.pircbotx</groupId>
+            <groupId>com.github.pircbotx</groupId>
             <artifactId>pircbotx</artifactId>
-            <version>2.0.1</version>
+            <version>-2.1-g479835f-165</version>
             <scope>compile</scope>
             <exclusions>
                 <!-- provides an ancient version, junit plugin is pulling in a more recent one -->
@@ -76,6 +81,11 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <!-- provided by jenkins core -->
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <!-- provided by jenkins core -->
                 <exclusion>
@@ -104,6 +114,10 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -172,7 +186,6 @@
                     <loggers>
                         <hudson.plugins.im>FINE</hudson.plugins.im>
                     </loggers>
-                    <maskClasses>com.google.common.</maskClasses>
                     <compatibleSinceVersion>2.0</compatibleSinceVersion>
                 </configuration>
             </plugin>
