@@ -31,7 +31,7 @@
         <revision>2.43</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <version.instant-messaging.plugin>1.48</version.instant-messaging.plugin>
+        <version.instant-messaging.plugin>1.49</version.instant-messaging.plugin>
         <java.level>8</java.level>
         <jenkins.version>2.332.1</jenkins.version>
     </properties>
