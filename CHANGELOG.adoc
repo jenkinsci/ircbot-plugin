@@ -1,6 +1,14 @@
 = Changelog
 
 [[IRCPlugin-Version-2.42]]
+== Version 2.43 (2022-04-16)
+
+https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.42...jenkinsci:ircbot-2.43
+
+* Update to new major version of PircBotX 2.1
+* Align Guava usage with current Jenkins ecosystem
+* Some more recipe updates for dependency versions
+
 == Version 2.42 (2021-11-22)
 
 https://github.com/jenkinsci/ircbot-plugin/compare/ircbot-2.41...jenkinsci:ircbot-2.42
