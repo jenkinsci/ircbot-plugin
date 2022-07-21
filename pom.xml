@@ -32,8 +32,7 @@
         <revision>2.44</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <version.instant-messaging.plugin>1.49</version.instant-messaging.plugin>
-        <java.level>8</java.level>
+        <version.instant-messaging.plugin>1.50</version.instant-messaging.plugin>
         <jenkins.version>2.332.1</jenkins.version>
     </properties>
 
@@ -45,6 +44,11 @@
                 <version>1500.ve4d05cd32975</version>
                 <scope>import</scope>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
