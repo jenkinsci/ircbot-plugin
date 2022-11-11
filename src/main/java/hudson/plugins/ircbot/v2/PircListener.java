@@ -94,7 +94,7 @@ public class PircListener extends ListenerAdapter {
         String message = event.getMessage();
         for (MessageListener l : this.msgListeners) {
             if (this.nick.equals(l.target)) {
-                if (l.sender == CHAT_ESTABLISHER || sender.equals(l.sender)) {
+                if (l.sender.equals(CHAT_ESTABLISHER) || sender.equals(l.sender)) {
                     l.listener.onMessage(new IMMessage(sender, this.nick, message));
                 }
             }
