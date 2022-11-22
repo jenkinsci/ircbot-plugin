@@ -12,7 +12,7 @@
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>ircbot</artifactId>
     <packaging>hpi</packaging>
-    <version>${revision}${changelist}</version>
+    <version>${revision}.${changelist}</version>
 
     <name>Jenkins IRC Plugin</name>
     <description>A build status publisher that notifies channels on an IRC server</description>
@@ -29,11 +29,11 @@
     </licenses>
 
     <properties>
-        <revision>2.47</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>3</revision>
+        <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <version.instant-messaging.plugin>1.53</version.instant-messaging.plugin>
-        <jenkins.version>2.332.4</jenkins.version>
+	<jenkins.version>2.332.4</jenkins.version>
+	<!-- Note: keep in sync with io.jenkins.tools.bom version below -->
     </properties>
 
     <dependencyManagement>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.jvnet.hudson.plugins</groupId>
             <artifactId>instant-messaging</artifactId>
-            <version>${version.instant-messaging.plugin}</version>
+            <version>1.53</version>
             <exclusions>
                 <!-- Provided by Jenkins core -->
                 <exclusion>
