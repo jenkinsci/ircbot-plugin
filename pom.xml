@@ -32,15 +32,15 @@
         <revision>3</revision>
         <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-	<jenkins.version>2.332.4</jenkins.version>
-	<!-- Note: keep in sync with io.jenkins.tools.bom version below -->
+        <jenkins.version>2.361.4</jenkins.version>
+        <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.332.x</artifactId>
+                <artifactId>bom-2.361.x</artifactId>
                 <version>1706.vc166d5f429f8</version>
                 <scope>import</scope>
                 <type>pom</type>
