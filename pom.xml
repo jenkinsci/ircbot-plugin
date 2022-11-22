@@ -34,6 +34,8 @@
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <jenkins.version>2.361.1</jenkins.version>
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
+        <spotbugs.effort>Max</spotbugs.effort>
+        <spotbugs.threshold>Low</spotbugs.threshold>
     </properties>
 
     <dependencyManagement>
