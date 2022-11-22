@@ -32,7 +32,7 @@
         <revision>2.46</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <version.instant-messaging.plugin>1.52</version.instant-messaging.plugin>
+        <version.instant-messaging.plugin>1.53</version.instant-messaging.plugin>
         <jenkins.version>2.332.4</jenkins.version>
     </properties>
 
