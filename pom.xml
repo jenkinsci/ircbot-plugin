@@ -32,7 +32,7 @@
         <revision>3</revision>
         <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <jenkins.version>2.361.4</jenkins.version>
+        <jenkins.version>2.361.1</jenkins.version>
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
     </properties>
 
