@@ -1,5 +1,7 @@
 = Changelog
 
+See [GitHub releases](https://github.com/jenkinsci/ircbot-plugin/releases) for all newer versions.
+
 [[IRCPlugin-Version-2.43]]
 == Version 2.44 (2022-07-21)
 
