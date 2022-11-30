@@ -186,6 +186,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     }
 
     //@Override
+    @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC_ANON",
+        justification = "Commented below, no idea how to solve")
     public boolean connect() {
         try {
 
@@ -199,7 +201,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
             final CountDownLatch connectLatch = new CountDownLatch(1);
 
-
+            // SIC_INNER_SHOULD_BE_STATIC_ANON.... whatever that means:
+            // The class hudson.plugins.im.build_notify.PrintFailingTestsBuildToChatNotifier$1
+            // could be refactored into a named _static_ inner class.
             ListenerAdapter connectListener = new ListenerAdapter() {
 
                 @Override
