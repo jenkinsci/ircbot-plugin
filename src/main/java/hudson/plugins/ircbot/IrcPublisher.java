@@ -241,6 +241,9 @@ public class IrcPublisher extends IMPublisher {
          * Check boxes values are not passed in the posted form when they are unchecked.
          * The workaround consists in acceding these values via the JSON representation.
          */
+        @Deprecated
+        @SuppressFBWarnings(value="UPM_UNCALLED_PRIVATE_METHOD",
+            justification="Here just in case for UI and config loads")
         private static List<JSONObject> fillChannelsFromJSON(JSONObject root){
             throw new UnsupportedOperationException();
         }
