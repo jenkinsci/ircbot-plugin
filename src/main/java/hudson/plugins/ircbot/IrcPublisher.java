@@ -611,8 +611,8 @@ public class IrcPublisher extends IMPublisher {
             return this.charset;
         }
 
-
-
+        @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC_ANON",
+            justification = "No idea how to solve")
         public ParameterNames getParamNames() {
             return new ParameterNames() {
                 @Override
