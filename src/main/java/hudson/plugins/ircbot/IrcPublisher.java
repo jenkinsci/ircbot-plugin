@@ -142,7 +142,7 @@ public class IrcPublisher extends IMPublisher {
 
         private static final String PREFIX = "irc_publisher.";
 
-        public static final String[] CHARSETS;
+        private static final String[] CHARSETS;
 
         static {
             SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
@@ -155,6 +155,10 @@ public class IrcPublisher extends IMPublisher {
                 }
             }
             CHARSETS = cs;
+        }
+
+        public String[] getCharsets() {
+            return CHARSETS;
         }
 
         boolean enabled = false;
