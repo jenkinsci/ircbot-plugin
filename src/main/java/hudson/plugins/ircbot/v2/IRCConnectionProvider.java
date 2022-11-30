@@ -1,5 +1,7 @@
 package hudson.plugins.ircbot.v2;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import hudson.plugins.im.IMConnection;
 import hudson.plugins.im.IMConnectionProvider;
 import hudson.plugins.im.IMException;
@@ -19,6 +21,8 @@ public class IRCConnectionProvider extends IMConnectionProvider {
         INSTANCE.releaseConnection();
     }
 
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+        justification = "Yes we do generally init() ourselves")
     private IRCConnectionProvider() {
         super();
         init();

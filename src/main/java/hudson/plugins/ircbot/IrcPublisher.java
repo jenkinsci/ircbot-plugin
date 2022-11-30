@@ -142,7 +142,7 @@ public class IrcPublisher extends IMPublisher {
 
         private static final String PREFIX = "irc_publisher.";
 
-        public static final String[] CHARSETS;
+        private static final String[] CHARSETS;
 
         static {
             SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
@@ -155,6 +155,10 @@ public class IrcPublisher extends IMPublisher {
                 }
             }
             CHARSETS = cs;
+        }
+
+        public String[] getCharsets() {
+            return CHARSETS;
         }
 
         boolean enabled = false;
@@ -237,6 +241,9 @@ public class IrcPublisher extends IMPublisher {
          * Check boxes values are not passed in the posted form when they are unchecked.
          * The workaround consists in acceding these values via the JSON representation.
          */
+        @Deprecated
+        @SuppressFBWarnings(value="UPM_UNCALLED_PRIVATE_METHOD",
+            justification="Here just in case for UI and config loads")
         private static List<JSONObject> fillChannelsFromJSON(JSONObject root){
             throw new UnsupportedOperationException();
         }
@@ -604,8 +611,8 @@ public class IrcPublisher extends IMPublisher {
             return this.charset;
         }
 
-
-
+        @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC_ANON",
+            justification = "No idea how to solve")
         public ParameterNames getParamNames() {
             return new ParameterNames() {
                 @Override
@@ -623,7 +630,7 @@ public class IrcPublisher extends IMPublisher {
             try {
                 return Integer.parseInt(System.getProperty("hudson.plugins.ircbot.messageRate", "500"));
             } catch (NumberFormatException nfe) {
-                return new Integer(500);
+                return Integer.valueOf(500);
             }
         }
 

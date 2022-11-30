@@ -75,8 +75,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
 
 
-    @SuppressFBWarnings(value="UR_UNINIT_READ",
-        justification="TODO: this is probably a geniune problem but I don't know why")
+    @SuppressFBWarnings(value={"UR_UNINIT_READ", "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR"},
+        justification="UR_UNINIT_READ: TODO: this is probably a genuine problem but I don't know why; MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR: Need ecosystem change to separate IRCConnection construction from PircListener connection")
     public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
         Builder config = new Configuration.Builder();
 
@@ -139,6 +139,10 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
         config.setEncoding(Charset.forName(this.descriptor.getCharset()));
 
         this.listener = new PircListener(this.pircConnection, this.descriptor.getNick());
+        // MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR
+        // https://spotbugs.readthedocs.io/en/stable/bugDescriptions.html
+        // Overridable method is called from constructor
+        // It may also leak the "this" reference of the partially constructed object.
         this.listener.addJoinListener(this);
         this.listener.addInviteListener(this);
         this.listener.addPartListener(this);
@@ -186,6 +190,8 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     }
 
     //@Override
+    @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC_ANON",
+        justification = "Commented below, no idea how to solve")
     public boolean connect() {
         try {
 
@@ -199,7 +205,9 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
 
             final CountDownLatch connectLatch = new CountDownLatch(1);
 
-
+            // SIC_INNER_SHOULD_BE_STATIC_ANON.... whatever that means:
+            // The class hudson.plugins.im.build_notify.PrintFailingTestsBuildToChatNotifier$1
+            // could be refactored into a named _static_ inner class.
             ListenerAdapter connectListener = new ListenerAdapter() {
 
                 @Override
