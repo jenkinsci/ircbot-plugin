@@ -8,6 +8,7 @@ package hudson.plugins.ircbot.steps;
  */
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -184,6 +185,7 @@ public class IrcNotifyStep extends Step {
         // (e.g. serializable fields change)
         private static final long serialVersionUID = 2;
 
+        @SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
         private transient final IrcNotifyStep step;
 
         public IrcNotifyStepExecution(@NonNull IrcNotifyStep step, @NonNull StepContext context) {
