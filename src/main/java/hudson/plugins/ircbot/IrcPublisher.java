@@ -623,7 +623,7 @@ public class IrcPublisher extends IMPublisher {
             try {
                 return Integer.parseInt(System.getProperty("hudson.plugins.ircbot.messageRate", "500"));
             } catch (NumberFormatException nfe) {
-                return new Integer(500);
+                return Integer.valueOf(500);
             }
         }
 
