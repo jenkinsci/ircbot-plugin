@@ -87,7 +87,7 @@
             <version>master-SNAPSHOT</version>
             -->
             <!-- <version>b1b48bfb64</version> -->
-            <version>master-SNAPSHOT</version>
+            <version>master-v2.3-gb1b48bf-9</version>
             <scope>compile</scope>
             <exclusions>
                 <!-- provides an ancient version, junit plugin is pulling in a more recent one -->
