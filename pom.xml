@@ -238,8 +238,7 @@
                         <id>no-snapshots-in-release</id>
                         <phase>validate</phase>
                         <goals>
-                            <!-- goal>enforce</goal -->
-                            <goal>display-info</goal>
+                            <goal>enforce</goal>
                         </goals>
                         <configuration>
                             <rules>
