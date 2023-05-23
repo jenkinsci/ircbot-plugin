@@ -84,8 +84,9 @@
             -->
             <!-- Alternately rely on master branch of the day, until release 2.4 is cut
                  See https://github.com/pircbotx/pircbotx/issues/414
-            -->
             <version>master-SNAPSHOT</version>
+            -->
+            <version>-578993c09f</version>
             <!-- <version>b1b48bfb64</version> -->
             <!-- <version>master</version> -->
             <!-- <version>master-v2.3-gb1b48bf-9</version> -->
