@@ -82,7 +82,7 @@
             <!-- Finally cheated by uploading (Deploy button) the JAR from JitPack
                  to https://repo.jenkins-ci.org/ snapshots; metadata parsed and
                  name/version assigned automatically by it; note it also reassigned
-                 the groupId back to "org.pircbotx": -->
+                 the groupId back to "org.pircbotx"; see also maven enforcer hacks: -->
             <version>2.4-20230523.142555-1</version>
 
             <!-- https://jitpack.io/#pircbotx/pircbotx => Branches => master-SNAPSHOT
@@ -225,6 +225,29 @@
                     <compatibleSinceVersion>2.0</compatibleSinceVersion>
                 </configuration>
             </plugin>
+
+            <!-- For the time being, until pircbotx-2.4 is officially released,
+                 we are constrained to using snapshots, which is frowned upon.
+                 See centralized config in
+                 https://github.com/jenkinsci/plugin-pom/blob/ec78ae1af0b5365d8d17121f3d5be720acb87f13/pom.xml#L550-L570
+              -->
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>no-snapshots-in-release</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <!-- goal>enforce</goal -->
+                            <goal>display-info</goal>
+                        </goals>
+                        <configuration>
+                            <fail>false</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
