@@ -74,8 +74,17 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.github.pircbotx</groupId>
+            <groupId>org.pircbotx</groupId>
+            <!-- groupId>com.github.pircbotx</groupId -->
             <artifactId>pircbotx</artifactId>
+
+            <!-- SEE BELOW ABOUT VERSIONING WOES until release 2.4 -->
+            <!-- Finally cheated by uploading (Deploy button) the JAR from JitPack
+                 to https://repo.jenkins-ci.org/ snapshots; metadata parsed and
+                 name/version assigned automatically by it; note it also reassigned
+                 the groupId back to "org.pircbotx": -->
+            <version>2.4-20230523.142555-1</version>
+
             <!-- https://jitpack.io/#pircbotx/pircbotx => Branches => master-SNAPSHOT
                  => https://jitpack.io/com/github/pircbotx/pircbotx/-v2.3-gb1b48bf-9/build.log
                  Using recent previews until 2.4 which should fix packaging
@@ -86,10 +95,10 @@
                  See https://github.com/pircbotx/pircbotx/issues/414
             <version>master-SNAPSHOT</version>
             -->
-            <version>578993c09f</version>
             <!-- <version>b1b48bfb64</version> -->
             <!-- <version>master</version> -->
             <!-- <version>master-v2.3-gb1b48bf-9</version> -->
+
             <scope>compile</scope>
             <exclusions>
                 <!-- provides an ancient version, junit plugin is pulling in a more recent one -->
@@ -131,6 +140,13 @@
         <repository>
             <id>jenkins-snapshots</id>
             <url>https://repo.jenkins-ci.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jenkins-artifactory-snapshots</id>
+            <url>https://repo.jenkins-ci.org/artifactory/snapshots</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
