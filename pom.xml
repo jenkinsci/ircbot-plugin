@@ -74,8 +74,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <!-- groupId>org.pircbotx</groupId -->
-            <groupId>com.github.pircbotx</groupId>
+            <groupId>org.pircbotx</groupId>
+            <!-- groupId>com.github.pircbotx</groupId -->
             <artifactId>pircbotx</artifactId>
             <version>2.3.1</version>
 
