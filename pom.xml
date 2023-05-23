@@ -74,17 +74,17 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.pircbotx</groupId>  <!-- For JARs uploaded to Jenkins Repo (snapshots) -->
-            <!-- groupId>com.github.pircbotx</groupId -->  <!-- For builds uploaded to Jitpack by github CI -->
+            <!-- groupId>org.pircbotx</groupId -->  <!-- For JARs uploaded to Jenkins Repo (snapshots) -->
+            <groupId>com.github.pircbotx</groupId>  <!-- For builds uploaded to Jitpack by github CI -->
             <artifactId>pircbotx</artifactId>
-            <!-- version>2.3.1</version -->
+            <version>2.3.1</version>
 
             <!-- SEE BELOW ABOUT VERSIONING WOES when a non-release version must be used -->
             <!-- Finally cheated by uploading (Deploy button) the JAR from JitPack
                  to https://repo.jenkins-ci.org/ snapshots; metadata parsed and
                  name/version assigned automatically by it; note it also reassigned
                  the groupId back to "org.pircbotx"; see also maven enforcer hacks: -->
-            <version>2.4-20230523.142555-1</version>
+            <!-- version>2.4-20230523.142555-1</version -->
 
             <!-- Normally https://jitpack.io/#pircbotx/pircbotx => Branches => master-SNAPSHOT
                  => https://jitpack.io/com/github/pircbotx/pircbotx/-v2.3-gb1b48bf-9/build.log
