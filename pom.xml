@@ -242,7 +242,16 @@
                             <goal>display-info</goal>
                         </goals>
                         <configuration>
-                            <fail>false</fail>
+                            <rules>
+                                <requireReleaseDeps>
+                                    <message>No SNAPSHOT versions are allowed for releases (except pircbotx)</message>
+                                    <excludes>
+                                        <exclude>org.pircbotx:pircbotx</exclude>
+                                        <exclude>com.github.pircbotx:pircbotx</exclude>
+                                    </excludes>
+                                </requireReleaseDeps>
+                            </rules>
+                            <fail>true</fail>
                         </configuration>
                     </execution>
                 </executions>
