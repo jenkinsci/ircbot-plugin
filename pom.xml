@@ -74,31 +74,30 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.pircbotx</groupId>
-            <!-- groupId>com.github.pircbotx</groupId -->
+            <!-- groupId>org.pircbotx</groupId -->  <!-- For JARs uploaded to Jenkins Repo (snapshots) -->
+            <groupId>com.github.pircbotx</groupId>  <!-- For builds uploaded to Jitpack by github CI -->
             <artifactId>pircbotx</artifactId>
             <version>2.3.1</version>
 
-            <!-- SEE BELOW ABOUT VERSIONING WOES until release 2.4 -->
+            <!-- SEE BELOW ABOUT VERSIONING WOES when a non-release version must be used -->
             <!-- Finally cheated by uploading (Deploy button) the JAR from JitPack
                  to https://repo.jenkins-ci.org/ snapshots; metadata parsed and
                  name/version assigned automatically by it; note it also reassigned
                  the groupId back to "org.pircbotx"; see also maven enforcer hacks: -->
             <!-- version>2.4-20230523.142555-1</version -->
 
-            <!-- https://jitpack.io/#pircbotx/pircbotx => Branches => master-SNAPSHOT
+            <!-- Normally https://jitpack.io/#pircbotx/pircbotx => Branches => master-SNAPSHOT
                  => https://jitpack.io/com/github/pircbotx/pircbotx/-v2.3-gb1b48bf-9/build.log
-                 Using recent previews until 2.4 which should fix packaging
-                 NOTE the leading minus in temporary-availability version!
-            <version>-v2.3-gb1b48bf-9</version>
-            -->
-            <!-- Alternately rely on master branch of the day, until release 2.4 is cut
-                 See https://github.com/pircbotx/pircbotx/issues/414
-            <version>master-SNAPSHOT</version>
-            -->
-            <!-- <version>b1b48bfb64</version> -->
-            <!-- <version>master</version> -->
-            <!-- <version>master-v2.3-gb1b48bf-9</version> -->
+                 Using recent previews until a release (deleted after a couple of months).
+                 NOTE the leading minus in temporary-availability version! -->
+            <!-- version>-v2.3-gb1b48bf-9</version -->
+            <!-- version>master-v2.3-gb1b48bf-9</version -->
+            <!-- version>b1b48bfb64</version -->
+
+            <!-- Alternately rely on master branch of the day
+                 See https://github.com/pircbotx/pircbotx/issues/414 -->
+            <!-- version>master-SNAPSHOT</version -->
+            <!-- version>master</version -->
 
             <scope>compile</scope>
             <exclusions>
