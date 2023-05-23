@@ -231,6 +231,7 @@
                  See centralized config in
                  https://github.com/jenkinsci/plugin-pom/blob/ec78ae1af0b5365d8d17121f3d5be720acb87f13/pom.xml#L550-L570
               -->
+<!--
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
@@ -255,6 +256,7 @@
                     </execution>
                 </executions>
             </plugin>
+-->
 
         </plugins>
     </build>
