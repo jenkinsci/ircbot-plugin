@@ -9,7 +9,7 @@ buildPlugin(
  // See also https://github.com/jenkins-infra/pipeline-library/pull/577
  //          https://github.com/jenkins-infra/pipeline-library/pull/522
  //          https://github.com/jenkins-infra/pipeline-library/pull/635
- useArtifactCachingProxy: false,
+ useArtifactCachingProxy: true,
  configurations: [
   // Test the common case (i.e., a recent LTS release) on both Linux and Windows.
   [ platform: 'linux', jdk: '11', jenkins: '2.375.1' ],
