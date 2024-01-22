@@ -66,6 +66,7 @@ public class IrcPublisher extends IMPublisher {
      * channels defined at the descriptor level.
      * @deprecated only used to deserialize old instances. please use {@link #getNotificationTargets()}
      */
+    @SuppressFBWarnings("PA_PUBLIC_PRIMITIVE_ATTRIBUTE")
     @Deprecated
     public List<String> channels = new ArrayList<String>();
 
