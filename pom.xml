@@ -32,7 +32,7 @@
         <revision>3</revision>
         <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <jenkins.version>2.375.1</jenkins.version>
+        <jenkins.version>2.387.3</jenkins.version>
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
@@ -42,8 +42,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.375.x</artifactId>
-                <version>2198.v39c76fc308ca</version>
+                <artifactId>bom-2.387.x</artifactId>
+                <version>2543.vfb_1a_5fb_9496d</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.jvnet.hudson.plugins</groupId>
             <artifactId>instant-messaging</artifactId>
-            <version>2.768.v82b_9ec69388f</version>
+            <version>2.772.vb_93c35128ff9</version>
             <exclusions>
                 <!-- Provided by Jenkins core -->
                 <exclusion>
