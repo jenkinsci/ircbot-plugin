@@ -200,6 +200,8 @@ IRC Notification => Advanced), e.g.
 !heyJenkins cb
 ```
 ...and also that you are asking on the channel which is not marked "Notification only",
-and not e.g. in a private chat when only a channel is configured.
+and not e.g. in a private chat when only a channel connection is configured and you
+"Disallow Private Chat" in the Advanced configuration section. Note that per currently
+open issues, you may have to use the command prefix in a private chat as well.
 
 [[IRCPlugin-Changelog]]
