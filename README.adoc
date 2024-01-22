@@ -146,7 +146,7 @@ to start this string with a separator such as a semicolon)
 an arbitrary message to specified or default (global config) targets
 with the pipeline step (and ignoring the strategy and filtering rules
 options above)
-|notificationStrategy |string a|
+|`notificationStrategy` |string a|
 https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/NotificationStrategy.java
 
 * `"ALL"` - No matter what, notifications should always be sent.
@@ -165,11 +165,11 @@ how (TODO: try in practice and document here):
 
 [cols=",,",options="header",]
 |===
-|argument name |syntax |description
-|buildToChatNotifier |class name?
+|`argument name` |syntax |description
+|`buildToChatNotifier` |class name?
 |https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/IMPublisher.java#L88
 
-|matrixMultiplier |string or java/groovy token? a|
+|`matrixMultiplier` |string or java/groovy token? a|
 * https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/IMPublisher.java#L89
 * https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/MatrixJobMultiplier.java
 
