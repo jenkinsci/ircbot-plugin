@@ -173,9 +173,11 @@ how (TODO: try in practice and document here):
 * https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/IMPublisher.java#L89
 * https://github.com/jenkinsci/instant-messaging-plugin/blob/master/src/main/java/hudson/plugins/im/MatrixJobMultiplier.java
 
-e.g. MatrixJobMultiplier
-* ONLY_CONFIGURATIONS
-* ONLY_PARENT ALL
+e.g. per `MatrixJobMultiplier`:
+
+* `ONLY_CONFIGURATIONS`
+* `ONLY_PARENT`
+* `ALL`
 |===
 
 [[IRCPlugin-KnownIssues]]
