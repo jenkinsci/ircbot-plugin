@@ -3,6 +3,7 @@
 /.settings
 /.classpath
 /work*
+/.idea
 
 ### https://github.com/github/gitignore/blob/master/Maven.gitignore
 /pom.xml.tag
