@@ -14,7 +14,7 @@ public class IRCPrivateChat implements IMChat {
     private final PircListener listener;
     private final String nick;
     private final String chatPartner;
-    private IRCConnection connection;
+    private final IRCConnection connection;
 
     public IRCPrivateChat(IRCConnection connection, PircListener listener, String nick, String chatPartner) {
         this.connection = connection;
@@ -38,7 +38,7 @@ public class IRCPrivateChat implements IMChat {
         return false;
     }
 
-    //@Overrid
+    //@Override
     public boolean isCommandsAccepted() {
         return true;
     }
