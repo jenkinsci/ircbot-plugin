@@ -13,8 +13,8 @@ public class IRCChannel implements IMChat {
 
     private final String channelName;
     private final PircListener listener;
-    private IRCConnection connection;
-    private boolean commandsAccepted;
+    private final IRCConnection connection;
+    private final boolean commandsAccepted;
 
     public IRCChannel(String channelName, IRCConnection connection, PircListener listener, boolean commandsAccepted) {
         this.channelName = channelName;
@@ -38,7 +38,7 @@ public class IRCChannel implements IMChat {
         return true;
     }
 
-    //@Overrid
+    //@Override
     public boolean isCommandsAccepted() {
         return this.commandsAccepted;
     }
