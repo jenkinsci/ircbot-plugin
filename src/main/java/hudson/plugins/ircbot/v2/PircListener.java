@@ -14,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import org.pircbotx.PircBotX;
+import org.pircbotx.exception.DaoException;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.InviteEvent;
@@ -92,6 +93,23 @@ public class PircListener extends ListenerAdapter {
     public void onPrivateMessage(PrivateMessageEvent event) {
         String sender = event.getUser().getNick();
         String message = event.getMessage();
+        if (!sender.equals(CHAT_ESTABLISHER)) {
+            // Ensure that later the ...getChannel(sender) in IRCConnection.send()
+            // would not throw exceptions about unknown channel, but would actually
+            // send a response to this sender. The "bot" here is a PircBotX layer,
+            // not our instant-messaging-plugin Bot class instance. We get() the
+            // UserChannelDao a few times here to avoid the hassle of spelling out
+            // a parameterized class temporary instance.
+            synchronized (PircListener.class) {
+                try {
+                    if (null == event.getBot().getUserChannelDao().getChannel(sender)) {
+                        event.getBot().getUserChannelDao().createChannel(sender);
+                    }
+                } catch (DaoException ignored) {
+                    event.getBot().getUserChannelDao().createChannel(sender);
+                }
+            }
+        }
         for (MessageListener l : this.msgListeners) {
             if (this.nick.equals(l.target)) {
                 if (l.sender.equals(CHAT_ESTABLISHER) || sender.equals(l.sender)) {
