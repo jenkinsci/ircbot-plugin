@@ -486,10 +486,15 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
                     return;
                 }
 
-                IRCPrivateChat chat = new IRCPrivateChat(IRCConnection.this, listener, descriptor.getUserName(), message.getFrom());
-                Bot bot = new Bot(chat,
-                        descriptor.getNick(), descriptor.getHost(),
-                        descriptor.getCommandPrefix(), authentication);
+                IRCPrivateChat chat = new IRCPrivateChat(
+                    IRCConnection.this, listener,
+                    descriptor.getUserName(), message.getFrom());
+                Bot bot = new Bot(
+                    chat,
+                    descriptor.getNick(), descriptor.getHost(),
+                    descriptor.getCommandPrefix(), authentication,
+                    false // Tell the bot to accept all messages, not requiring a prefix (still parsing it away if present)
+                );
 
                 privateChats.put(message.getFrom(), bot);
 
