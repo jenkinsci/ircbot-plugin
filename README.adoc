@@ -193,4 +193,13 @@ level of the logger `hudson.plugins.ircbot` to FINEST (see
 https://www.jenkins.io/doc/book/system-administration/viewing-logs/[Logging]), try to
 reproduce the problem and attach the collected logs to the JIRA issue.
 
+If the bot does not respond to your queries in IRC chat, make sure you are using
+the correct "Command prefix" if one is set up (see your `$JENKINS_URL/configure` =>
+IRC Notification => Advanced), e.g.
+```
+!heyJenkins cb
+```
+...and also that you are asking on the channel which is not marked "Notification only",
+and not e.g. in a private chat when only a channel is configured.
+
 [[IRCPlugin-Changelog]]
