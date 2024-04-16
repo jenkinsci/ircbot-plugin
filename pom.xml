@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.jvnet.hudson.plugins</groupId>
             <artifactId>instant-messaging</artifactId>
-            <version>2.772.vb_93c35128ff9</version>
+            <version>2.777.vfc1db_63216cc</version>
             <exclusions>
                 <!-- Provided by Jenkins core -->
                 <exclusion>
