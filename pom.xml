@@ -34,7 +34,9 @@
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
         <jenkins.baseline>2.479</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+        <!-- jenkins.version>${jenkins.baseline}.1</jenkins.version -->
+        <!-- TEMP: bom-2.479.x now requires at least 2.479.3 core: -->
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
