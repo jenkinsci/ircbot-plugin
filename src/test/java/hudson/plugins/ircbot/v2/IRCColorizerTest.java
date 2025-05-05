@@ -1,18 +1,18 @@
 package hudson.plugins.ircbot.v2;
 
-import org.jvnet.hudson.test.Bug;
+import org.jvnet.hudson.test.Issue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.pircbotx.Colors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class IRCColorizerTest {
+class IRCColorizerTest {
 
     @Test
-    @Bug(22360)
-    public void shouldColorizeKeywords() {
+    @Issue("JENKINS-22360")
+    void shouldColorizeKeywords() {
         String message = "Build job123 is STILL FAILING: https://server.com/build/42";
         String colorizedMessage = IRCColorizer.colorize(message);
 
