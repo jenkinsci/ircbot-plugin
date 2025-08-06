@@ -75,7 +75,7 @@ public class IRCConnection implements IMConnection, JoinListener, InviteListener
     private final Map<String, Bot> privateChats = new HashMap<String, Bot>();
 
 
-    @SuppressFBWarnings(value={"UR_UNINIT_READ", "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR"},
+    @SuppressFBWarnings(value={"UR_UNINIT_READ"},
         justification="UR_UNINIT_READ: TODO: this is probably a genuine problem but I don't know why; MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR: Need ecosystem change to separate IRCConnection construction from PircListener connection")
     public IRCConnection(DescriptorImpl descriptor, AuthenticationHolder authentication) {
         Builder config = new Configuration.Builder();
