@@ -5,7 +5,7 @@ image:https://img.shields.io/github/release/jenkinsci/ircbot-plugin.svg?label=re
 image:https://img.shields.io/jenkins/plugin/i/ircbot.svg?color=blue[link="https://plugins.jenkins.io/ircbot" alt="Jenkins Plugin Installs"]
 image:https://ci.jenkins.io/job/Plugins/job/ircbot-plugin/job/master/badge/icon[link="https://ci.jenkins.io/job/Plugins/job/ircbot-plugin/job/master/" alt="Build Status"]
 image:https://img.shields.io/github/license/jenkinsci/ircbot-plugin.svg[link="https://github.com/jenkinsci/ircbot-plugin/blob/master/LICENSE.txt" alt="GitHub license"]
-image:https://img.shields.io/maintenance/yes/2025.svg[link="https://github.com/jenkinsci/ircbot-plugin" alt="Maintenance"]
+image:https://img.shields.io/maintenance/yes/2026.svg[link="https://github.com/jenkinsci/ircbot-plugin" alt="Maintenance"]
 
 == Introduction
 
