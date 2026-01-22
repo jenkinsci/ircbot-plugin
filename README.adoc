@@ -207,7 +207,7 @@ and not e.g. in a private chat when only a channel connection is configured and 
 open issues, you may have to use the command prefix in a private chat as well.
 
 [[IRCPlugin-Changelog]]
-=== Change log
+== Change log
 
 For changes in current code base please see
 https://github.com/jenkinsci/ircbot-plugin/commits/master/
@@ -216,6 +216,6 @@ https://github.com/jenkinsci/ircbot-plugin/releases
 or https://plugins.jenkins.io/ircbot/releases/
 
 [[IRCPlugin-License]]
-## LICENSE
+== LICENSE
 
-Provided under the terms of MIT License, see [LICENSE](LICENSE.txt)
+Provided under the terms of MIT License, see link:./LICENSE.txt[LICENSE]
