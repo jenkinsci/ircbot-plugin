@@ -38,7 +38,6 @@ import java.util.logging.Logger;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.apache.commons.lang.StringUtils;
 
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -659,16 +658,16 @@ public class IrcPublisher extends IMPublisher {
                 this.messageRate = getMessageRateFromSystemProperty();
             }
 
-            if (StringUtils.isNotBlank(this.password)) {
+            if ((this.password != null && !this.password.isBlank())) {
                 this.secretPassword = Secret.fromString(Scrambler.descramble(this.password));
                 this.password = null;
             }
-            if (StringUtils.isNotBlank(this.nickServPassword)) {
+            if ((this.nickServPassword != null && !this.nickServPassword.isBlank())) {
                 this.secretNickServPassword = Secret.fromString(Scrambler.descramble(this.nickServPassword));
                 this.nickServPassword = null;
             }
 
-            if (StringUtils.isNotBlank(this.hudsonLogin)) {
+            if ((this.hudsonLogin != null && !this.hudsonLogin.isBlank())) {
                 this.jenkinsLogin = this.hudsonLogin;
                 this.hudsonLogin = null;
             }
