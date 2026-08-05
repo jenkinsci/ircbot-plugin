@@ -41,6 +41,7 @@
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
         <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
+        <ban-commons-lang-2.skip>false</ban-commons-lang-2.skip>
     </properties>
 
     <dependencyManagement>
@@ -66,6 +67,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>commons-lang3-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.jvnet.hudson.plugins</groupId>
             <artifactId>instant-messaging</artifactId>
