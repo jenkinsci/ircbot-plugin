@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jenkins.model.Jenkins;
+
 import org.apache.commons.lang3.StringUtils;
 
 import org.jenkinsci.plugins.workflow.steps.Step;
@@ -39,6 +41,7 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.verb.POST;
 
 /**
  * Pipeline step
@@ -244,7 +247,9 @@ public class IrcNotifyStep extends Step {
             return "IRC Notification";
         }
 
+        @POST
         public ListBoxModel doFillNotificationStrategyItems() {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             ListBoxModel items = new ListBoxModel();
             for (NotificationStrategy strategy : NotificationStrategy.values()) {
                 items.add(strategy.getDisplayName(), strategy.getDisplayName());
